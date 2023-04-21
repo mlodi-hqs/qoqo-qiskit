@@ -4,7 +4,7 @@
 """Configuration of sphinx documentation module"""
 import tomli
 
-main_version = tomli.load(open("pyproject.toml", "rb"))["project"]["version"]
+main_version = tomli.load(open("../qoqo_qiskit/pyproject.toml", "rb"))["project"]["version"]
 
 # -- General configuration ------------------------------------------------
 
