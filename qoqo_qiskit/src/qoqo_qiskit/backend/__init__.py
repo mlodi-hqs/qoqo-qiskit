@@ -13,3 +13,5 @@
 
 
 from qoqo_qiskit.backend.backend import QoqoQiskitBackend
+
+__all__ = ("QoqoQiskitBackend")
