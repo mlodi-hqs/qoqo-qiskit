@@ -297,7 +297,7 @@ class QoqoQiskitBackend:
         else:
             element = element[::-1]
             for key in clas_regs_sizes:
-                splitted.append(element[: clas_regs_sizes[key] :])
+                splitted.append(element[:clas_regs_sizes[key]:])
                 splitted[-1] = splitted[-1][::-1]
-                element = element[clas_regs_sizes[key] :]
+                element = element[clas_regs_sizes[key]:]
         return splitted
