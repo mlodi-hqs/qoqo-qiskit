@@ -19,3 +19,4 @@ doctest = false
 
 [dependencies]
 roqoqo = "1.4"
+ndarray = "0.15"
