@@ -16,6 +16,8 @@ use roqoqo::devices::{Device, GenericDevice};
 
 use ndarray::Array2;
 
+use crate::IBMDevice;
+
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IBMLagosDevice { 
@@ -29,7 +31,7 @@ impl IBMLagosDevice {
     ///
     /// An initiated IBMLagosDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
-    fn new() -> Self {
+    pub fn new() -> Self {
         let generic = GenericDevice {
             number_qubits: 7,
             single_qubit_gates: HashMap::new(),
@@ -38,6 +40,24 @@ impl IBMLagosDevice {
             decoherence_rates: HashMap::new(),
         };
         Self { generic_device: generic }
+    }
+}
+
+impl Default for IBMLagosDevice {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl From<&IBMLagosDevice> for IBMDevice {
+    fn from(input: &IBMLagosDevice) -> Self {
+        Self::IBMLagosDevice(input.clone())
+    }
+}
+
+impl From<IBMLagosDevice> for IBMDevice {
+    fn from(input: IBMLagosDevice) -> Self {
+        Self::IBMLagosDevice(input)
     }
 }
 
