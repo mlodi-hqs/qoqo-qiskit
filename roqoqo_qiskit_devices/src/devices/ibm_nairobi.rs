@@ -17,20 +17,21 @@ use roqoqo::devices::{Device, GenericDevice};
 use ndarray::Array2;
 
 
-pub struct IBMBelemDevice { 
+#[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IBMNairobiDevice { 
     generic_device: GenericDevice
 }
 
-impl IBMBelemDevice {
-    /// Creates a new IBMLagos.
+impl IBMNairobiDevice {
+    /// Creates a new IBMNairobi.
     ///
     /// # Returns
     ///
-    /// An initiated IBMLagosDevice with single and two-qubit gates and decoherence rates set to zero.
+    /// An initiated IBMNairobiDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     fn new() -> Self {
         let generic = GenericDevice {
-            number_qubits: 5,
+            number_qubits: 7,
             single_qubit_gates: HashMap::new(),
             two_qubit_gates: HashMap::new(),
             multi_qubit_gates: HashMap::new(),
@@ -40,11 +41,11 @@ impl IBMBelemDevice {
     }
 }
 
-/// Implements Device trait for SquareLatticeDevice.
+/// Implements Device trait for IBMNairobiDevice.
 ///
 /// The Device trait defines standard functions available for roqoqo devices.
 ///
-impl Device for IBMBelemDevice {
+impl Device for IBMNairobiDevice {
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.
     ///
     /// # Arguments
@@ -160,7 +161,7 @@ impl Device for IBMBelemDevice {
     /// A list (Vec) of pairs of qubits linked with a native two-qubit-gate in the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
-        vec![(0, 1), (1, 2), (1, 3), (3, 4)]
+        vec![(0, 1), (1, 2), (1, 3), (3, 5), (4, 5), (5, 6)]
     }
 
     /// Turns Device into GenericDevice
@@ -168,10 +169,6 @@ impl Device for IBMBelemDevice {
     /// Can be used as a generic interface for devices when a boxed dyn trait object cannot be used
     /// (for example when the interface needs to be serialized)
     ///
-    /// # Note
-    ///
-    /// [crate::devices::GenericDevice] uses nested HashMaps to represent the most general device connectivity.
-    /// The memory usage will be inefficient for devices with large qubit numbers.
     fn to_generic_device(&self) -> roqoqo::devices::GenericDevice {
         self.generic_device.clone()
     }

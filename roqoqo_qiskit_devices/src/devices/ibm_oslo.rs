@@ -17,16 +17,17 @@ use roqoqo::devices::{Device, GenericDevice};
 use ndarray::Array2;
 
 
-pub struct IBMNairobiDevice { 
+#[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IBMOsloDevice { 
     generic_device: GenericDevice
 }
 
-impl IBMNairobiDevice {
-    /// Creates a new IBMLagos.
+impl IBMOsloDevice {
+    /// Creates a new IBMOslo.
     ///
     /// # Returns
     ///
-    /// An initiated IBMLagosDevice with single and two-qubit gates and decoherence rates set to zero.
+    /// An initiated IBMOsloDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     fn new() -> Self {
         let generic = GenericDevice {
@@ -40,11 +41,11 @@ impl IBMNairobiDevice {
     }
 }
 
-/// Implements Device trait for SquareLatticeDevice.
+/// Implements Device trait for IBMOsloDevice.
 ///
 /// The Device trait defines standard functions available for roqoqo devices.
 ///
-impl Device for IBMNairobiDevice {
+impl Device for IBMOsloDevice {
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.
     ///
     /// # Arguments
@@ -168,10 +169,6 @@ impl Device for IBMNairobiDevice {
     /// Can be used as a generic interface for devices when a boxed dyn trait object cannot be used
     /// (for example when the interface needs to be serialized)
     ///
-    /// # Note
-    ///
-    /// [crate::devices::GenericDevice] uses nested HashMaps to represent the most general device connectivity.
-    /// The memory usage will be inefficient for devices with large qubit numbers.
     fn to_generic_device(&self) -> roqoqo::devices::GenericDevice {
         self.generic_device.clone()
     }
