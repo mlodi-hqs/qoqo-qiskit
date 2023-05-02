@@ -24,7 +24,7 @@ pub struct IBMBelemDevice {
 }
 
 impl IBMBelemDevice {
-    /// Creates a new IBMBelem.
+    /// Creates a new IBMBelemDevice.
     ///
     /// # Returns
     ///

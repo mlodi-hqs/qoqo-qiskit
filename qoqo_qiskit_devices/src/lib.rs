@@ -15,3 +15,24 @@
 //! Qiskit devices' interface for qoqo.
 //!
 //! Collection of IBM's qiskit devices interfaces implementing qoqo's Device trait.
+
+use pyo3::prelude::*;
+use pyo3::types::PyDict;
+use pyo3::wrap_pymodule;
+
+pub mod devices;
+pub use devices::*;
+
+/// IBM python interface
+///
+/// Provides the devices that are used to execute quantum program on the IBM backend.
+#[pymodule]
+fn qoqo_qiskit_devices(_py: Python, module: &PyModule) -> PyResult<()> {
+    let wrapper = wrap_pymodule!(devices::ibm_devices);
+    module.add_wrapped(wrapper)?;
+
+    let system = PyModule::import(_py, "sys")?;
+    let system_modules: &PyDict = system.getattr("modules")?.downcast()?;
+    system_modules.set_item("qoqo_qiskit_devices.devices", module.getattr("ibm_devices")?)?;
+    Ok(())
+}

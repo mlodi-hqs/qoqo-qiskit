@@ -24,7 +24,7 @@ pub struct IBMLagosDevice {
 }
 
 impl IBMLagosDevice {
-    /// Creates a new IBMLagos.
+    /// Creates a new IBMLagosDevice.
     ///
     /// # Returns
     ///

@@ -17,22 +17,30 @@
 use roqoqo::devices::Device;
 
 mod ibm_belem;
-mod ibm_jakarta;
-mod ibm_lagos;
-mod ibm_lima;
-mod ibm_manila;
-mod ibm_nairobi;
-mod ibm_oslo;
-mod ibm_perth;
-mod ibm_quito;
 pub use crate::devices::ibm_belem::IBMBelemDevice;
+
+mod ibm_jakarta;
 pub use crate::devices::ibm_jakarta::IBMJakartaDevice;
+
+mod ibm_lagos;
 pub use crate::devices::ibm_lagos::IBMLagosDevice;
+
+mod ibm_lima;
 pub use crate::devices::ibm_lima::IBMLimaDevice;
+
+mod ibm_manila;
 pub use crate::devices::ibm_manila::IBMManilaDevice;
+
+mod ibm_nairobi;
 pub use crate::devices::ibm_nairobi::IBMNairobiDevice;
+
+mod ibm_oslo;
 pub use crate::devices::ibm_oslo::IBMOsloDevice;
+
+mod ibm_perth;
 pub use crate::devices::ibm_perth::IBMPerthDevice;
+
+mod ibm_quito;
 pub use crate::devices::ibm_quito::IBMQuitoDevice;
 
 /// Collection of IBM quantum devices.
