@@ -18,10 +18,9 @@ use ndarray::Array2;
 
 use crate::IBMDevice;
 
-
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
-pub struct IBMManilaDevice { 
-    generic_device: GenericDevice
+pub struct IBMManilaDevice {
+    generic_device: GenericDevice,
 }
 
 impl IBMManilaDevice {
@@ -39,7 +38,9 @@ impl IBMManilaDevice {
             multi_qubit_gates: HashMap::new(),
             decoherence_rates: HashMap::new(),
         };
-        Self { generic_device: generic }
+        Self {
+            generic_device: generic,
+        }
     }
 }
 
