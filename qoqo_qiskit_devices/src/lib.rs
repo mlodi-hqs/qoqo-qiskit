@@ -15,4 +15,3 @@
 //! Qiskit devices' interface for qoqo.
 //!
 //! Collection of IBM's qiskit devices interfaces implementing qoqo's Device trait.
-
