@@ -42,6 +42,15 @@ impl IBMQuitoDevice {
             generic_device: generic,
         }
     }
+
+    /// Returns the IBM's identifier.
+    ///
+    /// # Returns
+    ///
+    /// A str of the name IBM uses as identifier.
+    pub fn name() -> &'static str {
+        "ibmq_quito"
+    }
 }
 
 impl Default for IBMQuitoDevice {

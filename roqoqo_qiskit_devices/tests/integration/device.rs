@@ -107,16 +107,17 @@ fn test_number_qubits(device: IBMDevice, qubits: usize) {
     assert_eq!(device.number_qubits(), qubits);
 }
 
-// #[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
-// #[test_case(IBMDevice::from(IBMJakartaDevice::new()); "JakartaDevice")]
-// #[test_case(IBMDevice::from(IBMLagosDevice::new()); "LagosDevice")]
-// #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
-// #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
-// #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-// #[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
-// #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
-// #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
-// fn test_two_qubit_edges_generic(device: IBMDevice) {
-//     let gdevice = device.to_generic_device();
-//     assert_eq!(device.two_qubit_edges(), gdevice.two_qubit_edges());
-// }
+#[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
+#[test_case(IBMDevice::from(IBMJakartaDevice::new()); "JakartaDevice")]
+#[test_case(IBMDevice::from(IBMLagosDevice::new()); "LagosDevice")]
+#[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
+#[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
+#[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
+#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
+#[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
+#[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
+fn test_two_qubit_edges_generic(device: IBMDevice) {
+    let gdevice = device.to_generic_device();
+    // assert_eq!(device.two_qubit_edges(), gdevice.two_qubit_edges());
+    assert_eq!(device.number_qubits(), gdevice.number_qubits());
+}

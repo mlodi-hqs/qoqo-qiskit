@@ -42,6 +42,15 @@ impl IBMNairobiDevice {
             generic_device: generic,
         }
     }
+
+    /// Returns the IBM's identifier.
+    ///
+    /// # Returns
+    ///
+    /// A str of the name IBM uses as identifier.
+    pub fn name() -> &'static str {
+        "ibm_nairobi"
+    }
 }
 
 impl Default for IBMNairobiDevice {
