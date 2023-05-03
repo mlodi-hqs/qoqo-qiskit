@@ -32,6 +32,14 @@ impl IBMJakartaDeviceWrapper {
             internal: IBMJakartaDevice::new(),
         }
     }
+
+    /// IBM's identifier.
+    ///
+    /// Returns:
+    ///     str: The IBM's identifier of the Device.
+    pub fn name(&self) -> &str {
+        roqoqo_qiskit_devices::IBMJakartaDevice::name()
+    }
 }
 
 impl Default for IBMJakartaDeviceWrapper {

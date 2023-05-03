@@ -32,6 +32,14 @@ impl IBMNairobiDeviceWrapper {
             internal: IBMNairobiDevice::new(),
         }
     }
+
+    /// IBM's identifier.
+    ///
+    /// Returns:
+    ///     str: The IBM's identifier of the Device.
+    pub fn name(&self) -> &str {
+        roqoqo_qiskit_devices::IBMNairobiDevice::name()
+    }
 }
 
 impl Default for IBMNairobiDeviceWrapper {

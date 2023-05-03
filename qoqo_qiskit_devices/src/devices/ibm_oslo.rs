@@ -32,6 +32,14 @@ impl IBMOsloDeviceWrapper {
             internal: IBMOsloDevice::new(),
         }
     }
+
+    /// IBM's identifier.
+    ///
+    /// Returns:
+    ///     str: The IBM's identifier of the Device.
+    pub fn name(&self) -> &str {
+        roqoqo_qiskit_devices::IBMOsloDevice::name()
+    }
 }
 
 impl Default for IBMOsloDeviceWrapper {

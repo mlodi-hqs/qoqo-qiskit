@@ -32,6 +32,14 @@ impl IBMLimaDeviceWrapper {
             internal: IBMLimaDevice::new(),
         }
     }
+
+    /// IBM's identifier.
+    ///
+    /// Returns:
+    ///     str: The IBM's identifier of the Device.
+    pub fn name(&self) -> &str {
+        roqoqo_qiskit_devices::IBMLimaDevice::name()
+    }
 }
 
 impl Default for IBMLimaDeviceWrapper {
