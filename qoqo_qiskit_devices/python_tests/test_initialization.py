@@ -14,14 +14,12 @@
 import pytest
 import sys
 
-from qoqo import Circuit
-
-from qoqo_qiskit_devices.devices import IBMBelemDevice
+from qoqo_qiskit_devices import ibm_devices
 
 
 def test_belem():
     """Test IBMBelemDevice initialization."""
-    belem = IBMBelemDevice()
+    belem = ibm_devices.IBMBelemDevice()
 
 
 if __name__ == '__main__':

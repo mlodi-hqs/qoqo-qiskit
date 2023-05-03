@@ -1,3 +1,4 @@
+"""Device information-gathering routines."""
 # Copyright © 2023 HQS Quantum Simulations GmbH. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -9,13 +10,20 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""IBM backend for the qoqo quantum toolkit.
 
-.. autosummary::
-    :toctree: generated/
+from qoqo_qiskit_devices import ibm_devices
 
-    devices
-"""
+from qiskit_ibm_provider import *
 
-from .qoqo_qiskit_devices import *
-from .device_property import *
+
+class DeviceProperties():
+    """Utility for updating the properties on an IBMDevice instance."""
+
+    def __init__(self, device: ibm_devices) -> None:
+        """Initialized DeviceProperty utility.
+
+        Args:
+            device (ibm_devices): The qoqo_qiskit_devices instance that is to be updated.
+        """
+        self.device = device
+
