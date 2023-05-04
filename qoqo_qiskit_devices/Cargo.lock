@@ -96,6 +96,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a987beff54b60ffa6d51982e1aa1146bc42f19bd26be28b0586f252fccf5317"
 
 [[package]]
+name = "libm"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "348108ab3fba42ec82ff6e9564fc4ca0247bdccdc68dd8af9764bbc79c3c8ffb"
+
+[[package]]
 name = "lock_api"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -203,6 +209,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "578ede34cf02f8924ab9447f50c28075b4d3e5b269972345e7e0372b38c6cdcd"
 dependencies = [
  "autocfg",
+ "libm",
+]
+
+[[package]]
+name = "numpy"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96b0fee4571867d318651c24f4a570c3f18408cf95f16ccb576b3ce85496a46e"
+dependencies = [
+ "libc",
+ "ndarray",
+ "num-complex",
+ "num-integer",
+ "num-traits",
+ "pyo3",
+ "rustc-hash",
 ]
 
 [[package]]
@@ -353,6 +375,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "qoqo"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf07f3e506270363fc27cd0d64d6a731e16bb541aefe5d6ada33a5eae988abff"
+dependencies = [
+ "bincode",
+ "ndarray",
+ "num-complex",
+ "numpy",
+ "proc-macro2",
+ "pyo3",
+ "pyo3-build-config",
+ "qoqo-macros",
+ "qoqo_calculator",
+ "qoqo_calculator_pyo3",
+ "quote",
+ "roqoqo",
+ "serde",
+ "serde_json",
+ "syn 2.0.15",
+ "thiserror",
+]
+
+[[package]]
+name = "qoqo-macros"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d92049ac4baa56a91d6d349714192e8ccb48cbceab7c0ed01a225442e950e492"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.15",
+]
+
+[[package]]
 name = "qoqo_calculator"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -364,12 +421,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "qoqo_calculator_pyo3"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33c05048865d7ffafd9279022c180040d336c8d7784c87b7e879bb6245dd2c80"
+dependencies = [
+ "num-complex",
+ "pyo3",
+ "pyo3-build-config",
+ "qoqo_calculator",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "qoqo_qiskit_devices"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "ndarray",
+ "numpy",
  "pyo3",
  "pyo3-build-config",
+ "qoqo",
+ "qoqo-macros",
  "roqoqo",
  "roqoqo_qiskit_devices",
  "serde",
@@ -417,6 +492,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand_distr"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32cb0b9bc82b0a0876c2dd994a7e7a2683d3e7390ca40e6886785ef0c7e3ee31"
+dependencies = [
+ "num-traits",
+ "rand",
+]
+
+[[package]]
 name = "rawpointer"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -446,6 +531,7 @@ dependencies = [
  "qoqo_calculator",
  "quote",
  "rand",
+ "rand_distr",
  "roqoqo-derive",
  "serde",
  "syn 2.0.15",
@@ -472,6 +558,12 @@ dependencies = [
  "serde",
  "serde_json",
 ]
+
+[[package]]
+name = "rustc-hash"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
 name = "ryu"

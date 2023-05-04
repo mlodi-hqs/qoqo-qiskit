@@ -12,7 +12,10 @@
 
 use std::collections::HashMap;
 
-use roqoqo::devices::{Device, GenericDevice};
+use roqoqo::{
+    devices::{Device, GenericDevice},
+    RoqoqoError,
+};
 
 use ndarray::Array2;
 
@@ -50,6 +53,155 @@ impl IBMBelemDevice {
     /// A str of the name IBM uses as identifier.
     pub fn name() -> &'static str {
         "ibmq_belem"
+    }
+
+    /// Setting the gate time of a single qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the single-qubit-gate.
+    /// * `qubit` - The qubit for which the gate time is set.
+    /// * `gate_time` - Gate time for the given gate.
+    ///
+    /// # Returns
+    ///
+    /// An IBMBelemDevice with updated gate times.
+    ///
+    pub fn set_single_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        qubit: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        self.generic_device
+            .set_single_qubit_gate_time(gate, qubit, gate_time)
+    }
+
+    /// Setting the gate time of a two qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the two-qubit-gate.
+    /// * `control` - The control qubit for which the gate time is set.
+    /// * `target` - The target qubit for which the gate time is set.
+    /// * `gate_time` - The gate time for the given gate.
+    ///
+    /// # Returns
+    ///
+    /// A IBMBelemDevice with updated gate times.
+    ///
+    pub fn set_two_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        control: usize,
+        target: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        let to_check = (control, target);
+        if !self.two_qubit_edges().contains(&to_check) {
+            Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Two qubit gate between positions {} and {} not possible on IBMBelemDevice",
+                    control, target
+                ),
+            })
+        } else {
+            self.generic_device
+                .set_two_qubit_gate_time(gate, control, target, gate_time)
+        }
+    }
+
+    /// Setting the gate time of a three qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the two-qubit-gate.
+    /// * `control_0` - The control_0 qubit for which the gate time is set.
+    /// * `control_1` - The control_1 qubit for which the gate time is set.
+    /// * `target` - The target qubit for which the gate time is set.
+    /// * `gate_time` - The gate time for the given gate.
+    ///
+    /// # Returns
+    ///
+    /// A IBMBelemDevice with updated gate times.
+    ///
+    pub fn set_three_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        control_0: usize,
+        control_1: usize,
+        target: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        self.generic_device
+            .set_three_qubit_gate_time(gate, control_0, control_1, target, gate_time)
+    }
+
+    /// Setting the gate time of a multi qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the multi-qubit-gate.
+    /// * `qubits` - The qubits for which the gate time is set.
+    /// * `gate_time` - The gate time for the given gate.
+    ///
+    /// # Returns
+    ///
+    /// A IBMBelemDevice with updated gate times.
+    ///
+    pub fn set_multi_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        qubits: Vec<usize>,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        self.generic_device
+            .set_multi_qubit_gate_time(gate, qubits, gate_time)
+    }
+
+    /// Function to set the decoherence rates for one qubit in the device.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the rate is set
+    /// * `rates` - decoherence rates for one qubit in the device, provided as a (3x3)-matrix.
+    pub fn set_qubit_decoherence_rates(
+        &mut self,
+        qubit: usize,
+        rates: Array2<f64>,
+    ) -> Result<(), RoqoqoError> {
+        self.generic_device
+            .set_qubit_decoherence_rates(qubit, rates)
+    }
+
+    /// Adds qubit damping to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the damping is added.
+    /// * `damping` - The damping rates.
+    pub fn add_damping(&mut self, qubit: usize, damping: f64) -> Result<(), RoqoqoError> {
+        self.generic_device.add_damping(qubit, damping)
+    }
+
+    /// Adds qubit dephasing to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the dephasing is added
+    /// * `dephasing` - The dephasing rates.
+    pub fn add_dephasing(&mut self, qubit: usize, dephasing: f64) -> Result<(), RoqoqoError> {
+        self.generic_device.add_dephasing(qubit, dephasing)
+    }
+
+    /// Adds qubit depolarising to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the depolarising noise is added
+    /// * `depolarising` - The depolarising rates.
+    pub fn add_depolarising(&mut self, qubit: usize, depolarising: f64) -> Result<(), RoqoqoError> {
+        self.generic_device.add_depolarising(qubit, depolarising)
     }
 }
 
