@@ -34,9 +34,6 @@ pub use crate::devices::ibm_manila::IBMManilaDevice;
 mod ibm_nairobi;
 pub use crate::devices::ibm_nairobi::IBMNairobiDevice;
 
-mod ibm_oslo;
-pub use crate::devices::ibm_oslo::IBMOsloDevice;
-
 mod ibm_perth;
 pub use crate::devices::ibm_perth::IBMPerthDevice;
 
@@ -48,7 +45,6 @@ pub use crate::devices::ibm_quito::IBMQuitoDevice;
 pub enum IBMDevice {
     IBMLagosDevice(IBMLagosDevice),
     IBMNairobiDevice(IBMNairobiDevice),
-    IBMOsloDevice(IBMOsloDevice),
     IBMPerthDevice(IBMPerthDevice),
     IBMBelemDevice(IBMBelemDevice),
     IBMJakartaDevice(IBMJakartaDevice),
@@ -77,7 +73,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.single_qubit_gate_time(hqslang, qubit),
             IBMDevice::IBMNairobiDevice(x) => x.single_qubit_gate_time(hqslang, qubit),
-            IBMDevice::IBMOsloDevice(x) => x.single_qubit_gate_time(hqslang, qubit),
             IBMDevice::IBMPerthDevice(x) => x.single_qubit_gate_time(hqslang, qubit),
             IBMDevice::IBMBelemDevice(x) => x.single_qubit_gate_time(hqslang, qubit),
             IBMDevice::IBMJakartaDevice(x) => x.single_qubit_gate_time(hqslang, qubit),
@@ -104,7 +99,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.two_qubit_gate_time(hqslang, control, target),
             IBMDevice::IBMNairobiDevice(x) => x.two_qubit_gate_time(hqslang, control, target),
-            IBMDevice::IBMOsloDevice(x) => x.two_qubit_gate_time(hqslang, control, target),
             IBMDevice::IBMPerthDevice(x) => x.two_qubit_gate_time(hqslang, control, target),
             IBMDevice::IBMBelemDevice(x) => x.two_qubit_gate_time(hqslang, control, target),
             IBMDevice::IBMJakartaDevice(x) => x.two_qubit_gate_time(hqslang, control, target),
@@ -139,9 +133,6 @@ impl Device for IBMDevice {
                 x.three_qubit_gate_time(hqslang, control_0, control_1, target)
             }
             IBMDevice::IBMNairobiDevice(x) => {
-                x.three_qubit_gate_time(hqslang, control_0, control_1, target)
-            }
-            IBMDevice::IBMOsloDevice(x) => {
                 x.three_qubit_gate_time(hqslang, control_0, control_1, target)
             }
             IBMDevice::IBMPerthDevice(x) => {
@@ -181,7 +172,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.multi_qubit_gate_time(hqslang, qubits),
             IBMDevice::IBMNairobiDevice(x) => x.multi_qubit_gate_time(hqslang, qubits),
-            IBMDevice::IBMOsloDevice(x) => x.multi_qubit_gate_time(hqslang, qubits),
             IBMDevice::IBMPerthDevice(x) => x.multi_qubit_gate_time(hqslang, qubits),
             IBMDevice::IBMBelemDevice(x) => x.multi_qubit_gate_time(hqslang, qubits),
             IBMDevice::IBMJakartaDevice(x) => x.multi_qubit_gate_time(hqslang, qubits),
@@ -206,7 +196,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.qubit_decoherence_rates(qubit),
             IBMDevice::IBMNairobiDevice(x) => x.qubit_decoherence_rates(qubit),
-            IBMDevice::IBMOsloDevice(x) => x.qubit_decoherence_rates(qubit),
             IBMDevice::IBMPerthDevice(x) => x.qubit_decoherence_rates(qubit),
             IBMDevice::IBMBelemDevice(x) => x.qubit_decoherence_rates(qubit),
             IBMDevice::IBMJakartaDevice(x) => x.qubit_decoherence_rates(qubit),
@@ -226,7 +215,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.number_qubits(),
             IBMDevice::IBMNairobiDevice(x) => x.number_qubits(),
-            IBMDevice::IBMOsloDevice(x) => x.number_qubits(),
             IBMDevice::IBMPerthDevice(x) => x.number_qubits(),
             IBMDevice::IBMBelemDevice(x) => x.number_qubits(),
             IBMDevice::IBMJakartaDevice(x) => x.number_qubits(),
@@ -257,7 +245,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.two_qubit_edges(),
             IBMDevice::IBMNairobiDevice(x) => x.two_qubit_edges(),
-            IBMDevice::IBMOsloDevice(x) => x.two_qubit_edges(),
             IBMDevice::IBMPerthDevice(x) => x.two_qubit_edges(),
             IBMDevice::IBMBelemDevice(x) => x.two_qubit_edges(),
             IBMDevice::IBMJakartaDevice(x) => x.two_qubit_edges(),
@@ -276,7 +263,6 @@ impl Device for IBMDevice {
         match self {
             IBMDevice::IBMLagosDevice(x) => x.to_generic_device(),
             IBMDevice::IBMNairobiDevice(x) => x.to_generic_device(),
-            IBMDevice::IBMOsloDevice(x) => x.to_generic_device(),
             IBMDevice::IBMPerthDevice(x) => x.to_generic_device(),
             IBMDevice::IBMBelemDevice(x) => x.to_generic_device(),
             IBMDevice::IBMJakartaDevice(x) => x.to_generic_device(),

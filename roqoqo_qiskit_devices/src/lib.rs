@@ -19,5 +19,5 @@
 pub mod devices;
 pub use devices::{
     IBMBelemDevice, IBMDevice, IBMJakartaDevice, IBMLagosDevice, IBMLimaDevice, IBMManilaDevice,
-    IBMNairobiDevice, IBMOsloDevice, IBMPerthDevice, IBMQuitoDevice,
+    IBMNairobiDevice, IBMPerthDevice, IBMQuitoDevice,
 };

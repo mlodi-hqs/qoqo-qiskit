@@ -28,9 +28,6 @@ pub use ibm_manila::*;
 mod ibm_nairobi;
 pub use ibm_nairobi::*;
 
-mod ibm_oslo;
-pub use ibm_oslo::*;
-
 mod ibm_perth;
 pub use ibm_perth::*;
 
@@ -48,7 +45,6 @@ pub fn ibm_devices(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<IBMLimaDeviceWrapper>()?;
     m.add_class::<IBMManilaDeviceWrapper>()?;
     m.add_class::<IBMNairobiDeviceWrapper>()?;
-    m.add_class::<IBMOsloDeviceWrapper>()?;
     m.add_class::<IBMPerthDeviceWrapper>()?;
     m.add_class::<IBMQuitoDeviceWrapper>()?;
     Ok(())

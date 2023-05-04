@@ -22,7 +22,6 @@ use test_case::test_case;
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_single_qubit_gate_time(device: IBMDevice) {
@@ -35,7 +34,6 @@ fn test_single_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_two_qubit_gate_time(device: IBMDevice) {
@@ -48,7 +46,6 @@ fn test_two_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_three_qubit_gate_time(device: IBMDevice) {
@@ -66,7 +63,6 @@ fn test_three_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_multi_qubit_gate_time(device: IBMDevice) {
@@ -84,7 +80,6 @@ fn test_multi_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_qubit_decoherence_rates(device: IBMDevice) {
@@ -100,7 +95,6 @@ fn test_qubit_decoherence_rates(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMLimaDevice::new()), 5; "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()), 5; "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()), 7; "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()), 7; "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()), 7; "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()), 5; "QuitoDevice")]
 fn test_number_qubits(device: IBMDevice, qubits: usize) {
@@ -113,7 +107,6 @@ fn test_number_qubits(device: IBMDevice, qubits: usize) {
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
 #[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
 #[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMOsloDevice::new()); "OsloDevice")]
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_two_qubit_edges_generic(device: IBMDevice) {
