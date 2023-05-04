@@ -88,6 +88,7 @@ impl Device for IBMOsloDevice {
     /// * `Some<f64>` - The gate time.
     /// * `None` - The gate is not available on the device.
     ///
+    #[allow(unused_variables)]
     fn single_qubit_gate_time(&self, hqslang: &str, qubit: &usize) -> Option<f64> {
         Some(0.0)
     }
@@ -105,6 +106,7 @@ impl Device for IBMOsloDevice {
     /// * `Some<f64>` - The gate time.
     /// * `None` - The gate is not available on the device.
     ///
+    #[allow(unused_variables)]
     fn two_qubit_gate_time(&self, hqslang: &str, control: &usize, target: &usize) -> Option<f64> {
         Some(0.0)
     }
@@ -123,6 +125,7 @@ impl Device for IBMOsloDevice {
     /// * `Some<f64>` - The gate time.
     /// * `None` - The gate is not available on the device.
     ///
+    #[allow(unused_variables)]
     fn three_qubit_gate_time(
         &self,
         hqslang: &str,
@@ -144,6 +147,7 @@ impl Device for IBMOsloDevice {
     /// * `Some<f64>` - The gate time.
     /// * `None` - The gate is not available on the device.
     ///
+    #[allow(unused_variables)]
     fn multi_qubit_gate_time(&self, hqslang: &str, qubits: &[usize]) -> Option<f64> {
         Some(0.0)
     }
@@ -159,6 +163,7 @@ impl Device for IBMOsloDevice {
     /// * `Some<Array2<f64>>` - The decoherence rates.
     /// * `None` - The qubit is not part of the device.
     ///
+    #[allow(unused_variables)]
     fn qubit_decoherence_rates(&self, qubit: &usize) -> Option<Array2<f64>> {
         Some(Array2::zeros((3, 3)))
     }
