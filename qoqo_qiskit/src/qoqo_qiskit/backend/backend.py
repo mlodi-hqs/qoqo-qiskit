@@ -82,9 +82,7 @@ class QoqoQiskitBackend:
         output_complex_register_dict: Dict[str, List[List[complex]]] = dict()
 
         for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            internal_bit_register_dict[bit_def.name()] = [
-                False for _ in range(bit_def.length())
-            ]
+            internal_bit_register_dict[bit_def.name()] = [False for _ in range(bit_def.length())]
             clas_regs_sizes[bit_def.name()] = bit_def.length()
             if bit_def.is_output():
                 output_bit_register_dict[bit_def.name()] = list()
@@ -94,9 +92,7 @@ class QoqoQiskitBackend:
                 0.0 for _ in range(float_def.length())
             ]
             if float_def.is_output():
-                output_float_register_dict[float_def.name()] = cast(
-                    List[List[float]], list()
-                )
+                output_float_register_dict[float_def.name()] = cast(List[List[float]], list())
 
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
             internal_complex_register_dict[complex_def.name()] = [
@@ -297,7 +293,7 @@ class QoqoQiskitBackend:
         else:
             element = element[::-1]
             for key in clas_regs_sizes:
-                splitted.append(element[:clas_regs_sizes[key]:])
+                splitted.append(element[: clas_regs_sizes[key] :])
                 splitted[-1] = splitted[-1][::-1]
-                element = element[clas_regs_sizes[key]:]
+                element = element[clas_regs_sizes[key] :]
         return splitted

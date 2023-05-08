@@ -29,8 +29,8 @@ def to_qiskit_circuit(
         qubit_register_name (Optional[str]): the name of the qubit register.
 
     Returns:
-        Tuple[QuantumCircuit, Dict[str, int]]: the equivalent QuantumCircuit and the dict containing
-                                     info for Qiskit's backend.
+        Tuple[QuantumCircuit, Dict[str, int]]: the equivalent QuantumCircuit and the dict
+                                            containing info for Qiskit's backend.
     """
     # Populating dict output. Currently handling:
     #   - PragmaSetStateVector (continues further down)

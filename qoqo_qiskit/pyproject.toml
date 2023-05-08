@@ -1,7 +1,7 @@
 [project]
 name = "qoqo_qiskit"
-license = {file="LICENSE"}
 version = "0.1.0"
+license = {file="LICENSE"}
 authors = [
     {name="HQS Quantum Simulation GmbH", email="info@quantumsimulations.de"}
 ]
@@ -12,10 +12,11 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "qoqo>=1.4",
-    "qoqo_qasm>=0.5",
+    "qoqo_qasm>=0.7",
     "qiskit",
     "numpy"
 ]
+
 [project.optional-dependencies]
 tests = [
   'pytest',
@@ -33,7 +34,6 @@ dev = [
     'black'
 ]
 docs = [
-    'qoqo>=1.4',
     'numpy',
     'sphinx>=2.1',
     'nbsphinx',
@@ -47,9 +47,6 @@ docs = [
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools_scm]
-version_scheme = "python-simplified-semver"
 
 [tool.mypy]
 ignore_missing_imports = true
