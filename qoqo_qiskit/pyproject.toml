@@ -1,5 +1,6 @@
 [project]
 name = "qoqo_qiskit"
+version = "0.1.0"
 license = {file="LICENSE"}
 authors = [
     {name="HQS Quantum Simulation GmbH", email="info@quantumsimulations.de"}
@@ -9,7 +10,6 @@ maintainers = [
 ]
 readme = "README.md"
 requires-python = ">=3.7"
-dynamic = ["version"]
 dependencies = [
     "qoqo>=1.4",
     "qoqo_qasm>=0.7",
@@ -47,10 +47,6 @@ docs = [
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools_scm]
-version_scheme = "python-simplified-semver"
-root = "src/qoqo_qiskit"
 
 [tool.mypy]
 ignore_missing_imports = true
