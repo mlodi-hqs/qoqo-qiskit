@@ -33,7 +33,6 @@ dev = [
     'black'
 ]
 docs = [
-    'qoqo>=1.4',
     'numpy',
     'sphinx>=2.1',
     'nbsphinx',
