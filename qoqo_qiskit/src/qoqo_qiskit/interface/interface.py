@@ -31,6 +31,9 @@ def to_qiskit_circuit(
     Returns:
         Tuple[QuantumCircuit, Dict[str, int]]: the equivalent QuantumCircuit and the dict
                                             containing info for Qiskit's backend.
+
+    Raises:
+        ValueError: the circuit contains a symbolic PragmaLoop operation.
     """
     # Populating dict output. Currently handling:
     #   - PragmaSetStateVector (continues further down)
@@ -75,8 +78,11 @@ def to_qiskit_circuit(
         elif "PragmaGetDensityMatrix" in op.tags():
             circuit_info["SimulationInfo"]["PragmaGetDensityMatrix"] = True
         elif "PragmaLoop" in op.tags():
-            for _ in range(int(op.repetitions().float())):
-                filtered_circuit += op.circuit()
+            if op.repetitions().is_float:
+                for _ in range(int(op.repetitions().float())):
+                    filtered_circuit += op.circuit()
+            else:
+                raise ValueError("A symbolic PragmaLoop operation is not supported.")
         else:
             filtered_circuit += op
 

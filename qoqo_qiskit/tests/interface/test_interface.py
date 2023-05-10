@@ -13,11 +13,15 @@
 
 import pytest
 import sys
+
 from qoqo import Circuit
 from qoqo import operations as ops
+
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
+
+from typing import Union
 
 
 def test_basic_circuit():
@@ -114,8 +118,8 @@ def test_measure_qubit():
     assert (0, "crg", 0) in sim_dict["MeasurementInfo"]["MeasureQubit"]
 
 
-@pytest.mark.parametrize("repetitions", [0, 2, 4])
-def test_pragma_loop(repetitions: int):
+@pytest.mark.parametrize("repetitions", [0, 2, 4, "test"])
+def test_pragma_loop(repetitions: Union[int, str]):
     inner_circuit = Circuit()
     inner_circuit += ops.PauliX(1)
     inner_circuit += ops.PauliY(2)
@@ -127,14 +131,17 @@ def test_pragma_loop(repetitions: int):
 
     qc = QuantumCircuit(4)
     qc.h(0)
-    for _ in range(repetitions):
-        qc.x(1)
-        qc.y(2)
+    if type(repetitions) != str:
+        for _ in range(repetitions):
+            qc.x(1)
+            qc.y(2)
     qc.h(3)
 
-    out_circ, sim_dict = to_qiskit_circuit(circuit)
-
-    assert out_circ == qc
+    try:
+        out_circ, _ = to_qiskit_circuit(circuit)
+        assert out_circ == qc
+    except ValueError as e:
+        assert e.args == ("A symbolic PragmaLoop operation is not supported.",)
 
 
 def test_simulation_info():
