@@ -17,7 +17,7 @@ from qoqo import Circuit
 from qoqo import operations as ops
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
-from qoqo_qiskit.interface import to_qiskit_circuit
+from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
 
 
 def test_basic_circuit():
