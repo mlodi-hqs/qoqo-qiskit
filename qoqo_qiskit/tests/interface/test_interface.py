@@ -114,6 +114,29 @@ def test_measure_qubit():
     assert (0, "crg", 0) in sim_dict["MeasurementInfo"]["MeasureQubit"]
 
 
+@pytest.mark.parametrize("repetitions", [0, 2, 4])
+def test_pragma_loop(repetitions: int):
+    inner_circuit = Circuit()
+    inner_circuit += ops.PauliX(1)
+    inner_circuit += ops.PauliY(2)
+
+    circuit = Circuit()
+    circuit += ops.Hadamard(0)
+    circuit += ops.PragmaLoop(repetitions=repetitions, circuit=inner_circuit)
+    circuit += ops.Hadamard(3)
+
+    qc = QuantumCircuit(4)
+    qc.h(0)
+    for _ in range(repetitions):
+        qc.x(1)
+        qc.y(2)
+    qc.h(3)
+
+    out_circ, sim_dict = to_qiskit_circuit(circuit)
+
+    assert out_circ == qc
+
+
 def test_simulation_info():
     circuit = Circuit()
     circuit += ops.Hadamard(0)
