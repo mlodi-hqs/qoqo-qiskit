@@ -24,7 +24,7 @@ from qoqo.measurements import (  # type:ignore
 
 from qiskit_aer import AerSimulator
 
-from qoqo_qiskit.backend import QoqoQiskitBackend
+from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
 
 from typing import List, Any
 
@@ -235,7 +235,9 @@ def test_measurement(operations: List[Any]):
     circuit += ops.DefinitionBit("ri", len(involved_qubits), True)
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    input = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
+    input = PauliZProductInput(
+        number_qubits=len(involved_qubits), use_flipped_measurement=True
+    )
 
     measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=input)
 
