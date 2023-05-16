@@ -14,4 +14,4 @@ __Testing__
 
 This software is still in the beta stage. Functions and documentation are not yet complete and breaking changes can occur.
 
-If you find unexpected behaviour please open a github issue. You can also run the pytests in qoqo_myqlm/tests/ locally.
+If you find unexpected behaviour please open a github issue. You can also run the pytests in qoqo_qiskit/tests/ locally.

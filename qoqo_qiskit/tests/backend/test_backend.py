@@ -24,7 +24,7 @@ from qoqo.measurements import (  # type:ignore
 
 from qiskit_aer import AerSimulator
 
-from qoqo_qiskit.backend import QoqoQiskitBackend
+from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
 
 from typing import List, Any
 

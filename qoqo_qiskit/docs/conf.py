@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-"""Configuration of sphinx documentation module"""
+"""Configuration of sphinx documentation module."""
 import tomli
 
-main_version = tomli.load(open("../qoqo_qiskit/pyproject.toml", "rb"))["project"]["version"]
+main_version = tomli.load(open("../pyproject.toml", "rb"))["project"]["version"]
 
 # -- General configuration ------------------------------------------------
 

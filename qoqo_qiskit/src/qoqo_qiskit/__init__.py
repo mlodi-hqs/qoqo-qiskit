@@ -9,7 +9,20 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Qoqo-qiskit backend package for compatibility and simulation purposes."""
+"""Qoqo-qiskit backend package for compatibility and simulation purposes.
+
+Translates qoqo operations and circuits to qiskit equivalents.
+
+.. autosummary::
+    :toctree: generated/
+
+    to_qiskit_circuit
+    QoqoQiskitSimulator
+
+"""
 
 
-from qoqo_qiskit.backend.backend import QoqoQiskitBackend
+from qoqo_qiskit.backend import QoqoQiskitBackend
+from qoqo_qiskit.interface import to_qiskit_circuit
+
+__all__ = ("to_qiskit_circuit", "QoqoQiskitBackend")

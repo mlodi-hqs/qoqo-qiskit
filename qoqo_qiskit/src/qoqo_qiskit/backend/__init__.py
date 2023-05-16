@@ -12,4 +12,6 @@
 """Qoqo-qiskit backend package for compatibility and simulation purposes."""
 
 
-from qoqo_qiskit.interface.interface import to_qiskit_circuit
+from qoqo_qiskit.backend.backend import QoqoQiskitBackend
+
+__all__ = "QoqoQiskitBackend"

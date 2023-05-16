@@ -29,13 +29,19 @@ def to_qiskit_circuit(
         qubit_register_name (Optional[str]): the name of the qubit register.
 
     Returns:
-        Tuple[QuantumCircuit, Dict[str, int]]: the equivalent QuantumCircuit and the dict containing
-                                     info for Qiskit's backend.
+        Tuple[QuantumCircuit, Dict[str, int]]: the equivalent QuantumCircuit and the dict
+                                            containing info for Qiskit's backend.
+
+    Raises:
+        ValueError: the circuit contains a symbolic PragmaLoop operation.
     """
     # Populating dict output. Currently handling:
     #   - PragmaSetStateVector (continues further down)
+    #   - PragmaGetStateVector
+    #   - PragmaGetDensityMatrix
     #   - PragmaSetNumberOfMeasurement
     #   - PragmaRepeatedMeasurement
+    #   - PragmaLoop
     #   - MeasureQubit
     filtered_circuit = Circuit()
     circuit_info: Dict[str, Any] = {}
@@ -71,6 +77,12 @@ def to_qiskit_circuit(
             circuit_info["SimulationInfo"]["PragmaGetStateVector"] = True
         elif "PragmaGetDensityMatrix" in op.tags():
             circuit_info["SimulationInfo"]["PragmaGetDensityMatrix"] = True
+        elif "PragmaLoop" in op.tags():
+            if op.repetitions().is_float:
+                for _ in range(int(op.repetitions().float())):
+                    filtered_circuit += op.circuit()
+            else:
+                raise ValueError("A symbolic PragmaLoop operation is not supported.")
         else:
             filtered_circuit += op
 
@@ -78,9 +90,11 @@ def to_qiskit_circuit(
     qasm_backend = QasmBackend(qubit_register_name=qubit_register_name)
     input_qasm_str = qasm_backend.circuit_to_qasm_str(filtered_circuit)
 
-    # Handling PragmaSetStateVector + QASM -> Qiskit transformation
+    # QASM -> Qiskit transformation
     return_circuit = QuantumCircuit()
     from_qasm_circuit = QuantumCircuit.from_qasm_str(input_qasm_str)
+
+    # Handling PragmaSetStateVector
     if len(initial_statevector) != 0:
         qregs = []
         for qreg in from_qasm_circuit.qregs:
