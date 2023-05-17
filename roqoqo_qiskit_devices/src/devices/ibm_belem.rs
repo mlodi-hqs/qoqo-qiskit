@@ -13,7 +13,7 @@
 use std::collections::HashMap;
 
 use roqoqo::{
-    devices::{Device, GenericDevice},
+    devices::{GenericDevice, QoqoDevice},
     RoqoqoError,
 };
 
@@ -223,11 +223,11 @@ impl From<IBMBelemDevice> for IBMDevice {
     }
 }
 
-/// Implements Device trait for IBMBelemDevice.
+/// Implements QoqoDevice trait for IBMBelemDevice.
 ///
-/// The Device trait defines standard functions available for roqoqo devices.
+/// The QoqoDevice trait defines standard functions available for roqoqo devices.
 ///
-impl Device for IBMBelemDevice {
+impl QoqoDevice for IBMBelemDevice {
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.
     ///
     /// # Arguments
@@ -243,6 +243,20 @@ impl Device for IBMBelemDevice {
     #[allow(unused_variables)]
     fn single_qubit_gate_time(&self, hqslang: &str, qubit: &usize) -> Option<f64> {
         Some(0.0)
+    }
+
+    /// Returns the names of a single qubit operations available on the device.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The list of gate names.
+    ///
+    fn single_qubit_gate_names(&self) -> Vec<String> {
+        vec![
+            "PauliX".to_string(),
+            "RotateZ".to_string(),
+            "SqrtPauliX".to_string(),
+        ]
     }
 
     /// Returns the gate time of a two qubit operation if the two qubit operation is available on device.
@@ -261,6 +275,16 @@ impl Device for IBMBelemDevice {
     #[allow(unused_variables)]
     fn two_qubit_gate_time(&self, hqslang: &str, control: &usize, target: &usize) -> Option<f64> {
         Some(0.0)
+    }
+
+    /// Returns the names of a two qubit operations available on the device.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The list of gate names.
+    ///
+    fn two_qubit_gate_names(&self) -> Vec<String> {
+        vec!["CNOT".to_string()]
     }
 
     /// Returns the gate time of a three qubit operation if the three qubit operation is available on device.
@@ -304,6 +328,18 @@ impl Device for IBMBelemDevice {
         Some(0.0)
     }
 
+    /// Returns the names of a mutli qubit operations available on the device.
+    ///
+    /// The list of names also includes the three qubit gate operations.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The list of gate names.
+    ///
+    fn multi_qubit_gate_names(&self) -> Vec<String> {
+        vec![]
+    }
+
     /// Returns the matrix of the decoherence rates of the Lindblad equation.
     ///
     /// # Arguments
@@ -324,10 +360,41 @@ impl Device for IBMBelemDevice {
     ///
     /// # Returns
     ///
-    /// `usize` - The number of qubits in the device.
+    /// * `usize` - The number of qubits in the device.
     ///
     fn number_qubits(&self) -> usize {
         self.generic_device.number_qubits
+    }
+
+    /// Return a list of longest linear chains through the device.
+    ///
+    /// Returns at least one chain of qubits with linear connectivity in the device,
+    /// that has the maximum possible number of qubits with linear connectivity in the device.
+    /// Can return more that one of the possible chains but is not guaranteed to return
+    /// all possible chains. (For example for all-to-all connectivity only one chain will be returned).
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
+    ///
+    fn longest_chains(&self) -> Vec<Vec<usize>> {
+        vec![vec![0, 1, 3, 4], vec![1, 2, 3, 4]]
+    }
+
+    /// Return a list of longest closed linear chains through the device.
+    ///
+    /// Returns at least one chain of qubits with linear connectivity in the device ,
+    /// that has the maximum possible number of qubits with linear connectivity in the device.
+    /// The chain must be closed, the first qubit needs to be connected to the last qubit.
+    /// Can return more that one of the possible chains but is not guaranteed to return
+    /// all possible chains. (For example for all-to-all connectivity only one chain will be returned).
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
+    ///
+    fn longest_closed_chains(&self) -> Vec<Vec<usize>> {
+        vec![]
     }
 
     /// Returns the list of pairs of qubits linked with a native two-qubit-gate in the device.
@@ -345,18 +412,10 @@ impl Device for IBMBelemDevice {
     ///
     /// # Returns
     ///
-    /// A list (Vec) of pairs of qubits linked with a native two-qubit-gate in the device.
+    /// * `Vec<(usize, usize)>` - A list of pairs of qubits linked with a native two-qubit-gate in
+    ///                           the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
         vec![(0, 1), (1, 2), (1, 3), (3, 4)]
-    }
-
-    /// Turns Device into GenericDevice
-    ///
-    /// Can be used as a generic interface for devices when a boxed dyn trait object cannot be used
-    /// (for example when the interface needs to be serialized)
-    ///
-    fn to_generic_device(&self) -> roqoqo::devices::GenericDevice {
-        self.generic_device.clone()
     }
 }
