@@ -125,7 +125,16 @@ impl QoqoDevice for IBMDevice {
     /// * `Vec<String>` - The list of gate names.
     ///
     fn two_qubit_gate_names(&self) -> Vec<String> {
-        todo!()
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMNairobiDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMPerthDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMBelemDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMJakartaDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMLimaDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMManilaDevice(x) => x.two_qubit_gate_names(),
+            IBMDevice::IBMQuitoDevice(x) => x.two_qubit_gate_names(),
+        }
     }
 
     /// Returns the gate time of a three qubit operation if the three qubit operation is available on device.
@@ -201,7 +210,7 @@ impl QoqoDevice for IBMDevice {
         }
     }
 
-    /// Returns the names of a mutli qubit operations available on the device.
+    /// Returns the names of a multi qubit operations available on the device.
     ///
     /// The list of names also includes the three qubit gate operations.
     ///
@@ -210,7 +219,16 @@ impl QoqoDevice for IBMDevice {
     /// * `Vec<String>` - The list of gate names.
     ///
     fn multi_qubit_gate_names(&self) -> Vec<String> {
-        todo!()
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMNairobiDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMPerthDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMBelemDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMJakartaDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMLimaDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMManilaDevice(x) => x.multi_qubit_gate_names(),
+            IBMDevice::IBMQuitoDevice(x) => x.multi_qubit_gate_names(),
+        }
     }
 
     /// Returns the matrix of the decoherence rates of the Lindblad equation.
