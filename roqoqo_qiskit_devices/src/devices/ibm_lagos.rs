@@ -10,18 +10,14 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
-
-use roqoqo::devices::{Device, GenericDevice};
+use roqoqo::devices::QoqoDevice;
 
 use ndarray::Array2;
 
 use crate::IBMDevice;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
-pub struct IBMLagosDevice {
-    generic_device: GenericDevice,
-}
+pub struct IBMLagosDevice {}
 
 impl IBMLagosDevice {
     /// Creates a new IBMLagosDevice.
@@ -31,16 +27,7 @@ impl IBMLagosDevice {
     /// An initiated IBMLagosDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     pub fn new() -> Self {
-        let generic = GenericDevice {
-            number_qubits: 7,
-            single_qubit_gates: HashMap::new(),
-            two_qubit_gates: HashMap::new(),
-            multi_qubit_gates: HashMap::new(),
-            decoherence_rates: HashMap::new(),
-        };
-        Self {
-            generic_device: generic,
-        }
+        Self {}
     }
 
     /// Returns the IBM's identifier.
@@ -71,11 +58,11 @@ impl From<IBMLagosDevice> for IBMDevice {
     }
 }
 
-/// Implements Device trait for IBMLagosDevice.
+/// Implements QoqoDevice trait for IBMLagosDevice.
 ///
-/// The Device trait defines standard functions available for roqoqo devices.
+/// The QoqoDevice trait defines standard functions available for roqoqo devices.
 ///
-impl Device for IBMLagosDevice {
+impl QoqoDevice for IBMLagosDevice {
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.
     ///
     /// # Arguments
@@ -91,6 +78,20 @@ impl Device for IBMLagosDevice {
     #[allow(unused_variables)]
     fn single_qubit_gate_time(&self, hqslang: &str, qubit: &usize) -> Option<f64> {
         Some(0.0)
+    }
+
+    /// Returns the names of a single qubit operations available on the device.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The list of gate names.
+    ///
+    fn single_qubit_gate_names(&self) -> Vec<String> {
+        vec![
+            "PauliX".to_string(),
+            "RotateZ".to_string(),
+            "SqrtPauliX".to_string(),
+        ]
     }
 
     /// Returns the gate time of a two qubit operation if the two qubit operation is available on device.
@@ -109,6 +110,16 @@ impl Device for IBMLagosDevice {
     #[allow(unused_variables)]
     fn two_qubit_gate_time(&self, hqslang: &str, control: &usize, target: &usize) -> Option<f64> {
         Some(0.0)
+    }
+
+    /// Returns the names of a two qubit operations available on the device.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The list of gate names.
+    ///
+    fn two_qubit_gate_names(&self) -> Vec<String> {
+        vec!["CNOT".to_string()]
     }
 
     /// Returns the gate time of a three qubit operation if the three qubit operation is available on device.
@@ -133,8 +144,9 @@ impl Device for IBMLagosDevice {
         control_1: &usize,
         target: &usize,
     ) -> Option<f64> {
-        Some(0.0)
+        None
     }
+
     /// Returns the gate time of a multi qubit operation if the multi qubit operation is available on device.
     ///
     /// # Arguments
@@ -149,7 +161,19 @@ impl Device for IBMLagosDevice {
     ///
     #[allow(unused_variables)]
     fn multi_qubit_gate_time(&self, hqslang: &str, qubits: &[usize]) -> Option<f64> {
-        Some(0.0)
+        None
+    }
+
+    /// Returns the names of a multi qubit operations available on the device.
+    ///
+    /// The list of names also includes the three qubit gate operations.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The list of gate names.
+    ///
+    fn multi_qubit_gate_names(&self) -> Vec<String> {
+        vec![]
     }
 
     /// Returns the matrix of the decoherence rates of the Lindblad equation.
@@ -175,7 +199,43 @@ impl Device for IBMLagosDevice {
     /// `usize` - The number of qubits in the device.
     ///
     fn number_qubits(&self) -> usize {
-        self.generic_device.number_qubits
+        7
+    }
+
+    /// Return a list of longest linear chains through the device.
+    ///
+    /// Returns at least one chain of qubits with linear connectivity in the device,
+    /// that has the maximum possible number of qubits with linear connectivity in the device.
+    /// Can return more that one of the possible chains but is not guaranteed to return
+    /// all possible chains. (For example for all-to-all connectivity only one chain will be returned).
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
+    ///
+    fn longest_chains(&self) -> Vec<Vec<usize>> {
+        vec![
+            vec![0, 1, 3, 5, 6],
+            vec![0, 1, 3, 5, 4],
+            vec![2, 1, 3, 5, 4],
+            vec![2, 1, 3, 5, 6],
+        ]
+    }
+
+    /// Return a list of longest closed linear chains through the device.
+    ///
+    /// Returns at least one chain of qubits with linear connectivity in the device ,
+    /// that has the maximum possible number of qubits with linear connectivity in the device.
+    /// The chain must be closed, the first qubit needs to be connected to the last qubit.
+    /// Can return more that one of the possible chains but is not guaranteed to return
+    /// all possible chains. (For example for all-to-all connectivity only one chain will be returned).
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
+    ///
+    fn longest_closed_chains(&self) -> Vec<Vec<usize>> {
+        vec![]
     }
 
     /// Returns the list of pairs of qubits linked with a native two-qubit-gate in the device.
@@ -197,14 +257,5 @@ impl Device for IBMLagosDevice {
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
         vec![(0, 1), (1, 2), (1, 3), (3, 5), (4, 5), (5, 6)]
-    }
-
-    /// Turns Device into GenericDevice
-    ///
-    /// Can be used as a generic interface for devices when a boxed dyn trait object cannot be used
-    /// (for example when the interface needs to be serialized)
-    ///
-    fn to_generic_device(&self) -> roqoqo::devices::GenericDevice {
-        self.generic_device.clone()
     }
 }

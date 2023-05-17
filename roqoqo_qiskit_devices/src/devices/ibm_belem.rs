@@ -27,7 +27,7 @@ impl IBMBelemDevice {
     /// An initiated IBMBelemDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     pub fn new() -> Self {
-        Self::new()
+        Self {}
     }
 
     /// Returns the IBM's identifier.
@@ -164,7 +164,7 @@ impl QoqoDevice for IBMBelemDevice {
         None
     }
 
-    /// Returns the names of a mutli qubit operations available on the device.
+    /// Returns the names of a multi qubit operations available on the device.
     ///
     /// The list of names also includes the three qubit gate operations.
     ///

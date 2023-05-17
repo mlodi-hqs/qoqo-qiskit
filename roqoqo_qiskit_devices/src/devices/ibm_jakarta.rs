@@ -10,16 +10,14 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-use roqoqo::devices::{GenericDevice, QoqoDevice};
+use roqoqo::devices::QoqoDevice;
 
 use ndarray::Array2;
 
 use crate::IBMDevice;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
-pub struct IBMJakartaDevice {
-    generic_device: GenericDevice,
-}
+pub struct IBMJakartaDevice { }
 
 impl IBMJakartaDevice {
     /// Creates a new IBMJakartaDevice.
@@ -29,7 +27,7 @@ impl IBMJakartaDevice {
     /// An initiated IBMJakartaDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     pub fn new() -> Self {
-        Self::new()
+        Self {}
     }
 
     /// Returns the IBM's identifier.
@@ -60,9 +58,9 @@ impl From<IBMJakartaDevice> for IBMDevice {
     }
 }
 
-/// Implements Device trait for IBMJakartaDevice.
+/// Implements QoqoDevice trait for IBMJakartaDevice.
 ///
-/// The Device trait defines standard functions available for roqoqo devices.
+/// The QoqoDevice trait defines standard functions available for roqoqo devices.
 ///
 impl QoqoDevice for IBMJakartaDevice {
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.
@@ -166,7 +164,7 @@ impl QoqoDevice for IBMJakartaDevice {
         None
     }
 
-    /// Returns the names of a mutli qubit operations available on the device.
+    /// Returns the names of a multi qubit operations available on the device.
     ///
     /// The list of names also includes the three qubit gate operations.
     ///
