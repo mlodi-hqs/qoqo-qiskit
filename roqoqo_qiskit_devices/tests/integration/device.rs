@@ -11,7 +11,7 @@
 // limitations under the License.
 
 use ndarray::Array2;
-use roqoqo::devices::Device;
+use roqoqo::devices::QoqoDevice;
 use roqoqo_qiskit_devices::*;
 
 use test_case::test_case;
@@ -50,10 +50,8 @@ fn test_two_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_three_qubit_gate_time(device: IBMDevice) {
     assert_eq!(
-        device
-            .three_qubit_gate_time("ControlledControlledPauliZ", &0, &1, &2)
-            .unwrap(),
-        0.0
+        device.three_qubit_gate_time("ControlledControlledPauliZ", &0, &1, &2),
+        None
     );
 }
 
@@ -67,10 +65,8 @@ fn test_three_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_multi_qubit_gate_time(device: IBMDevice) {
     assert_eq!(
-        device
-            .multi_qubit_gate_time("MultiQubitZZ", &[0, 1, 2])
-            .unwrap(),
-        0.0
+        device.multi_qubit_gate_time("MultiQubitZZ", &[0, 1, 2]),
+        None
     );
 }
 
@@ -99,18 +95,4 @@ fn test_qubit_decoherence_rates(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()), 5; "QuitoDevice")]
 fn test_number_qubits(device: IBMDevice, qubits: usize) {
     assert_eq!(device.number_qubits(), qubits);
-}
-
-#[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
-#[test_case(IBMDevice::from(IBMJakartaDevice::new()); "JakartaDevice")]
-#[test_case(IBMDevice::from(IBMLagosDevice::new()); "LagosDevice")]
-#[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
-#[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
-#[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
-#[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
-#[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
-fn test_two_qubit_edges_generic(device: IBMDevice) {
-    let gdevice = device.to_generic_device();
-    // assert_eq!(device.two_qubit_edges(), gdevice.two_qubit_edges());
-    assert_eq!(device.number_qubits(), gdevice.number_qubits());
 }
