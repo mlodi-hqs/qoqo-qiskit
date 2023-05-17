@@ -65,9 +65,9 @@ class DeviceProperties:
             raise ValueError("The input qubit is not available on the device.")
         if gate not in self.configurations.basis_gates:
             raise ValueError("The input gate is not available on the device.")
-        for entry in self.properties.gates:
-            if len(entry.qubits) == 1 and entry.qubits == qubit and entry.gate == gate:
-                return entry.parameters[1].value
+        return self.properties.gate_property(
+            gate=gate, qubits=qubit, name="gate_length"
+        )[0]
 
     def two_qubit_gate_time(self, gate: str, control: int, target: int) -> float:
         """Returns the two-qubit gate time for a given gate and qubit.
@@ -91,11 +91,17 @@ class DeviceProperties:
             raise ValueError("The input qubit is not available on the device.")
         if gate not in self.configurations.basis_gates:
             raise ValueError("The input gate is not available on the device.")
-        for entry in self.properties.gates:
-            if (
-                len(entry.qubits) == 2
-                and control in entry.qubits
-                and target in entry.qubits
-                and entry.gate == gate
-            ):
-                return entry.parameters[1].value
+        return self.properties.gate_property(
+            gate=gate, qubits=[control, target], name="gate_length"
+        )[0]
+
+    def dephasing_time(self, qubit: int) -> float:
+        """Returns the device dephasing value for a given qubit.
+
+        Args:
+            qubit (int): The input qubit.
+
+        Returns:
+            float: The dephasing value of the input qubit in the device.
+        """
+        return self.properties.t2(qubit=qubit)
