@@ -27,7 +27,7 @@ impl IBMBelemDevice {
     /// An initiated IBMBelemDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     pub fn new() -> Self {
-        Self {}
+        Self::new()
     }
 
     /// Returns the IBM's identifier.
@@ -144,8 +144,9 @@ impl QoqoDevice for IBMBelemDevice {
         control_1: &usize,
         target: &usize,
     ) -> Option<f64> {
-        Some(0.0)
+        None
     }
+
     /// Returns the gate time of a multi qubit operation if the multi qubit operation is available on device.
     ///
     /// # Arguments
@@ -160,7 +161,7 @@ impl QoqoDevice for IBMBelemDevice {
     ///
     #[allow(unused_variables)]
     fn multi_qubit_gate_time(&self, hqslang: &str, qubits: &[usize]) -> Option<f64> {
-        Some(0.0)
+        None
     }
 
     /// Returns the names of a mutli qubit operations available on the device.
