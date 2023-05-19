@@ -17,7 +17,7 @@ Translates qoqo operations and circuits to qiskit equivalents.
     :toctree: generated/
 
     to_qiskit_circuit
-    QoqoQiskitSimulator
+    QoqoQiskitBackend
 
 """
 

@@ -29,7 +29,7 @@ def to_qiskit_circuit(
         qubit_register_name (Optional[str]): the name of the qubit register.
 
     Returns:
-        Tuple[QuantumCircuit, Dict[str, int]]: the equivalent QuantumCircuit and the dict
+        Tuple[QuantumCircuit, Dict[str, int]]: equivalent QuantumCircuit and dict\
                                             containing info for Qiskit's backend.
 
     Raises:
