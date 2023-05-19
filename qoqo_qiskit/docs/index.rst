@@ -1,6 +1,6 @@
 Welcome to qoqo-qiskit's documentation!
 ======================================
-qoqo the HQS Quantum Simulation software package to represent quantum circuits.
+Qiskit backend for the qoqo/roqoqo quantum toolkit by `HQS Quantum Simulations <https://quantumsimulations.de>`_.
 
 .. toctree::
    :maxdepth: 2
