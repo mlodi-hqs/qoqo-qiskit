@@ -21,7 +21,7 @@ use crate::IBMDevice;
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IBMBelemDevice {
     /// The number of qubits
-    pub number_qubits: usize,
+    number_qubits: usize,
     /// Gate times for all single qubit gates
     single_qubit_gates: HashMap<String, HashMap<usize, f64>>,
     /// Gate times for all two qubit gates
