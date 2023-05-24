@@ -16,6 +16,25 @@ from qiskit_ibm_provider import IBMProvider
 import types
 
 
+def _qiskit_gate_equivalent(gate: str) -> str:
+    """Outputs qiskit equivalent of a Qoqo gate name.
+
+    Args:
+        gate (str): The name of the qoqo gate.
+
+    Returns:
+        str: The name of the equivalent Qiskit.
+    """
+    if gate == "PauliX":
+        return "x"
+    elif gate == "RotateZ":
+        return "rz"
+    elif gate == "SqrtPauliX":
+        return "sx"
+    elif gate == "CNOT":
+        return "cx"
+
+
 def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
     """Sets a qoqo_qiskit_devices.ibm_devices instance noise info.
 
@@ -39,21 +58,23 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
         device.add_damping(qubit=qubit, damping=damping)
         device.add_dephasing(qubit=qubit, dephasing=dephasing)
         for gate in device.single_qubit_gate_names():
+            qiskit_gate = _qiskit_gate_equivalent(gate)
             device.set_single_qubit_gate_time(
                 gate=gate,
                 qubit=qubit,
                 gate_time=properties.gate_property(
-                    gate=gate, qubits=qubit, name="gate_length"
+                    gate=qiskit_gate, qubits=qubit, name="gate_length"
                 )[0],
             )
         for edge in device.two_qubit_edges():
             for gate in device.two_qubit_gate_names():
+                qiskit_gate = _qiskit_gate_equivalent(gate)
                 device.set_two_qubit_gate_time(
                     gate=gate,
                     control=edge[0],
                     target=edge[1],
                     gate_time=properties.gate_property(
-                        gate=gate, qubits=[edge[0], edge[1]], name="gate_length"
+                        gate=qiskit_gate, qubits=[edge[0], edge[1]], name="gate_length"
                     )[0],
                 )
                 device.set_two_qubit_gate_time(
@@ -61,7 +82,7 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
                     control=edge[1],
                     target=edge[0],
                     gate_time=properties.gate_property(
-                        gate=gate, qubits=[edge[1], edge[0]], name="gate_length"
+                        gate=qiskit_gate, qubits=[edge[1], edge[0]], name="gate_length"
                     )[0],
                 )
     return device
