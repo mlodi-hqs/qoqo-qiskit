@@ -15,6 +15,7 @@
 //! Provides the devices that are used to execute quantum programs on IBM's devices.
 
 use roqoqo::devices::QoqoDevice;
+use roqoqo::RoqoqoError;
 
 mod ibm_belem;
 pub use crate::devices::ibm_belem::IBMBelemDevice;
@@ -53,6 +54,114 @@ pub enum IBMDevice {
     IBMQuitoDevice(IBMQuitoDevice),
 }
 
+impl IBMDevice {
+    /// Setting the gate time of a single qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the single-qubit-gate.
+    /// * `qubit` - The qubit for which the gate time is set.
+    /// * `gate_time` - gate time for the given gate.
+    pub fn set_single_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        qubit: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMNairobiDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMPerthDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMBelemDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMJakartaDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMLimaDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMManilaDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+            IBMDevice::IBMQuitoDevice(x) => x.set_single_qubit_gate_time(gate, qubit, gate_time),
+        }
+    }
+
+    /// Setting the gate time of a two qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the two-qubit-gate.
+    /// * `control` - The control qubit for which the gate time is set.
+    /// * `target` - The target qubit for which the gate time is set.
+    /// * `gate_time` - gate time for the given gate.
+    pub fn set_two_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        control: usize,
+        target: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        match self {
+            IBMDevice::IBMLagosDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMNairobiDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMPerthDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMBelemDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMJakartaDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMLimaDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMManilaDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+            IBMDevice::IBMQuitoDevice(x) => {
+                x.set_two_qubit_gate_time(gate, control, target, gate_time)
+            }
+        }
+    }
+
+    /// Adds qubit damping to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the dampins is added.
+    /// * `daming` - The damping rates.
+    pub fn add_damping(&mut self, qubit: usize, damping: f64) -> Result<(), RoqoqoError> {
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMNairobiDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMPerthDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMBelemDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMJakartaDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMLimaDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMManilaDevice(x) => x.add_damping(qubit, damping),
+            IBMDevice::IBMQuitoDevice(x) => x.add_damping(qubit, damping),
+        }
+    }
+
+    /// Adds qubit dephasing to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the dephasing is added.
+    /// * `dephasing` - The dephasing rates.
+    pub fn add_dephasing(&mut self, qubit: usize, dephasing: f64) -> Result<(), RoqoqoError> {
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMNairobiDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMPerthDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMBelemDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMJakartaDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMLimaDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMManilaDevice(x) => x.add_dephasing(qubit, dephasing),
+            IBMDevice::IBMQuitoDevice(x) => x.add_dephasing(qubit, dephasing),
+        }
+    }
+}
+
 /// Implements the Device trait for IBMDevice.
 ///
 /// Defines standard functions available for roqoqo-iqm devices.
@@ -89,7 +198,16 @@ impl QoqoDevice for IBMDevice {
     /// * `Vec<String>` - The list of gate names.
     ///
     fn single_qubit_gate_names(&self) -> Vec<String> {
-        todo!()
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMNairobiDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMPerthDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMBelemDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMJakartaDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMLimaDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMManilaDevice(x) => x.single_qubit_gate_names(),
+            IBMDevice::IBMQuitoDevice(x) => x.single_qubit_gate_names(),
+        }
     }
 
     /// Returns the gate time of a two qubit operation if the two qubit operation is available on device.
