@@ -19,6 +19,12 @@ import types
 def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
     """Sets a qoqo_qiskit_devices.ibm_devices instance noise info.
 
+    Performs the following updates:
+        - adds damping
+        - adds dephasing
+        - sets single qubit gate times
+        - sets two qubit gate times
+
     Args:
         device (ibm_devices): The qoqo_qiskit_devices instance to update.
 
