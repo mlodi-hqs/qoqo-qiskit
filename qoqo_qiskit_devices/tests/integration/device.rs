@@ -48,14 +48,14 @@ fn new_device(device: IBMDevice) -> Py<PyAny> {
 fn test_gate_names(device: Py<PyAny>) {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
-        let singe_qubit_gates = device
+        let single_qubit_gates = device
             .call_method0(py, "single_qubit_gate_names")
             .unwrap()
             .extract::<Vec<String>>(py)
             .unwrap();
-        assert!(singe_qubit_gates.contains(&"PauliX".to_string()));
-        assert!(singe_qubit_gates.contains(&"SqrtPauliX".to_string()));
-        assert!(singe_qubit_gates.contains(&"RotateZ".to_string()));
+        assert!(single_qubit_gates.contains(&"PauliX".to_string()));
+        assert!(single_qubit_gates.contains(&"SqrtPauliX".to_string()));
+        assert!(single_qubit_gates.contains(&"RotateZ".to_string()));
 
         let two_qubit_gates = device
             .call_method0(py, "two_qubit_gate_names")
@@ -71,4 +71,68 @@ fn test_gate_names(device: Py<PyAny>) {
             .unwrap();
         assert_eq!(multi_qubit_gates, Vec::<String>::new());
     })
+}
+
+/// Test single-qubit and two-qubit gates times setters and getters
+#[test_case(new_device(IBMDevice::from(IBMBelemDevice::new())); "belem")]
+#[test_case(new_device(IBMDevice::from(IBMNairobiDevice::new())); "nairobi")]
+#[test_case(new_device(IBMDevice::from(IBMJakartaDevice::new())); "jakarta")]
+#[test_case(new_device(IBMDevice::from(IBMLagosDevice::new())); "lagos")]
+#[test_case(new_device(IBMDevice::from(IBMLimaDevice::new())); "lima")]
+#[test_case(new_device(IBMDevice::from(IBMManilaDevice::new())); "manila")]
+#[test_case(new_device(IBMDevice::from(IBMPerthDevice::new())); "perth")]
+#[test_case(new_device(IBMDevice::from(IBMQuitoDevice::new())); "quito")]
+fn test_gate_timings(device: Py<PyAny>) {
+    pyo3::prepare_freethreaded_python();
+    Python::with_gil(|py| {
+        device
+            .call_method1(py, "set_single_qubit_gate_time", ("PauliX", 0, 0.5))
+            .unwrap();
+        let single_qubit_time = device
+            .call_method1(py, "single_qubit_gate_time", ("PauliX", 0))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(single_qubit_time, 0.5);
+
+        device
+            .call_method1(py, "set_two_qubit_gate_time", ("CNOT", 0, 1, 0.5))
+            .unwrap();
+        let two_qubit_time = device
+            .call_method1(py, "two_qubit_gate_time", ("CNOT", 0, 1))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(two_qubit_time, 0.5);
+    });
+}
+
+/// Test add_damping, add_dephasing, decoherence methods
+#[test_case(new_device(IBMDevice::from(IBMBelemDevice::new())); "belem")]
+#[test_case(new_device(IBMDevice::from(IBMNairobiDevice::new())); "nairobi")]
+#[test_case(new_device(IBMDevice::from(IBMJakartaDevice::new())); "jakarta")]
+#[test_case(new_device(IBMDevice::from(IBMLagosDevice::new())); "lagos")]
+#[test_case(new_device(IBMDevice::from(IBMLimaDevice::new())); "lima")]
+#[test_case(new_device(IBMDevice::from(IBMManilaDevice::new())); "manila")]
+#[test_case(new_device(IBMDevice::from(IBMPerthDevice::new())); "perth")]
+#[test_case(new_device(IBMDevice::from(IBMQuitoDevice::new())); "quito")]
+fn test_damping_dephasing_decoherence(device: Py<PyAny>) {
+    pyo3::prepare_freethreaded_python();
+    Python::with_gil(|py| {
+        device.call_method1(py, "add_damping", (0, 0.5)).unwrap();
+        device.call_method1(py, "add_dephasing", (0, 0.2)).unwrap();
+        let rates = device
+            .call_method1(py, "qubit_decoherence_rates", (0,))
+            .unwrap()
+            .extract::<Vec<Vec<f64>>>(py)
+            .unwrap();
+        assert_eq!(
+            rates,
+            vec![
+                vec![0.5, 0.0, 0.0],
+                vec![0.0, 0.0, 0.0],
+                vec![0.0, 0.0, 0.2]
+            ]
+        )
+    });
 }
