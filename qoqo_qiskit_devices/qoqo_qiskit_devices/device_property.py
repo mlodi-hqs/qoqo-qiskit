@@ -28,8 +28,10 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
     name = device.name()
     properties = IBMProvider().get_backend(name).properties()
     for qubit in range(device.number_qubits()):
-        decoherence_rate = 1 / properties.t1(qubit=qubit)
-        device.set_decoherence_rate(qubit, decoherence_rate)
+        damping = 1 / properties.t1(qubit=qubit)
+        dephasing = 1 / properties.t2(qubit=qubit)
+        device.add_damping(qubit=qubit, damping=damping)
+        device.add_dephasing(qubit=qubit, dephasing=dephasing)
         for gate in device.single_qubit_gate_names():
             device.set_single_qubit_gate_time(
                 gate=gate,
