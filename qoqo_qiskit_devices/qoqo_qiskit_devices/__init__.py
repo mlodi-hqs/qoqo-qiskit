@@ -18,4 +18,4 @@
 """
 
 from .qoqo_qiskit_devices import *
-from .device_property import *
+from .device_property import set_qiskit_noise_information
