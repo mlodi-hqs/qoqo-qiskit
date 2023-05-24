@@ -13,95 +13,47 @@
 
 from qiskit_ibm_provider import IBMProvider
 
-from typing import Union
 import types
 
 
-class DeviceProperties:
-    """Utility for updating the properties on an IBMDevice instance."""
+def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
+    """Sets a qoqo_qiskit_devices.ibm_devices instance noise info.
 
-    def __init__(self, device: Union[types.ModuleType, str]) -> None:
-        """Initialized DeviceProperty utility.
+    Args:
+        device (ibm_devices): The qoqo_qiskit_devices instance to update.
 
-        Args:
-            device (Union[ibm_devices, str]): The qoqo_qiskit_devices instance (or name) that
-                is used to get the properties from IBM.
-
-        Raises:
-            TypeError: The input is not a string or an `ibm_devices` instance.
-        """
-        if isinstance(device, str):
-            self.properties = IBMProvider().get_backend(device).properties()
-            self.name = device
-        else:
-            try:
-                self.properties = IBMProvider().get_backend(device.name()).properties()
-                self.name = device.name()
-            except Exception:
-                raise TypeError(
-                    "The input device is not a string or is not an `ibm_devices` instance."
+    Returns:
+        ibm_devices: The input instance updated with qiskit's physical device info.
+    """
+    name = device.name()
+    properties = IBMProvider().get_backend(name).properties()
+    for qubit in range(device.number_qubits()):
+        decoherence_rate = 1 / properties.t1(qubit=qubit)
+        device.set_decoherence_rate(qubit, decoherence_rate)
+        for gate in device.single_qubit_gate_names():
+            device.set_single_qubit_gate_time(
+                gate=gate,
+                qubit=qubit,
+                gate_time=properties.gate_property(
+                    gate=gate, qubits=qubit, name="gate_length"
+                )[0],
+            )
+        for edge in device.two_qubit_edges():
+            for gate in device.two_qubit_gate_names():
+                device.set_two_qubit_gate_time(
+                    gate=gate,
+                    control=edge[0],
+                    target=edge[1],
+                    gate_time=properties.gate_property(
+                        gate=gate, qubits=[edge[0], edge[1]], name="gate_length"
+                    )[0],
                 )
-        self.configurations = IBMProvider().get_backend(self.name).configuration()
-
-    def update(self) -> None:
-        """Updates the device information."""
-        self.properties = IBMProvider().get_backend(self.name).properties(refresh=True)
-
-    def single_qubit_gate_time(self, gate: str, qubit: int) -> float:
-        """Returns the single-qubit gate time for a given gate and qubit.
-
-        Args:
-            gate (str): The input gate.
-            qubit (int): The input qubit.
-
-        Raises:
-            ValueError: The input gate is not available on the device.
-            ValueError: The input qubit is not available on the device.
-
-        Returns:
-            float: The gate time.
-        """
-        if qubit >= self.configurations.n_qubits:
-            raise ValueError("The input qubit is not available on the device.")
-        if gate not in self.configurations.basis_gates:
-            raise ValueError("The input gate is not available on the device.")
-        return self.properties.gate_property(
-            gate=gate, qubits=qubit, name="gate_length"
-        )[0]
-
-    def two_qubit_gate_time(self, gate: str, control: int, target: int) -> float:
-        """Returns the two-qubit gate time for a given gate and qubit.
-
-        Args:
-            gate (str): The input gate.
-            control (int): The input control qubit.
-            target (int): The input target qubit.
-
-        Raises:
-            ValueError: The input gate is not available on the device.
-            ValueError: The input qubit is not available on the device.
-
-        Returns:
-            float: The gate time.
-        """
-        if (
-            control >= self.configurations.n_qubits
-            or target >= self.configurations.n_qubits
-        ):
-            raise ValueError("The input qubit is not available on the device.")
-        if gate not in self.configurations.basis_gates:
-            raise ValueError("The input gate is not available on the device.")
-        return self.properties.gate_property(
-            gate=gate, qubits=[control, target], name="gate_length"
-        )[0]
-
-    def dephasing_time(self, qubit: int) -> float:
-        """Returns the device dephasing value for a given qubit.
-
-        Args:
-            qubit (int): The input qubit.
-
-        Returns:
-            float: The dephasing value of the input qubit in the device.
-        """
-        return self.properties.t2(qubit=qubit)
+                device.set_two_qubit_gate_time(
+                    gate=gate,
+                    control=edge[1],
+                    target=edge[0],
+                    gate_time=properties.gate_property(
+                        gate=gate, qubits=[edge[1], edge[0]], name="gate_length"
+                    )[0],
+                )
+    return device
