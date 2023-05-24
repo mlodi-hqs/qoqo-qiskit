@@ -63,6 +63,27 @@ impl IBMLagosDeviceWrapper {
         self.internal.single_qubit_gate_time(hqslang, &qubit)
     }
 
+    /// Set the gate time of a single qubit gate.
+    ///
+    /// Args:
+    ///     gate (str): hqslang name of the single-qubit-gate.
+    ///     qubit (int): The qubit for which the gate time is set.
+    ///     gate_time (float): The gate time for the given gate.
+    ///
+    /// Raises:
+    ///     PyValueError: Qubit is not in device.
+    #[pyo3(text_signature = "(gate, qubit, gate_time)")]
+    pub fn set_single_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        qubit: usize,
+        gate_time: f64,
+    ) -> PyResult<()> {
+        self.internal
+            .set_single_qubit_gate_time(gate, qubit, gate_time)
+            .map_err(|err| PyValueError::new_err(format!("{:?}", err)))
+    }
+
     /// Returns the names of a single qubit operations available on the device.
     ///
     /// Returns:
@@ -88,6 +109,29 @@ impl IBMLagosDeviceWrapper {
     pub fn two_qubit_gate_time(&self, hqslang: &str, control: usize, target: usize) -> Option<f64> {
         self.internal
             .two_qubit_gate_time(hqslang, &control, &target)
+    }
+
+    /// Set the gate time of a two qubit gate.
+    ///
+    /// Args:
+    ///     gate (str): hqslang name of the single-qubit-gate.
+    ///     control (int): The control qubit for which the gate time is set.
+    ///     target (int): The control qubit for which the gate time is set.
+    ///     gate_time (float): The gate time for the given gate.
+    ///
+    /// Raises:
+    ///     PyValueError: Qubit is not in device.
+    #[pyo3(text_signature = "(gate, control, target, gate_time)")]
+    pub fn set_two_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        control: usize,
+        target: usize,
+        gate_time: f64,
+    ) -> PyResult<()> {
+        self.internal
+            .set_two_qubit_gate_time(gate, control, target, gate_time)
+            .map_err(|err| PyValueError::new_err(format!("{:?}", err)))
     }
 
     /// Returns the names of a two qubit operations available on the device.
@@ -170,6 +214,36 @@ impl IBMLagosDeviceWrapper {
                 }
             }
         })
+    }
+
+    /// Adds single qubit damping to noise rates.
+    ///
+    /// Args:
+    ///     qubit (int): The qubit for which the decoherence is added.
+    ///     damping (float): The damping rates.
+    ///
+    /// Raises:
+    ///     PyValueError: Qubit is not in device.
+    #[pyo3(text_signature = "(qubit, damping)")]
+    pub fn add_damping(&mut self, qubit: usize, damping: f64) -> PyResult<()> {
+        self.internal
+            .add_damping(qubit, damping)
+            .map_err(|err| PyValueError::new_err(format!("Cannot add decoherence: {}", err)))
+    }
+
+    /// Adds single qubit dephasing to noise rates.
+    ///
+    /// Args:
+    ///     qubit (int): The qubit for which the decoherence is added.
+    ///     dephasing (float): The dephasing rates.
+    ///
+    /// Raises:
+    ///     PyValueError: Qubit is not in device.
+    #[pyo3(text_signature = "(qubit, dephasing)")]
+    pub fn add_dephasing(&mut self, qubit: usize, dephasing: f64) -> PyResult<()> {
+        self.internal
+            .add_dephasing(qubit, dephasing)
+            .map_err(|err| PyValueError::new_err(format!("Cannot add decoherence: {}", err)))
     }
 
     /// Return number of qubits in device.
