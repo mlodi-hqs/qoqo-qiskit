@@ -10,14 +10,27 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-use roqoqo::devices::QoqoDevice;
+use std::collections::HashMap;
 
-use ndarray::Array2;
+use roqoqo::{devices::QoqoDevice, RoqoqoError};
+
+use ndarray::{array, Array2};
 
 use crate::IBMDevice;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
-pub struct IBMBelemDevice {}
+pub struct IBMBelemDevice {
+    /// The number of qubits
+    pub number_qubits: usize,
+    /// Gate times for all single qubit gates
+    single_qubit_gates: HashMap<String, HashMap<usize, f64>>,
+    /// Gate times for all two qubit gates
+    two_qubit_gates: HashMap<String, TwoQubitGates>,
+    /// Decoherence rates for all qubits
+    decoherence_rates: HashMap<usize, Array2<f64>>,
+}
+
+type TwoQubitGates = HashMap<(usize, usize), f64>;
 
 impl IBMBelemDevice {
     /// Creates a new IBMBelemDevice.
@@ -27,7 +40,12 @@ impl IBMBelemDevice {
     /// An initiated IBMBelemDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     pub fn new() -> Self {
-        Self {}
+        Self {
+            number_qubits: 5,
+            single_qubit_gates: HashMap::new(),
+            two_qubit_gates: HashMap::new(),
+            decoherence_rates: HashMap::new(),
+        }
     }
 
     /// Returns the IBM's identifier.
@@ -55,6 +73,135 @@ impl From<&IBMBelemDevice> for IBMDevice {
 impl From<IBMBelemDevice> for IBMDevice {
     fn from(input: IBMBelemDevice) -> Self {
         Self::IBMBelemDevice(input)
+    }
+}
+
+impl IBMBelemDevice {
+    /// Setting the gate time of a single qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the single-qubit-gate.
+    /// * `qubit` - The qubit for which the gate time is set.
+    /// * `gate_time` - gate time for the given gate.
+    pub fn set_single_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        qubit: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        if qubit >= self.number_qubits {
+            return Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Qubit {} larger than number qubits {}",
+                    qubit, self.number_qubits
+                ),
+            });
+        }
+        match self.single_qubit_gates.get_mut(gate) {
+            Some(gate_times) => {
+                let gatetime = gate_times.entry(qubit).or_insert(gate_time);
+                *gatetime = gate_time;
+            }
+            None => {
+                let mut new_map = HashMap::new();
+                new_map.insert(qubit, gate_time);
+                self.single_qubit_gates.insert(gate.to_string(), new_map);
+            }
+        }
+        Ok(())
+    }
+
+    /// Setting the gate time of a two qubit gate.
+    ///
+    /// # Arguments
+    ///
+    /// * `gate` - hqslang name of the two-qubit-gate.
+    /// * `control` - The control qubit for which the gate time is set.
+    /// * `target` - The target qubit for which the gate time is set.
+    /// * `gate_time` - gate time for the given gate.
+    pub fn set_two_qubit_gate_time(
+        &mut self,
+        gate: &str,
+        control: usize,
+        target: usize,
+        gate_time: f64,
+    ) -> Result<(), RoqoqoError> {
+        if control >= self.number_qubits {
+            return Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Qubit {} larger than number qubits {}",
+                    control, self.number_qubits
+                ),
+            });
+        }
+        if target >= self.number_qubits {
+            return Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Qubit {} larger than number qubits {}",
+                    target, self.number_qubits
+                ),
+            });
+        }
+
+        match self.two_qubit_gates.get_mut(gate) {
+            Some(gate_times) => {
+                let gatetime = gate_times.entry((control, target)).or_insert(gate_time);
+                *gatetime = gate_time;
+            }
+            None => {
+                let mut new_map = HashMap::new();
+                new_map.insert((control, target), gate_time);
+                self.two_qubit_gates.insert(gate.to_string(), new_map);
+            }
+        }
+        Ok(())
+    }
+
+    /// Adds qubit damping to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the dampins is added.
+    /// * `daming` - The damping rates.
+    pub fn add_damping(&mut self, qubit: usize, damping: f64) -> Result<(), RoqoqoError> {
+        if qubit > self.number_qubits {
+            return Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Qubit {} out of range for device of size {}",
+                    qubit, self.number_qubits
+                ),
+            });
+        }
+        let aa = self
+            .decoherence_rates
+            .entry(qubit)
+            .or_insert_with(|| Array2::zeros((3, 3)));
+        *aa = aa.clone() + array![[damping, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]];
+        Ok(())
+    }
+
+    /// Adds qubit dephasing to noise rates.
+    ///
+    /// # Arguments
+    ///
+    /// * `qubit` - The qubit for which the dephasing is added.
+    /// * `dephasing` - The dephasing rates.
+    pub fn add_dephasing(&mut self, qubit: usize, dephasing: f64) -> Result<(), RoqoqoError> {
+        if qubit > self.number_qubits {
+            return Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Qubit {} out of range for device of size {}",
+                    qubit, self.number_qubits
+                ),
+            });
+        }
+        let aa = self
+            .decoherence_rates
+            .entry(qubit)
+            .or_insert_with(|| Array2::zeros((3, 3)));
+        *aa = aa.clone() + array![[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, dephasing]];
+        Ok(())
     }
 }
 
@@ -199,7 +346,7 @@ impl QoqoDevice for IBMBelemDevice {
     /// * `usize` - The number of qubits in the device.
     ///
     fn number_qubits(&self) -> usize {
-        5
+        self.number_qubits
     }
 
     /// Return a list of longest linear chains through the device.
