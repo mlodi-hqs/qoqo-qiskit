@@ -1,4 +1,4 @@
-"""Test qoqo_qiskit_devices initialization"""
+"""Test qoqo_qiskit_devices information retrieval"""
 # Copyright © 2023 HQS Quantum Simulations GmbH. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -14,12 +14,13 @@
 import pytest
 import sys
 
-from qoqo_qiskit_devices import ibm_devices
+from qoqo_qiskit_devices import ibm_devices, set_qiskit_noise_information
 
 
-def test_belem():
-    """Test IBMBelemDevice initialization."""
+def test_belem_info_update():
+    """Test IBMBelemDevice qiskit's info update."""
     belem = ibm_devices.IBMBelemDevice()
+    set_qiskit_noise_information(belem)
 
 
 if __name__ == "__main__":
