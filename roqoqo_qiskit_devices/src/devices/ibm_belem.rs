@@ -224,7 +224,10 @@ impl QoqoDevice for IBMBelemDevice {
     ///
     #[allow(unused_variables)]
     fn single_qubit_gate_time(&self, hqslang: &str, qubit: &usize) -> Option<f64> {
-        Some(0.0)
+        match self.single_qubit_gates.get(hqslang) {
+            Some(x) => x.get(qubit).copied(),
+            None => None,
+        }
     }
 
     /// Returns the names of a single qubit operations available on the device.
@@ -256,7 +259,10 @@ impl QoqoDevice for IBMBelemDevice {
     ///
     #[allow(unused_variables)]
     fn two_qubit_gate_time(&self, hqslang: &str, control: &usize, target: &usize) -> Option<f64> {
-        Some(0.0)
+        match self.two_qubit_gates.get(&hqslang.to_string()) {
+            Some(x) => x.get(&(*control, *target)).copied(),
+            None => None,
+        }
     }
 
     /// Returns the names of a two qubit operations available on the device.
@@ -336,7 +342,7 @@ impl QoqoDevice for IBMBelemDevice {
     ///
     #[allow(unused_variables)]
     fn qubit_decoherence_rates(&self, qubit: &usize) -> Option<Array2<f64>> {
-        Some(Array2::zeros((3, 3)))
+        self.decoherence_rates.get(qubit).cloned()
     }
 
     /// Returns the number of qubits the device supports.
