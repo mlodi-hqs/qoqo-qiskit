@@ -18,6 +18,7 @@ use roqoqo_qiskit_devices::*;
 
 use test_case::test_case;
 
+#[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
 #[test_case(IBMDevice::from(IBMJakartaDevice::new()); "JakartaDevice")]
 #[test_case(IBMDevice::from(IBMLagosDevice::new()); "LagosDevice")]
 #[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
@@ -35,6 +36,27 @@ fn test_default(device: IBMDevice) {
         IBMDevice::IBMLimaDevice(x) => assert_eq!(x, IBMLimaDevice::default()),
         IBMDevice::IBMManilaDevice(x) => assert_eq!(x, IBMManilaDevice::default()),
         IBMDevice::IBMQuitoDevice(x) => assert_eq!(x, IBMQuitoDevice::default()),
+    }
+}
+
+#[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
+#[test_case(IBMDevice::from(IBMJakartaDevice::new()); "JakartaDevice")]
+#[test_case(IBMDevice::from(IBMLagosDevice::new()); "LagosDevice")]
+#[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
+#[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
+#[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
+#[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
+#[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
+fn test_from(device: IBMDevice) {
+    match device {
+        IBMDevice::IBMLagosDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMNairobiDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMPerthDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMBelemDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMJakartaDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMLimaDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMManilaDevice(x) => _ = IBMDevice::from(&x),
+        IBMDevice::IBMQuitoDevice(x) => _ = IBMDevice::from(&x),
     }
 }
 

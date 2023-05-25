@@ -44,7 +44,7 @@ impl IBMBelemDeviceWrapper {
     /// Returns:
     ///     str: The IBM's identifier of the Device.
     pub fn name(&self) -> &str {
-        roqoqo_qiskit_devices::IBMBelemDevice::name()
+        roqoqo_qiskit_devices::IBMBelemDevice::name(&self.internal)
     }
 
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.

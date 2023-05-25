@@ -44,7 +44,7 @@ impl IBMLagosDeviceWrapper {
     /// Returns:
     ///     str: The IBM's identifier of the Device.
     pub fn name(&self) -> &str {
-        roqoqo_qiskit_devices::IBMLagosDevice::name()
+        roqoqo_qiskit_devices::IBMLagosDevice::name(&self.internal)
     }
 
     /// Returns the gate time of a single qubit operation if the single qubit operation is available on device.
