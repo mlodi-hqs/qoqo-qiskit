@@ -55,6 +55,24 @@ pub enum IBMDevice {
 }
 
 impl IBMDevice {
+    /// Returns the IBM's identifier.
+    ///
+    /// # Returns
+    ///
+    /// A str of the name IBM uses as identifier.
+    pub fn name(self) -> &'static str {
+        match self {
+            IBMDevice::IBMLagosDevice(x) => x.name(),
+            IBMDevice::IBMNairobiDevice(x) => x.name(),
+            IBMDevice::IBMPerthDevice(x) => x.name(),
+            IBMDevice::IBMBelemDevice(x) => x.name(),
+            IBMDevice::IBMJakartaDevice(x) => x.name(),
+            IBMDevice::IBMLimaDevice(x) => x.name(),
+            IBMDevice::IBMManilaDevice(x) => x.name(),
+            IBMDevice::IBMQuitoDevice(x) => x.name(),
+        }
+    }
+
     /// Setting the gate time of a single qubit gate.
     ///
     /// # Arguments

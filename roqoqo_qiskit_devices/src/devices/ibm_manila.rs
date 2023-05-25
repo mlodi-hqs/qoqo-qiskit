@@ -53,7 +53,7 @@ impl IBMManilaDevice {
     /// # Returns
     ///
     /// A str of the name IBM uses as identifier.
-    pub fn name() -> &'static str {
+    pub fn name(self) -> &'static str {
         "ibmq_manila"
     }
 }
