@@ -383,7 +383,16 @@ impl QoqoDevice for IBMBelemDevice {
     /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
     ///
     fn longest_closed_chains(&self) -> Vec<Vec<usize>> {
-        vec![]
+        vec![
+            vec![0, 1],
+            vec![1, 0],
+            vec![1, 2],
+            vec![2, 1],
+            vec![1, 3],
+            vec![3, 1],
+            vec![3, 4],
+            vec![4, 3],
+        ]
     }
 
     /// Returns the list of pairs of qubits linked with a native two-qubit-gate in the device.

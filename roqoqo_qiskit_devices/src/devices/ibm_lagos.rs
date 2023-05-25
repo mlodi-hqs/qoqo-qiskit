@@ -388,7 +388,20 @@ impl QoqoDevice for IBMLagosDevice {
     /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
     ///
     fn longest_closed_chains(&self) -> Vec<Vec<usize>> {
-        vec![]
+        vec![
+            vec![0, 1],
+            vec![1, 0],
+            vec![1, 2],
+            vec![2, 1],
+            vec![1, 3],
+            vec![3, 1],
+            vec![3, 5],
+            vec![5, 3],
+            vec![4, 5],
+            vec![5, 4],
+            vec![5, 6],
+            vec![6, 5],
+        ]
     }
 
     /// Returns the list of pairs of qubits linked with a native two-qubit-gate in the device.
