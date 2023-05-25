@@ -1,17 +1,15 @@
 <img src="../qoqo_Logo_vertical_color.png" alt="qoqo logo" width="300" />
 
-# qoqo_qiskit
+# roqoqo_qiskit_devices
 
 
-Qiskit interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
 
-__General__
+### Installation
 
-qoqo_qiskit provides an interface to Qiskit's package.
-Qiskit is under the Apache-2.0 license ( see https://github.com/Qiskit/qiskit/blob/master/LICENSE.txt ). qoqo_qiskit itself is also provided under the Apache-2.0 license.
+To use roqoqo in a Rust project simply add
 
-__Testing__
+```TOML
+roqoqo = {version="0.1"}
+```
 
-This software is still in the beta stage. Functions and documentation are not yet complete and breaking changes can occur.
-
-If you find unexpected behaviour please open a github issue. You can also run the pytests in qoqo_myqlm/tests/ locally.
+to the `[dependencies]` section of the project Cargo.toml.
