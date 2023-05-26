@@ -12,6 +12,9 @@
 # the License.
 
 from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_provider.accounts.exceptions import AccountNotFoundError
+
+from .mocked_properties import MockedProperties
 
 import types
 
@@ -51,7 +54,11 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
         ibm_devices: The input instance updated with qiskit's physical device info.
     """
     name = device.name()
-    properties = IBMProvider().get_backend(name).properties()
+    try:
+        properties = IBMProvider().get_backend(name).properties()
+    except AccountNotFoundError:
+        properties = MockedProperties()
+
     for qubit in range(device.number_qubits()):
         damping = 1 / properties.t1(qubit=qubit)
         dephasing = 1 / properties.t2(qubit=qubit)
@@ -66,6 +73,7 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
                     gate=qiskit_gate, qubits=qubit, name="gate_length"
                 )[0],
             )
+
     for edge in device.two_qubit_edges():
         for gate in device.two_qubit_gate_names():
             qiskit_gate = _qiskit_gate_equivalent(gate)
@@ -85,4 +93,5 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
                     gate=qiskit_gate, qubits=[edge[1], edge[0]], name="gate_length"
                 )[0],
             )
+
     return device
