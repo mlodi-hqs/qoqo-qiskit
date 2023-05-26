@@ -1,4 +1,4 @@
-qoqo qiskit devices documentation
+qoqo_qiskit_devices documentation
 ========================
 
 .. autosummary::

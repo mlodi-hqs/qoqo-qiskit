@@ -41,7 +41,7 @@ def _qiskit_gate_equivalent(gate: str) -> str:
 def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
     """Sets a qoqo_qiskit_devices.ibm_devices instance noise info.
 
-    Performs the following updates:
+    Obtains the device info from qiskit's IBMProvider and performs the following updates:
         - adds damping
         - adds dephasing
         - sets single qubit gate times
