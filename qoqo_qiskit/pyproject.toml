@@ -34,7 +34,6 @@ dev = [
     'black'
 ]
 docs = [
-    'numpy',
     'sphinx>=2.1',
     'nbsphinx',
     'pygments',
