@@ -2,8 +2,15 @@
 
 # qoqo_qiskit_devices
 
-
 Qiskit devices interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
+
+In order to make the update a device instance with Qiskit's information possible, the user has to run the following code before using this package:
+```python
+from qiskit_ibm_provider import IBMProvider
+
+IBMProvider.save_account(token=MY_API_TOKEN)
+```
+Where `MY_API_TOKEN` is the API key that can be found in the account settings of the IBM Quantum website after registration.
 
 ### Installation
 
