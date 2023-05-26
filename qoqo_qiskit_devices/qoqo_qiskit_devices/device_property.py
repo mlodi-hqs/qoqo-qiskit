@@ -66,23 +66,23 @@ def set_qiskit_noise_information(device: types.ModuleType) -> types.ModuleType:
                     gate=qiskit_gate, qubits=qubit, name="gate_length"
                 )[0],
             )
-        for edge in device.two_qubit_edges():
-            for gate in device.two_qubit_gate_names():
-                qiskit_gate = _qiskit_gate_equivalent(gate)
-                device.set_two_qubit_gate_time(
-                    gate=gate,
-                    control=edge[0],
-                    target=edge[1],
-                    gate_time=properties.gate_property(
-                        gate=qiskit_gate, qubits=[edge[0], edge[1]], name="gate_length"
-                    )[0],
-                )
-                device.set_two_qubit_gate_time(
-                    gate=gate,
-                    control=edge[1],
-                    target=edge[0],
-                    gate_time=properties.gate_property(
-                        gate=qiskit_gate, qubits=[edge[1], edge[0]], name="gate_length"
-                    )[0],
-                )
+    for edge in device.two_qubit_edges():
+        for gate in device.two_qubit_gate_names():
+            qiskit_gate = _qiskit_gate_equivalent(gate)
+            device.set_two_qubit_gate_time(
+                gate=gate,
+                control=edge[0],
+                target=edge[1],
+                gate_time=properties.gate_property(
+                    gate=qiskit_gate, qubits=[edge[0], edge[1]], name="gate_length"
+                )[0],
+            )
+            device.set_two_qubit_gate_time(
+                gate=gate,
+                control=edge[1],
+                target=edge[0],
+                gate_time=properties.gate_property(
+                    gate=qiskit_gate, qubits=[edge[1], edge[0]], name="gate_length"
+                )[0],
+            )
     return device

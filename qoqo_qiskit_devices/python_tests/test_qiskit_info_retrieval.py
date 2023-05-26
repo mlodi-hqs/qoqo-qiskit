@@ -21,13 +21,21 @@ from qoqo_qiskit_devices import ibm_devices, set_qiskit_noise_information
 def test_belem_info_update():
     """Test IBMBelemDevice qiskit's info update."""
     belem = ibm_devices.IBMBelemDevice()
+
+    assert belem.single_qubit_gate_time("PauliX", 0) == 1.0
+    assert belem.two_qubit_gate_time("CNOT", 0, 1) == 1.0
+    assert belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) == None
+    assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
+    assert np.all(belem.qubit_decoherence_rates(0) == 0.0)
+
     set_qiskit_noise_information(belem)
 
-    assert belem.single_qubit_gate_time("PauliX", 0)
-    assert belem.two_qubit_gate_time("CNOT", 0, 1)
+    assert belem.single_qubit_gate_time("PauliX", 0) != 1.0
+    assert belem.two_qubit_gate_time("CNOT", 0, 1) != 1.0
     assert belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) == None
     assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
     assert np.any(belem.qubit_decoherence_rates(0) != 0.0)
+
 
 if __name__ == "__main__":
     pytest.main(sys.argv)
