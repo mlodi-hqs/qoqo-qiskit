@@ -40,12 +40,32 @@ impl IBMLagosDevice {
     /// An initiated IBMLagosDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
     pub fn new() -> Self {
-        Self {
+        let mut device = Self {
             number_qubits: 7,
             single_qubit_gates: HashMap::new(),
             two_qubit_gates: HashMap::new(),
             decoherence_rates: HashMap::new(),
+        };
+
+        for qubit in 0..device.number_qubits() {
+            for gate in device.single_qubit_gate_names() {
+                device
+                    .set_single_qubit_gate_time(&gate, qubit, 1.0)
+                    .unwrap();
+            }
         }
+        for edge in device.two_qubit_edges() {
+            for gate in device.two_qubit_gate_names() {
+                device
+                    .set_two_qubit_gate_time(&gate, edge.0, edge.1, 1.0)
+                    .unwrap();
+                device
+                    .set_two_qubit_gate_time(&gate, edge.1, edge.0, 1.0)
+                    .unwrap();
+            }
+        }
+
+        device
     }
 
     /// Returns the IBM's identifier.

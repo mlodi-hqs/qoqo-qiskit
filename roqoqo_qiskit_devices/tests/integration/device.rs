@@ -81,7 +81,7 @@ fn test_device_name(device: IBMDevice, name: &str) {
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_single_qubit_gate_time(device: IBMDevice) {
-    assert_eq!(device.single_qubit_gate_time("PauliX", &0), None);
+    assert_eq!(device.single_qubit_gate_time("PauliX", &0), 1.0.into());
 }
 
 #[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
@@ -131,7 +131,7 @@ fn test_single_qubit_gate_names(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_two_qubit_gate_time(device: IBMDevice) {
-    assert_eq!(device.two_qubit_gate_time("CNOT", &0, &1), None);
+    assert_eq!(device.two_qubit_gate_time("CNOT", &0, &1), 1.0.into());
 }
 
 #[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
