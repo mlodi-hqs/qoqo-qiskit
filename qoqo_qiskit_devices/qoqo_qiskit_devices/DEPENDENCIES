@@ -6790,7 +6790,7 @@ SOFTWARE.
 
 
 ====================================================
-proc-macro2 1.0.57
+proc-macro2 1.0.58
 https://github.com/dtolnay/proc-macro2
 by David Tolnay <dtolnay@gmail.com>, Alex Crichton <alex@alexcrichton.com>
 A substitute implementation of the compiler's `proc_macro` API to decouple token-based libraries from the procedural macro use case.
@@ -14803,7 +14803,7 @@ LICENSE:
 MIT OR Apache-2.0
 
 ====================================================
-unicode-ident 1.0.8
+unicode-ident 1.0.9
 https://github.com/dtolnay/unicode-ident
 by David Tolnay <dtolnay@gmail.com>
 Determine whether characters have the XID_Start or XID_Continue properties according to Unicode Standard Annex #31
@@ -16004,7 +16004,7 @@ Software.
 
 
 ====================================================
-wide 0.7.8
+wide 0.7.9
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.
