@@ -63,8 +63,8 @@ class QoqoQiskitBackend:
             circuit (Circuit): the Circuit to simulate.
 
         Returns:
-            Tuple[Dict[str, List[List[bool]]],
-                  Dict[str, List[List[float]]],
+            Tuple[Dict[str, List[List[bool]]],\
+                  Dict[str, List[List[float]]],\
                   Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.
 
         Raises:
@@ -201,8 +201,8 @@ class QoqoQiskitBackend:
             measurement: The measurement that is run.
 
         Returns:
-            Tuple[Dict[str, List[List[bool]]],
-                  Dict[str, List[List[float]]],
+            Tuple[Dict[str, List[List[bool]]],\
+                  Dict[str, List[List[float]]],\
                   Dict[str, List[List[complex]]]]
         """
         constant_circuit = measurement.constant_circuit()
