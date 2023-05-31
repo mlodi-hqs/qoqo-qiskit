@@ -18,7 +18,7 @@ import numpy as np
 from qoqo_qiskit_devices import ibm_devices, set_qiskit_noise_information
 
 
-def test_belem_info_update(mocked: bool):
+def test_belem_info_update():
     """Test IBMBelemDevice qiskit's info update."""
     belem = ibm_devices.IBMBelemDevice()
 
