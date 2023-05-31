@@ -163,6 +163,18 @@ impl IBMLimaDevice {
                 ),
             });
         }
+        if !self
+            .two_qubit_edges()
+            .iter()
+            .any(|&(a, b)| (a, b) == (control, target) || (a, b) == (target, control))
+        {
+            return Err(RoqoqoError::GenericError {
+                msg: format!(
+                    "Qubits {} and {} are not connected in the device",
+                    control, target
+                ),
+            });
+        }
 
         match self.two_qubit_gates.get_mut(gate) {
             Some(gate_times) => {

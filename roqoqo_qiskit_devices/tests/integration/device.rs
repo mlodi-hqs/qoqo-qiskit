@@ -143,13 +143,18 @@ fn test_two_qubit_gate_time(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_set_two_qubit_gate_time(mut device: IBMDevice) {
+    // Correct setters
     assert!(device.set_two_qubit_gate_time("CNOT", 0, 1, 0.5).is_ok());
     assert_eq!(device.two_qubit_gate_time("CNOT", &0, &1).unwrap(), 0.5);
     assert!(device.set_two_qubit_gate_time("CNOT", 0, 1, 0.2).is_ok());
     assert_eq!(device.two_qubit_gate_time("CNOT", &0, &1).unwrap(), 0.2);
 
+    // Qubit's value too big
     assert!(device.set_two_qubit_gate_time("CNOT", 0, 12, 0.3).is_err());
     assert!(device.set_two_qubit_gate_time("CNOT", 11, 3, 0.4).is_err());
+
+    // Unconnected qubits
+    assert!(device.set_two_qubit_gate_time("CNOT", 0, 4, 0.8).is_err());
 }
 
 #[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
