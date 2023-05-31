@@ -7,7 +7,10 @@ qoqo_qiskit_devices is the interface for Qiskit's backend devices for HQS Quantu
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+.. autosummary::
+   :toctree: generated/
+
+   qoqo_qiskit_devices
    
 
 
