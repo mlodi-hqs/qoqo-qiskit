@@ -1,0 +1,9 @@
+[book]
+authors = ["HQS Quantum Simulations", "Kirsten Bark", "Nicolas Vogt", "Matteo Lodi"]
+language = "en"
+multilingual = false
+src = "src"
+title = "HQS qoqo_qiskit, qoqo_qiskit_devices and roqoqo_qiskit_devices User Documentation"
+
+[output.html]
+mathjax-support = true

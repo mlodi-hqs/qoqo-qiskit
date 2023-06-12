@@ -6,7 +6,10 @@ Qiskit backend for the qoqo/roqoqo quantum toolkit by `HQS Quantum Simulations <
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+.. autosummary::
+    :toctree: generated/
+
+    qoqo_qiskit
 
 
 
