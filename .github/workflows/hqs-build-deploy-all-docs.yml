@@ -28,7 +28,6 @@ jobs:
         version: latest
     - name: build
       run: |
-        cargo install mdbook
         # qoqo_qiskit
         cd qoqo_qiskit/docs
         python -m sphinx -T -E -b html . _build/html
