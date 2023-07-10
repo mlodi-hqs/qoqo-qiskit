@@ -32,7 +32,7 @@ dev = [
     'bandit',
     'mypy',
     'black',
-    'ruff'
+    'ruff',
 ]
 docs = [
     'sphinx>=2.1',
