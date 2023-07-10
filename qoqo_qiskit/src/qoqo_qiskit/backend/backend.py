@@ -74,7 +74,7 @@ class QoqoQiskitBackend:
             clas_regs_sizes,
             output_bit_register_dict,
             output_float_register_dict,
-            output_complex_register_dict
+            output_complex_register_dict,
         ) = self._setup_registers(circuit)
 
         # Qiskit conversion
@@ -136,14 +136,14 @@ class QoqoQiskitBackend:
         (
             output_bit_register_dict,
             output_float_register_dict,
-            output_complex_register_dict
+            output_complex_register_dict,
         ) = self._transform_result(
             sim_type,
             result,
             clas_regs_sizes,
             output_bit_register_dict,
             output_float_register_dict,
-            output_complex_register_dict
+            output_complex_register_dict,
         )
 
         return (
@@ -262,7 +262,9 @@ class QoqoQiskitBackend:
                 element = element[clas_regs_sizes[key] :]
         return splitted
 
-    def _setup_registers(self, circuit: Circuit) -> Tuple[
+    def _setup_registers(
+        self, circuit: Circuit
+    ) -> Tuple[
         Dict[str, int],
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
@@ -280,9 +282,7 @@ class QoqoQiskitBackend:
         output_complex_register_dict: Dict[str, List[List[complex]]] = {}
 
         for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            internal_bit_register_dict[bit_def.name()] = [
-                False for _ in range(bit_def.length())
-            ]
+            internal_bit_register_dict[bit_def.name()] = [False for _ in range(bit_def.length())]
             clas_regs_sizes[bit_def.name()] = bit_def.length()
             if bit_def.is_output():
                 output_bit_register_dict[bit_def.name()] = []
@@ -297,9 +297,7 @@ class QoqoQiskitBackend:
                 complex(0.0) for _ in range(complex_def.length())
             ]
             if complex_def.is_output():
-                output_complex_register_dict[complex_def.name()] = cast(
-                    List[List[complex]], []
-                )
+                output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
         return (
             clas_regs_sizes,
             output_bit_register_dict,
@@ -346,5 +344,5 @@ class QoqoQiskitBackend:
         return (
             output_bit_register_dict,
             _output_float_register_dict,
-            output_complex_register_dict
+            output_complex_register_dict,
         )
