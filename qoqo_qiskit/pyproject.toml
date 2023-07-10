@@ -31,7 +31,8 @@ dev = [
     'darglint',
     'bandit',
     'mypy',
-    'black'
+    'black',
+    'ruff'
 ]
 docs = [
     'sphinx>=2.1',
