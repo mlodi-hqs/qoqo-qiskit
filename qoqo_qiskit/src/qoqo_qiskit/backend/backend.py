@@ -343,4 +343,8 @@ class QoqoQiskitBackend:
             for reg in output_complex_register_dict:
                 output_complex_register_dict[reg].append(vector)
 
-        return (output_bit_register_dict, _output_float_register_dict, output_complex_register_dict)
+        return (
+            output_bit_register_dict,
+            _output_float_register_dict,
+            output_complex_register_dict
+        )
