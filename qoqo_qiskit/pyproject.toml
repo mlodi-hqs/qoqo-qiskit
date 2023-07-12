@@ -9,7 +9,7 @@ maintainers = [
     {name="Matteo Lodi", email="matteo.lodi@quantumsimulations.de"}
 ]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
     "qoqo>=1.5",
     "qoqo_qasm>=0.8",
