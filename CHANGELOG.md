@@ -2,6 +2,11 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.1.5
+
+* Updated to qoqo 1.5
+* Updated to pyo3 0.19
+
 ### 0.1.4
 
 * Added qoqo_qiskit_devices and roqoqo_qiskit_devices to the repository

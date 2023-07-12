@@ -47,8 +47,10 @@ roqoqo_qiskit_devices = {version="0.1"}
 
 to the `[dependencies]` section of the project Cargo.toml.
 
-## General
+## General Notes
 
 Qiskit is under the Apache-2.0 license ( see https://github.com/Qiskit/qiskit/blob/master/LICENSE.txt ).
 
 qoqo_qiskit, qoqo_qiskit_devices and roqoqo_qiskit_devices are also provided under the Apache-2.0 license.
+
+This project has been partly supported by [QSolid](https://www.q-solid.de/).

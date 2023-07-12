@@ -14,4 +14,4 @@
 
 from qoqo_qiskit.interface.interface import to_qiskit_circuit
 
-__all__ = "to_qiskit_circuit"
+__all__ = ["to_qiskit_circuit"]

@@ -70,38 +70,12 @@ class QoqoQiskitBackend:
         Raises:
             ValueError: the Circuit does not contain Measurement operations
         """
-        clas_regs_sizes: Dict[str, int] = dict()
-
-        # Initializing the classical registers for calculation and output
-        internal_bit_register_dict: Dict[str, List[bool]] = dict()
-        internal_float_register_dict: Dict[str, List[float]] = dict()
-        internal_complex_register_dict: Dict[str, List[complex]] = dict()
-
-        output_bit_register_dict: Dict[str, List[List[bool]]] = dict()
-        output_float_register_dict: Dict[str, List[List[float]]] = dict()
-        output_complex_register_dict: Dict[str, List[List[complex]]] = dict()
-
-        for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            internal_bit_register_dict[bit_def.name()] = [False for _ in range(bit_def.length())]
-            clas_regs_sizes[bit_def.name()] = bit_def.length()
-            if bit_def.is_output():
-                output_bit_register_dict[bit_def.name()] = list()
-
-        for float_def in circuit.filter_by_tag("DefinitionFloat"):
-            internal_float_register_dict[float_def.name()] = [
-                0.0 for _ in range(float_def.length())
-            ]
-            if float_def.is_output():
-                output_float_register_dict[float_def.name()] = cast(List[List[float]], list())
-
-        for complex_def in circuit.filter_by_tag("DefinitionComplex"):
-            internal_complex_register_dict[complex_def.name()] = [
-                complex(0.0) for _ in range(complex_def.length())
-            ]
-            if complex_def.is_output():
-                output_complex_register_dict[complex_def.name()] = cast(
-                    List[List[complex]], list()
-                )
+        (
+            clas_regs_sizes,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        ) = self._setup_registers(circuit)
 
         # Qiskit conversion
         res = to_qiskit_circuit(circuit)
@@ -159,28 +133,18 @@ class QoqoQiskitBackend:
         ).result()
 
         # Result transformation
-        if sim_type == "automatic":
-            if self.memory:
-                transformed_counts = self._counts_to_registers(
-                    result.get_memory(), True, clas_regs_sizes
-                )
-            else:
-                transformed_counts = self._counts_to_registers(
-                    result.get_counts(), False, clas_regs_sizes
-                )
-            for id, reg in enumerate(output_bit_register_dict):
-                reversed_list = []
-                for shot in transformed_counts[id]:
-                    reversed_list.append(shot[::-1])
-                output_bit_register_dict[reg] = reversed_list
-        elif sim_type == "statevector":
-            vector = list(np.asarray(result.data(0)["statevector"]).flatten())
-            for reg in output_complex_register_dict:
-                output_complex_register_dict[reg].append(vector)
-        elif sim_type == "density_matrix":
-            vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
-            for reg in output_complex_register_dict:
-                output_complex_register_dict[reg].append(vector)
+        (
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        ) = self._transform_result(
+            sim_type,
+            result,
+            clas_regs_sizes,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
 
         return (
             output_bit_register_dict,
@@ -206,9 +170,9 @@ class QoqoQiskitBackend:
                   Dict[str, List[List[complex]]]]
         """
         constant_circuit = measurement.constant_circuit()
-        output_bit_register_dict: Dict[str, List[List[bool]]] = dict()
-        output_float_register_dict: Dict[str, List[List[float]]] = dict()
-        output_complex_register_dict: Dict[str, List[List[complex]]] = dict()
+        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
+        output_float_register_dict: Dict[str, List[List[float]]] = {}
+        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
 
         for circuit in measurement.circuits():
             if constant_circuit is None:
@@ -264,17 +228,17 @@ class QoqoQiskitBackend:
             bit_map.append([])
         for key in counts:
             splitted = self._split(key, clas_regs_sizes)
-            for id, measurement in enumerate(splitted):
+            for i, measurement in enumerate(splitted):
                 transf_measurement = self._bit_to_bool(measurement)
                 if mem:
-                    bit_map[id].append(transf_measurement)
+                    bit_map[i].append(transf_measurement)
                 else:
                     for _ in range(counts[key]):
-                        bit_map[id].append(transf_measurement)
+                        bit_map[i].append(transf_measurement)
         return bit_map
 
-    def _are_measurement_operations_in(self, input: Circuit) -> bool:
-        for op in input:
+    def _are_measurement_operations_in(self, circuit: Circuit) -> bool:
+        for op in circuit:
             if "Measurement" in op.tags():
                 return True
         return False
@@ -297,3 +261,88 @@ class QoqoQiskitBackend:
                 splitted[-1] = splitted[-1][::-1]
                 element = element[clas_regs_sizes[key] :]
         return splitted
+
+    def _setup_registers(
+        self, circuit: Circuit
+    ) -> Tuple[
+        Dict[str, int],
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        clas_regs_sizes: Dict[str, int] = {}
+
+        # Initializing the classical registers for calculation and output
+        internal_bit_register_dict: Dict[str, List[bool]] = {}
+        internal_float_register_dict: Dict[str, List[float]] = {}
+        internal_complex_register_dict: Dict[str, List[complex]] = {}
+
+        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
+        output_float_register_dict: Dict[str, List[List[float]]] = {}
+        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
+
+        for bit_def in circuit.filter_by_tag("DefinitionBit"):
+            internal_bit_register_dict[bit_def.name()] = [False for _ in range(bit_def.length())]
+            clas_regs_sizes[bit_def.name()] = bit_def.length()
+            if bit_def.is_output():
+                output_bit_register_dict[bit_def.name()] = []
+        for float_def in circuit.filter_by_tag("DefinitionFloat"):
+            internal_float_register_dict[float_def.name()] = [
+                0.0 for _ in range(float_def.length())
+            ]
+            if float_def.is_output():
+                output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
+        for complex_def in circuit.filter_by_tag("DefinitionComplex"):
+            internal_complex_register_dict[complex_def.name()] = [
+                complex(0.0) for _ in range(complex_def.length())
+            ]
+            if complex_def.is_output():
+                output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
+        return (
+            clas_regs_sizes,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
+
+    def _transform_result(
+        self,
+        sim_type: str,
+        result: Any,
+        clas_regs_sizes: Dict[str, int],
+        output_bit_register_dict: Dict[str, List[List[bool]]],
+        _output_float_register_dict: Dict[str, List[List[float]]],
+        output_complex_register_dict: Dict[str, List[List[complex]]],
+    ) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        if sim_type == "automatic":
+            if self.memory:
+                transformed_counts = self._counts_to_registers(
+                    result.get_memory(), True, clas_regs_sizes
+                )
+            else:
+                transformed_counts = self._counts_to_registers(
+                    result.get_counts(), False, clas_regs_sizes
+                )
+            for i, reg in enumerate(output_bit_register_dict):
+                reversed_list = []
+                for shot in transformed_counts[i]:
+                    reversed_list.append(shot[::-1])
+                output_bit_register_dict[reg] = reversed_list
+        elif sim_type == "statevector":
+            vector = list(np.asarray(result.data(0)["statevector"]).flatten())
+            for reg in output_complex_register_dict:
+                output_complex_register_dict[reg].append(vector)
+        elif sim_type == "density_matrix":
+            vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
+            for reg in output_complex_register_dict:
+                output_complex_register_dict[reg].append(vector)
+
+        return (
+            output_bit_register_dict,
+            _output_float_register_dict,
+            output_complex_register_dict,
+        )
