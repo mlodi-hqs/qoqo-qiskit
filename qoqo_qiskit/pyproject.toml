@@ -14,6 +14,7 @@ dependencies = [
     "qoqo>=1.5",
     "qoqo_qasm>=0.8",
     "qiskit",
+    "qiskit_aer",
     "numpy"
 ]
 
