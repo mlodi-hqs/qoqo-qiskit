@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.1.6
+
+* Added `to_generic_device` function
+
 ### 0.1.5
 
 * Updated to qoqo 1.5
