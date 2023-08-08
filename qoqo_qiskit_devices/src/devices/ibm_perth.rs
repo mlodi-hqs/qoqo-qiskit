@@ -17,8 +17,9 @@ use pyo3::prelude::*;
 
 use bincode::deserialize;
 
+use qoqo::devices::GenericDeviceWrapper;
 use roqoqo::devices::QoqoDevice;
-use roqoqo_qiskit_devices::IBMPerthDevice;
+use roqoqo_qiskit_devices::{IBMDevice, IBMPerthDevice};
 
 /// IBM Perth device
 ///
@@ -301,6 +302,22 @@ impl IBMPerthDeviceWrapper {
     ///
     pub fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
         self.internal.two_qubit_edges()
+    }
+
+    /// Convert the device to a qoqo GenericDevice.
+    ///
+    /// Returns:
+    ///     GenericDevice: converted device.
+    ///
+    /// Raises:
+    ///     PyValueError: Could not convert the device to a qoqo GenericDevice.
+    pub fn to_generic_device(&self) -> PyResult<GenericDeviceWrapper> {
+        let ibm_device: IBMDevice = self.internal.clone().into();
+        Ok(GenericDeviceWrapper {
+            internal: ibm_device.to_generic_device().map_err(|err| {
+                PyValueError::new_err(format!("Cannot convert device to generic device: {}", err))
+            })?,
+        })
     }
 }
 

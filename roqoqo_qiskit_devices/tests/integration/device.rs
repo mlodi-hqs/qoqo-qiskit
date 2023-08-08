@@ -12,7 +12,7 @@
 
 use ndarray::array;
 
-use roqoqo::devices::QoqoDevice;
+use roqoqo::devices::{Device, QoqoDevice};
 use roqoqo_qiskit_devices::*;
 // use roqoqo_qiskit_devices::IBMDevice::*;
 
@@ -316,4 +316,54 @@ fn test_longest_closed_chain(device: IBMDevice) {
 #[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
 fn test_edges(device: IBMDevice) {
     assert!(!device.two_qubit_edges().is_empty());
+}
+
+#[test_case(IBMDevice::from(IBMBelemDevice::new()); "BelemDevice")]
+#[test_case(IBMDevice::from(IBMJakartaDevice::new()); "JakartaDevice")]
+#[test_case(IBMDevice::from(IBMLagosDevice::new()); "LagosDevice")]
+#[test_case(IBMDevice::from(IBMLimaDevice::new()); "LimaDevice")]
+#[test_case(IBMDevice::from(IBMManilaDevice::new()); "ManilaDevice")]
+#[test_case(IBMDevice::from(IBMNairobiDevice::new()); "NairobiDevice")]
+#[test_case(IBMDevice::from(IBMPerthDevice::new()); "PerthDevice")]
+#[test_case(IBMDevice::from(IBMQuitoDevice::new()); "QuitoDevice")]
+fn test_to_generic_device(device: IBMDevice) {
+    let created_generic = device.to_generic_device().unwrap();
+    assert_eq!(device.number_qubits(), created_generic.number_qubits());
+    let mut ibm_single_sorted = device.single_qubit_gate_names();
+    ibm_single_sorted.sort();
+    let mut generic_single_sorted = created_generic.single_qubit_gate_names();
+    generic_single_sorted.sort();
+    assert!(ibm_single_sorted == generic_single_sorted);
+    for i in 0..device.number_qubits() {
+        for gate in device.single_qubit_gate_names() {
+            assert_eq!(
+                device.single_qubit_gate_time(gate.as_str(), &i),
+                created_generic.single_qubit_gate_time(gate.as_str(), &i)
+            );
+        }
+        assert_eq!(
+            device.qubit_decoherence_rates(&i),
+            created_generic.qubit_decoherence_rates(&i)
+        );
+    }
+    let mut ibm_two_sorted = device.two_qubit_gate_names();
+    ibm_two_sorted.sort();
+    let mut generic_two_sorted = created_generic.two_qubit_gate_names();
+    generic_two_sorted.sort();
+    assert!(ibm_two_sorted == generic_two_sorted);
+    for gate in device.two_qubit_gate_names() {
+        for i in 0..device.number_qubits() - 1 {
+            for j in 1..device.number_qubits() {
+                assert_eq!(
+                    device.two_qubit_gate_time(gate.as_str(), &i, &j),
+                    created_generic.two_qubit_gate_time(gate.as_str(), &i, &j)
+                );
+            }
+        }
+    }
+    assert_eq!(
+        device.multi_qubit_gate_names(),
+        created_generic.multi_qubit_gate_names()
+    );
+    assert_eq!(device.two_qubit_edges(), created_generic.two_qubit_edges());
 }

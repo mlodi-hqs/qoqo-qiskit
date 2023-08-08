@@ -14,7 +14,7 @@
 //!
 //! Provides the devices that are used to execute quantum programs on IBM's devices.
 
-use roqoqo::devices::QoqoDevice;
+use roqoqo::devices::{GenericDevice, QoqoDevice};
 use roqoqo::RoqoqoError;
 
 mod ibm_belem;
@@ -177,6 +177,57 @@ impl IBMDevice {
             IBMDevice::IBMManilaDevice(x) => x.add_dephasing(qubit, dephasing),
             IBMDevice::IBMQuitoDevice(x) => x.add_dephasing(qubit, dephasing),
         }
+    }
+
+    /// Converts the device to a qoqo GenericDevice.
+    ///
+    /// # Returns
+    ///
+    /// * `GenericDevice` - The converted device.
+    /// * `RoqoqoError` - The error propagated from adding gate times and decoherence rates.
+    pub fn to_generic_device(&self) -> Result<GenericDevice, RoqoqoError> {
+        let mut new_generic_device = GenericDevice::new(self.number_qubits());
+
+        // Gate times
+        for gate in self.single_qubit_gate_names() {
+            for qubit in 0..self.number_qubits() {
+                if let Some(x) = self.single_qubit_gate_time(gate.as_str(), &qubit) {
+                    new_generic_device.set_single_qubit_gate_time(gate.as_str(), qubit, x)?;
+                }
+            }
+        }
+        for gate in self.two_qubit_gate_names() {
+            for (control, target) in self.two_qubit_edges() {
+                if let Some(x) = self.two_qubit_gate_time(gate.as_str(), &control, &target) {
+                    new_generic_device.set_two_qubit_gate_time(
+                        gate.as_str(),
+                        control,
+                        target,
+                        x,
+                    )?;
+                }
+            }
+            for (control, target) in self.two_qubit_edges() {
+                if let Some(x) = self.two_qubit_gate_time(gate.as_str(), &target, &control) {
+                    new_generic_device.set_two_qubit_gate_time(
+                        gate.as_str(),
+                        target,
+                        control,
+                        x,
+                    )?;
+                }
+            }
+        }
+        // for gate in self.multi_qubit_gate_names() {} // - skipped here as none of the devies have multi-qubit gates
+
+        // Decoherence rates
+        for qubit in 0..self.number_qubits() {
+            if let Some(x) = self.qubit_decoherence_rates(&qubit) {
+                new_generic_device.set_qubit_decoherence_rates(qubit, x)?;
+            }
+        }
+
+        Ok(new_generic_device)
     }
 }
 
