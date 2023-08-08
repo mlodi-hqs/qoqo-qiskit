@@ -25,13 +25,16 @@ from typing import Tuple, Dict, List, cast, Any, Optional
 class QoqoQiskitBackend:
     """Simulate a Qoqo QuantumProgram on a Qiskit backend."""
 
-    def __init__(self, qiskit_backend: Backend = None, memory: bool = False) -> None:
+    def __init__(
+        self, qiskit_backend: Backend = None, memory: bool = False, compilation: bool = True
+    ) -> None:
         """Init for Qiskit backend settings.
 
         Args:
             qiskit_backend (Backend): Qiskit backend instance to use for the simulation.
             memory (bool): Whether the output will return the actual single shots instead
                            of an equivalent sequence taken from a result summary.
+            compilation (bool): Whether the qiskit `compiler` should be used instead of `run`.
 
         Raises:
             TypeError: the input is not a valid Qiskit Backend instance.
@@ -43,6 +46,7 @@ class QoqoQiskitBackend:
         else:
             self.qiskit_backend = qiskit_backend
         self.memory = memory
+        self.compilation = compilation
 
     def run_circuit(
         self, circuit: Circuit
@@ -77,8 +81,23 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         ) = self._setup_registers(circuit)
 
+        try:
+            defs = circuit.definitions()
+            doubles = [defs[0]]
+            for op in defs:
+                if op not in doubles:
+                    doubles.append(op)
+            debugged_circuit = Circuit()
+            for def_bit in doubles:
+                debugged_circuit += def_bit
+            for op in circuit:
+                if op not in doubles:
+                    debugged_circuit += op
+        except IndexError:
+            debugged_circuit = circuit
+
         # Qiskit conversion
-        res = to_qiskit_circuit(circuit)
+        res = to_qiskit_circuit(debugged_circuit)
         compiled_circuit: QuantumCircuit = res[0]
         run_options: Dict[str, Any] = res[1]
 
@@ -128,9 +147,12 @@ class QoqoQiskitBackend:
             shots = custom_shots
 
         # Simulation
-        result = execute(
-            compiled_circuit, self.qiskit_backend, shots=shots, memory=self.memory
-        ).result()
+        if self.compilation:
+            result = execute(
+                compiled_circuit, self.qiskit_backend, shots=shots, memory=self.memory
+            ).result()
+        else:
+            result = self.qiskit_backend.run(compiled_circuit, shots=shots)
 
         # Result transformation
         (

@@ -235,9 +235,7 @@ def test_measurement(operations: List[Any]):
     circuit += ops.DefinitionBit("ri", len(involved_qubits), True)
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    input = PauliZProductInput(
-        number_qubits=len(involved_qubits), use_flipped_measurement=True
-    )
+    input = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
 
     measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=input)
 
@@ -273,6 +271,28 @@ def test_run_options():
     result = backend.run_circuit(circuit_1)
 
     assert len(result[0]["ro"]) == 250
+
+
+def test_debugged_circuit():
+    backend = QoqoQiskitBackend()
+
+    circuit = Circuit()
+    circuit += ops.DefinitionBit("ri", 1, True)
+    circuit += ops.DefinitionBit("ri", 1, True)
+    circuit += ops.DefinitionBit("ro", 1, True)
+    circuit += ops.MeasureQubit(0, "ri", 0)
+    circuit += ops.MeasureQubit(1, "ro", 0)
+
+    circuit_test = Circuit()
+    circuit_test += ops.DefinitionBit("ri", 1, True)
+    circuit_test += ops.DefinitionBit("ro", 1, True)
+    circuit_test += ops.MeasureQubit(0, "ri", 0)
+    circuit_test += ops.MeasureQubit(1, "ro", 0)
+
+    result = backend.run_circuit(circuit)
+    comparison = backend.run_circuit(circuit_test)
+
+    assert result == comparison
 
 
 @pytest.mark.parametrize(
