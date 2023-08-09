@@ -13,6 +13,7 @@
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
+use qoqo::devices::GenericDeviceWrapper;
 use qoqo_qiskit_devices::*;
 use roqoqo_qiskit_devices::*;
 
@@ -135,4 +136,29 @@ fn test_damping_dephasing_decoherence(device: Py<PyAny>) {
             ]
         )
     });
+}
+
+/// Test single_qubit_gate_names and two_qubit_gate_names functions of the devices
+#[test_case(IBMDevice::from(IBMBelemDevice::new()), new_device(IBMDevice::from(IBMBelemDevice::new())); "belem")]
+#[test_case(IBMDevice::from(IBMNairobiDevice::new()), new_device(IBMDevice::from(IBMNairobiDevice::new())); "nairobi")]
+#[test_case(IBMDevice::from(IBMJakartaDevice::new()), new_device(IBMDevice::from(IBMJakartaDevice::new())); "jakarta")]
+#[test_case(IBMDevice::from(IBMLagosDevice::new()), new_device(IBMDevice::from(IBMLagosDevice::new())); "lagos")]
+#[test_case(IBMDevice::from(IBMLimaDevice::new()), new_device(IBMDevice::from(IBMLimaDevice::new())); "lima")]
+#[test_case(IBMDevice::from(IBMManilaDevice::new()), new_device(IBMDevice::from(IBMManilaDevice::new())); "manila")]
+#[test_case(IBMDevice::from(IBMPerthDevice::new()), new_device(IBMDevice::from(IBMPerthDevice::new())); "perth")]
+#[test_case(IBMDevice::from(IBMQuitoDevice::new()), new_device(IBMDevice::from(IBMQuitoDevice::new())); "quito")]
+fn test_to_generic_device(device: IBMDevice, pyo3_device: Py<PyAny>) {
+    pyo3::prepare_freethreaded_python();
+    Python::with_gil(|py| {
+        let result = pyo3_device
+            .call_method0(py, "to_generic_device")
+            .unwrap()
+            .extract::<GenericDeviceWrapper>(py)
+            .unwrap();
+
+        let rust_result: GenericDeviceWrapper = GenericDeviceWrapper {
+            internal: device.to_generic_device().unwrap(),
+        };
+        assert_eq!(result, rust_result);
+    })
 }
