@@ -63,7 +63,7 @@ def set_qiskit_noise_information(
 
     for qubit in range(device.number_qubits()):
         damping = 1 / properties.t1(qubit=qubit)
-        dephasing = 1 / properties.t2(qubit=qubit)
+        dephasing = 1 / properties.t2(qubit=qubit) - 1 / (2 * properties.t1(qubit=qubit))
         device.add_damping(qubit=qubit, damping=damping)
         device.add_dephasing(qubit=qubit, dephasing=dephasing)
         for gate in device.single_qubit_gate_names():

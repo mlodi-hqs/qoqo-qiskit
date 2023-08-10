@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.1.7
+
+* Fixed missing transformation of T2 to Tphi
+
 ### 0.1.6
 
 * Added `to_generic_device` function
