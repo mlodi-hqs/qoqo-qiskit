@@ -54,4 +54,4 @@ class MockedProperties:
         Returns:
             float: T2 mocked time.
         """
-        return 100.0
+        return 400.0

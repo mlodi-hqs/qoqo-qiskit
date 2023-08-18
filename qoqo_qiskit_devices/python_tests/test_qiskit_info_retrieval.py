@@ -14,6 +14,7 @@
 import pytest
 import sys
 import numpy as np
+import warnings
 
 from qoqo_qiskit_devices import ibm_devices, set_qiskit_noise_information
 
@@ -28,13 +29,19 @@ def test_belem_info_update():
     assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
     assert np.all(belem.qubit_decoherence_rates(0) == 0.0)
 
-    set_qiskit_noise_information(belem, get_mocked_information=True)
+    with warnings.catch_warnings(record=True) as w:
+        set_qiskit_noise_information(belem, get_mocked_information=True)
 
-    assert belem.single_qubit_gate_time("PauliX", 0) != 1.0
-    assert belem.two_qubit_gate_time("CNOT", 0, 1) != 1.0
-    assert belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) == None
-    assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
-    assert np.any(belem.qubit_decoherence_rates(0) != 0.0)
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "dephasing" in str(w[-1].message)
+        assert belem.single_qubit_gate_time("PauliX", 0) != 1.0
+        assert belem.two_qubit_gate_time("CNOT", 0, 1) != 1.0
+        assert (
+            belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) == None
+        )
+        assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
+        assert np.any(belem.qubit_decoherence_rates(0) != 0.0)
 
 
 if __name__ == "__main__":
