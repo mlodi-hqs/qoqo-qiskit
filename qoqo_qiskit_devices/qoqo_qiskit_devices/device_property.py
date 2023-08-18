@@ -16,6 +16,7 @@ from qiskit_ibm_provider import IBMProvider
 from .mocked_properties import MockedProperties
 
 import types
+import warnings
 
 
 def _qiskit_gate_equivalent(gate: str) -> str:
@@ -56,6 +57,7 @@ def set_qiskit_noise_information(
         ibm_devices: The input instance updated with qiskit's physical device info.
     """
     name = device.name()
+    warn = False
     if get_mocked_information:
         properties = MockedProperties()
     else:
@@ -63,7 +65,11 @@ def set_qiskit_noise_information(
 
     for qubit in range(device.number_qubits()):
         damping = 1 / properties.t1(qubit=qubit)
-        dephasing = 1 / properties.t2(qubit=qubit) - 1 / (2 * properties.t1(qubit=qubit))
+        dephasing = 1 / properties.t2(qubit=qubit) - 1 / (
+            2 * properties.t1(qubit=qubit)
+        )
+        if dephasing < 0:
+            warn = True
         device.add_damping(qubit=qubit, damping=damping)
         device.add_dephasing(qubit=qubit, dephasing=dephasing)
         for gate in device.single_qubit_gate_names():
@@ -95,5 +101,11 @@ def set_qiskit_noise_information(
                     gate=qiskit_gate, qubits=[edge[1], edge[0]], name="gate_length"
                 )[0],
             )
+
+    if warn:
+        warnings.warn(
+            "IBM's calibration data resulted in negative dephasing value(s).",
+            stacklevel=2,
+        )
 
     return device
