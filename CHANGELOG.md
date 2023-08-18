@@ -2,13 +2,18 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.1.8
+
+* Added `qoqo_qiskit_device_from_ibmq_identifier` function
+* Added warning in case the dephasing obtained from IBM's machines turns out to be negative
+
 ### 0.1.7
 
 * Fixed missing transformation of T2 to Tphi
 
 ### 0.1.6
 
-* Added `to_generic_device` function
+* Added `to_generic_device` method
 
 ### 0.1.5
 
