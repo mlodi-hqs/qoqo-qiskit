@@ -162,3 +162,22 @@ fn test_to_generic_device(device: IBMDevice, pyo3_device: Py<PyAny>) {
         assert_eq!(result, rust_result);
     })
 }
+
+/// Test qoqo_qiskit_device_from_ibmq_identifier method
+#[test_case("ibmq_belem", new_device(IBMDevice::from(IBMBelemDevice::new())); "belem")]
+#[test_case("ibm_nairobi", new_device(IBMDevice::from(IBMNairobiDevice::new())); "nairobi")]
+#[test_case("ibmq_jakarta", new_device(IBMDevice::from(IBMJakartaDevice::new())); "jakarta")]
+#[test_case("ibm_lagos", new_device(IBMDevice::from(IBMLagosDevice::new())); "lagos")]
+#[test_case("ibmq_lima", new_device(IBMDevice::from(IBMLimaDevice::new())); "lima")]
+#[test_case("ibmq_manila", new_device(IBMDevice::from(IBMManilaDevice::new())); "manila")]
+#[test_case("ibm_perth", new_device(IBMDevice::from(IBMPerthDevice::new())); "perth")]
+#[test_case("ibmq_quito", new_device(IBMDevice::from(IBMQuitoDevice::new())); "quito")]
+fn test_initialization_from_identifier(name: &str, device: Py<PyAny>) {
+    pyo3::prepare_freethreaded_python();
+    Python::with_gil(|py| {
+        let device_type = device.as_ref(py).get_type();
+        let result = qoqo_qiskit_device_from_ibmq_identifier(name).unwrap();
+        let resulting_type = result.as_ref(py).get_type();
+        assert!(device_type.compare(resulting_type).is_ok());
+    })
+}
