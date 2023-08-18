@@ -37,7 +37,7 @@ pub use ibm_quito::*;
 use pyo3::{exceptions::PyValueError, prelude::*};
 
 /// Instantiate a new IBMDevice instance based on the given IBM identifier.
-/// 
+///
 /// Currently available identifiers:
 ///     - ibm_lagos
 ///     - ibm_nairobi
@@ -47,7 +47,7 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 ///     - ibmq_lima
 ///     - ibmq_manila
 ///     - ibmq_quito
-/// 
+///
 #[pyfunction]
 pub fn qoqo_qiskit_device_from_ibmq_identifier(identifier: &str) -> PyResult<Py<PyAny>> {
     pyo3::prepare_freethreaded_python();
