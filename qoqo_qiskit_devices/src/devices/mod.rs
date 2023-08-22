@@ -50,7 +50,7 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 ///
 /// Args:
 ///     identifier (str): The IBM identifier of the device.
-/// 
+///
 /// Returns:
 ///     qoqo_qiskit_devices.devices: The new device instance.
 #[pyfunction]
