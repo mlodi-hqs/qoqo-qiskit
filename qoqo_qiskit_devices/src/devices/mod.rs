@@ -48,6 +48,11 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 ///     - ibmq_manila
 ///     - ibmq_quito
 ///
+/// Args:
+///     identifier (str): The IBM identifier of the device.
+/// 
+/// Returns:
+///     qoqo_qiskit_devices.devices: The new device instance.
 #[pyfunction]
 pub fn qoqo_qiskit_device_from_ibmq_identifier(identifier: &str) -> PyResult<Py<PyAny>> {
     pyo3::prepare_freethreaded_python();
