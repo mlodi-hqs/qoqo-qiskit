@@ -4,7 +4,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 ### 0.1.9
 
-* Corrects `0.1.8` release issues
+* Corrected `0.1.8` release issues
 * Fixed README
 * Fixed docs
 
