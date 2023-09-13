@@ -55,7 +55,6 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 ///     qoqo_qiskit_devices.devices: The new device instance.
 #[pyfunction]
 pub fn qoqo_qiskit_device_from_ibmq_identifier(identifier: &str) -> PyResult<Py<PyAny>> {
-    pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| -> PyResult<Py<PyAny>> {
         match identifier {
             "ibm_lagos" => Ok(py

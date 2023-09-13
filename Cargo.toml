@@ -3,6 +3,7 @@ members = [
     "roqoqo_qiskit_devices",
     "qoqo_qiskit_devices",
 ]
+resolver = "2"
 
 [profile.release]
 lto = true

@@ -2,6 +2,11 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.1.10
+
+* Fixed linux deploy issues
+* Updated to qoqo 1.6
+
 ### 0.1.9
 
 * Corrected `0.1.8` release issues
