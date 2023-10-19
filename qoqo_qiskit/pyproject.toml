@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_qiskit"
-version = "0.1.10"
+version = "0.1.11"
 license = {file="LICENSE"}
 authors = [
     {name="HQS Quantum Simulation GmbH", email="info@quantumsimulations.de"}
@@ -11,8 +11,8 @@ maintainers = [
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "qoqo>=1.6",
-    "qoqo_qasm>=0.8",
+    "qoqo>=1.7",
+    "qoqo_qasm>=0.9.1",
     "qiskit",
     "qiskit_aer",
     "numpy"

@@ -1,9 +1,9 @@
 [project]
 name = "qoqo_qiskit_devices"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
   'qoqo_calculator_pyo3>=1.1',
-  'qoqo>=1.6',
+  'qoqo>=1.7',
   'qiskit-ibm-provider',
 ]
 license = {text="Apache-2.0 AND Apache-2.0 with LLVM-exception AND MIT AND Unicode-DFS-2016 AND BSD-2-Clause AND BSD-3-CLause"}
