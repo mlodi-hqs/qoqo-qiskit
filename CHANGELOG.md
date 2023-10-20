@@ -2,7 +2,7 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
-### 0.1.11
+### 0.2.0
 
 * Updated to qoqo 1.7
 

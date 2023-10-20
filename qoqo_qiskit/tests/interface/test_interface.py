@@ -28,10 +28,12 @@ def test_basic_circuit():
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.PauliX(1)
+    circuit += ops.Identity(1)
 
     qc = QuantumCircuit(2)
     qc.h(0)
     qc.x(1)
+    qc.id(1)
 
     out_circ, sim_dict = to_qiskit_circuit(circuit)
 
@@ -156,8 +158,7 @@ def test_simulation_info():
 
     assert sim_dict["SimulationInfo"]["PragmaGetStateVector"] == True
     assert sim_dict["SimulationInfo"]["PragmaGetDensityMatrix"] == True
-
-
+    
 # For pytest
 if __name__ == "__main__":
     pytest.main(sys.argv)
