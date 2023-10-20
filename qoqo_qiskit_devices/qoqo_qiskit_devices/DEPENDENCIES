@@ -2251,7 +2251,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-hashbrown 0.14.1
+hashbrown 0.14.2
 https://github.com/rust-lang/hashbrown
 by Amanieu d'Antras <amanieu@gmail.com>
 A Rust port of Google's SwissTable hash map
@@ -10431,7 +10431,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_qiskit_devices 0.1.11
+qoqo_qiskit_devices 0.2.0
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for qoqo python quantum computing toolkit
@@ -12476,7 +12476,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_qiskit_devices 0.1.11
+roqoqo_qiskit_devices 0.2.0
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for roqoqo rust quantum computing toolkit
@@ -15766,7 +15766,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-target-lexicon 0.12.11
+target-lexicon 0.12.12
 https://github.com/bytecodealliance/target-lexicon
 by Dan Gohman <sunfish@mozilla.com>
 Targeting utilities for compilers and related tools
@@ -16093,7 +16093,7 @@ SOFTWARE.
 
 
 ====================================================
-thiserror 1.0.49
+thiserror 1.0.50
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 derive(Error)
@@ -16307,7 +16307,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-thiserror-impl 1.0.49
+thiserror-impl 1.0.50
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 Implementation detail of the `thiserror` crate
