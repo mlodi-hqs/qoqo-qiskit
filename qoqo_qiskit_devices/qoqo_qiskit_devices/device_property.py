@@ -36,6 +36,8 @@ def _qiskit_gate_equivalent(gate: str) -> str:
         return "sx"
     elif gate == "CNOT":
         return "cx"
+    elif gate == "Identity":
+        return "id"
 
 
 def set_qiskit_noise_information(
