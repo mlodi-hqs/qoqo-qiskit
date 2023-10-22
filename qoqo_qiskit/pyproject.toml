@@ -49,6 +49,9 @@ docs = [
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+py-modules = []
+
 [tool.mypy]
 ignore_missing_imports = true
 pretty = true
