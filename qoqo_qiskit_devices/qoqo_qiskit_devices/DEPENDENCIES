@@ -10431,7 +10431,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_qiskit_devices 0.2.0
+qoqo_qiskit_devices 0.1.11
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for qoqo python quantum computing toolkit
@@ -12476,7 +12476,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_qiskit_devices 0.2.0
+roqoqo_qiskit_devices 0.1.11
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for roqoqo rust quantum computing toolkit

@@ -2,9 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
-### 0.2.0
+### 0.1.11
 
 * Updated to qoqo 1.7
+* Added Identity gate IBM info retrieval
 
 ### 0.1.10
 
