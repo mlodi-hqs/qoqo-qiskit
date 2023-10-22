@@ -11,6 +11,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
+import warnings
 import pytest
 import sys
 
@@ -19,13 +20,16 @@ from qoqo_qiskit_devices import ibm_devices
 
 def test_belem():
     """Test IBMBelemDevice initialization."""
-    belem = ibm_devices.IBMBelemDevice()
+    with warnings.catch_warnings(record=True) as w:
+        belem = ibm_devices.IBMBelemDevice()
+        assert len(w) == 1
 
 
 def test_jakarta():
     """Test IBMJakartaDevice initialization."""
-    jakarta = ibm_devices.IBMJakartaDevice()
-
+    with warnings.catch_warnings(record=True) as w:
+        jakarta = ibm_devices.IBMJakartaDevice()
+        assert len(w) == 1
 
 def test_lagos():
     """Test IBMLagosDevice initialization."""
@@ -34,12 +38,16 @@ def test_lagos():
 
 def test_lima():
     """Test IBMLimaDevice initialization."""
-    lima = ibm_devices.IBMLimaDevice()
+    with warnings.catch_warnings(record=True) as w:
+        lima = ibm_devices.IBMLimaDevice()
+        assert len(w) == 1
 
 
 def test_manila():
     """Test IBMManilaDevice initialization."""
-    manila = ibm_devices.IBMManilaDevice()
+    with warnings.catch_warnings(record=True) as w:
+        manila = ibm_devices.IBMManilaDevice()
+        assert len(w) == 1
 
 
 def test_nairobi():
@@ -54,7 +62,9 @@ def test_perth():
 
 def test_quito():
     """Test IBMQuitoDevice initialization."""
-    quito = ibm_devices.IBMQuitoDevice()
+    with warnings.catch_warnings(record=True) as w:
+        quito = ibm_devices.IBMQuitoDevice()
+        assert len(w) == 1
 
 
 if __name__ == "__main__":

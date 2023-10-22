@@ -5,7 +5,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 ### 0.1.11
 
 * Updated to qoqo 1.7
-* Added Identity gate IBM info retrieval
+* Added deprecation warnings for retired devices (Belem, Jakarta, Lima, Manila, Quito)
 
 ### 0.1.10
 
