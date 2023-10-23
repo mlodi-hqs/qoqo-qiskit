@@ -57,6 +57,7 @@ fn test_gate_names(device: Py<PyAny>) {
         assert!(single_qubit_gates.contains(&"PauliX".to_string()));
         assert!(single_qubit_gates.contains(&"SqrtPauliX".to_string()));
         assert!(single_qubit_gates.contains(&"RotateZ".to_string()));
+        assert!(single_qubit_gates.contains(&"Identity".to_string()));
 
         let two_qubit_gates = device
             .call_method0(py, "two_qubit_gate_names")
