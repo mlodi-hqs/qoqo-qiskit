@@ -16,11 +16,15 @@ import sys
 import numpy as np
 import warnings
 
-from qoqo_qiskit_devices import ibm_devices, set_qiskit_noise_information
+from qoqo_qiskit_devices import (
+    ibm_devices,
+    set_qiskit_noise_information,
+    get_error_on_gate_model,
+)
 
 
-def test_belem_info_update():
-    """Test IBMBelemDevice qiskit's info update."""
+def test_info_update():
+    """Test set_qiskit_noise_information method."""
     belem = ibm_devices.IBMBelemDevice()
 
     assert belem.single_qubit_gate_time("PauliX", 0) == 1.0
@@ -42,6 +46,31 @@ def test_belem_info_update():
         )
         assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
         assert np.any(belem.qubit_decoherence_rates(0) != 0.0)
+
+
+def test_noise_model():
+    """Test get_error_on_gate_model method."""
+    perth = ibm_devices.IBMPerthDevice()
+
+    with warnings.catch_warnings(record=True) as w:
+        noise_model = get_error_on_gate_model(perth, get_mocked_information=True)
+
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "dephasing" in str(w[-1].message)
+
+        for gate in [
+            gate for gate in perth.single_qubit_gate_names() if gate != "RotateZ"
+        ]:
+            for qubit in range(0, perth.number_qubits()):
+                assert noise_model.get_single_qubit_gate_error(gate, qubit) is not None
+
+        for gate in perth.two_qubit_gate_names():
+            for edge in perth.two_qubit_edges():
+                assert (
+                    noise_model.get_two_qubit_gate_error(gate, edge[0], edge[1])
+                    is not None
+                )
 
 
 if __name__ == "__main__":
