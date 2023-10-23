@@ -96,6 +96,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfa799dd5ed20a7e349f3b4639aa80d74549c81716d9ec4f994c9b5815598306"
 
 [[package]]
+name = "inventory"
+version = "0.3.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1be380c410bf0595e94992a648ea89db4dd3f3354ba54af206fd2a68cf5ac8e"
+
+[[package]]
 name = "itertools"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -342,6 +348,7 @@ checksum = "e681a6cfdc4adcc93b4d3cf993749a4552018ee0a9b65fc0ccfad74352c72a38"
 dependencies = [
  "cfg-if",
  "indoc",
+ "inventory",
  "libc",
  "memoffset",
  "num-complex",
@@ -397,9 +404,9 @@ dependencies = [
 
 [[package]]
 name = "qoqo"
-version = "1.6.1"
+version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8dbb59a54574177f4ab843b0b87f80497d2469092c77e8b96e7f7baad959a965"
+checksum = "d1dbcc69ae965d0c19f9ce0d4290db77689e3a22462fe0fbcf93fc85939a969e"
 dependencies = [
  "bincode",
  "ndarray",
@@ -416,15 +423,17 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "struqture",
+ "struqture-py",
  "syn 2.0.28",
  "thiserror",
 ]
 
 [[package]]
 name = "qoqo-macros"
-version = "1.6.1"
+version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "064bfdf00256e0598ee54fbaa54db9b440826db0b2590b14353f6a599afa7af6"
+checksum = "e0361ef299a5691f0ae9ed9bf6eccaa468d61d98635e6aa60730dc46585d2cc6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -459,7 +468,7 @@ dependencies = [
 
 [[package]]
 name = "qoqo_qiskit_devices"
-version = "0.1.10"
+version = "0.2.0"
 dependencies = [
  "bincode",
  "ndarray",
@@ -541,9 +550,9 @@ dependencies = [
 
 [[package]]
 name = "roqoqo"
-version = "1.6.1"
+version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "694ae0acd1bd94680a6c4fcf6c8f3f94906ade27033fff252daa2e45391e772a"
+checksum = "8a707439111ba01be3495fe64c9c2d92b8033c08781b0b91162ca43383c65c0e"
 dependencies = [
  "bincode",
  "nalgebra",
@@ -564,9 +573,9 @@ dependencies = [
 
 [[package]]
 name = "roqoqo-derive"
-version = "1.6.1"
+version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cf1e2e0d5b87c19279ead84889bd6b76a5fbfb4e323eec43e0e8f854f3bb444"
+checksum = "0db8bafb647b00998af3cd0e9073a82a60a1f87cfc925b56b3cc94c03cf0cb25"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -575,7 +584,7 @@ dependencies = [
 
 [[package]]
 name = "roqoqo_qiskit_devices"
-version = "0.1.10"
+version = "0.2.0"
 dependencies = [
  "ndarray",
  "roqoqo",
@@ -711,6 +720,42 @@ dependencies = [
  "test-case",
  "thiserror",
  "tinyvec",
+]
+
+[[package]]
+name = "struqture-py"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b90d640d2456ec86f77d43374acf35899c51b631148c3696fcbe0f75c2425ac0"
+dependencies = [
+ "bincode",
+ "num-complex",
+ "numpy",
+ "proc-macro2",
+ "pyo3",
+ "pyo3-build-config",
+ "qoqo_calculator",
+ "qoqo_calculator_pyo3",
+ "quote",
+ "schemars",
+ "serde",
+ "serde_json",
+ "struqture",
+ "struqture-py-macros",
+ "syn 2.0.28",
+ "thiserror",
+]
+
+[[package]]
+name = "struqture-py-macros"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36e6eb21aac68cfad86ff1fdf74fa29613f6347534f8525deb530aaf49de3999"
+dependencies = [
+ "num-complex",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.28",
 ]
 
 [[package]]
