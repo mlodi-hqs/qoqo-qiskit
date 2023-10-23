@@ -18,4 +18,4 @@
 """
 
 from .qoqo_qiskit_devices import *
-from .device_property import set_qiskit_noise_information
+from .device_property import set_qiskit_noise_information, get_error_on_gate_model
