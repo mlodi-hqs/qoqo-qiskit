@@ -34,7 +34,7 @@ jobs:
   build_maturin_builds_linux:
     name: maturin_build-linux
     needs: deploy_cratesio
-    uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_maturin_linux.yml@main
+    uses: mlodi-hqs/reusable_workflows/.github/workflows/reusable_build_maturin_linux.yml@main
     with: 
       py_interface_folder: "qoqo_qiskit_devices"
       deploy: true
@@ -46,19 +46,20 @@ jobs:
   build_maturin_builds_macos:
     name: maturin_build-macos
     needs: deploy_cratesio
-    uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_maturin_macos.yml@main
+    uses: mlodi-hqs/reusable_workflows/.github/workflows/reusable_build_maturin_macos.yml@main
     with: 
       py_interface_folder: "qoqo_qiskit_devices"
       # Try to build python wheels with universal2 for arm and x86
       universal2: true
       deploy: true
+      python_3_12: false
     secrets: inherit
 
 # Build windows wheels and upload them to PyPi
   build_maturin_builds_windows:
     name: maturin_build-windows
     needs: deploy_cratesio
-    uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_maturin_windows.yml@main
+    uses: mlodi-hqs/reusable_workflows/.github/workflows/reusable_build_maturin_windows.yml@main
     with: 
       py_interface_folder: "qoqo_qiskit_devices"
       deploy: true

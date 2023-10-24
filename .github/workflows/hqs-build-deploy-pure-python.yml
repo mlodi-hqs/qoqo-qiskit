@@ -9,7 +9,7 @@ jobs:
 
   deploy:
     name: deploy
-    uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_pure_python.yml@main
+    uses: mlodi-hqs/reusable_workflows/.github/workflows/reusable_build_pure_python.yml@main
     with: 
       python_folder: "qoqo_qiskit"
     secrets: inherit
