@@ -21,19 +21,21 @@ from qoqo_qiskit_devices import ibm_devices
 def test_belem():
     """Test IBMBelemDevice initialization."""
     with warnings.catch_warnings(record=True) as w:
-        ibm_devices.IBMBelemDevice()
+        dev = ibm_devices.IBMBelemDevice()
         assert len(w) == 1
         assert issubclass(w[-1].category, DeprecationWarning)
         assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_jakarta():
     """Test IBMJakartaDevice initialization."""
     with warnings.catch_warnings(record=True) as w:
-        ibm_devices.IBMJakartaDevice()
+        dev = ibm_devices.IBMJakartaDevice()
         assert len(w) == 1
         assert issubclass(w[-1].category, DeprecationWarning)
         assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_lagos():
@@ -44,19 +46,21 @@ def test_lagos():
 def test_lima():
     """Test IBMLimaDevice initialization."""
     with warnings.catch_warnings(record=True) as w:
-        ibm_devices.IBMLimaDevice()
+        dev = ibm_devices.IBMLimaDevice()
         assert len(w) == 1
         assert issubclass(w[-1].category, DeprecationWarning)
         assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_manila():
     """Test IBMManilaDevice initialization."""
     with warnings.catch_warnings(record=True) as w:
-        ibm_devices.IBMManilaDevice()
+        dev = ibm_devices.IBMManilaDevice()
         assert len(w) == 1
         assert issubclass(w[-1].category, DeprecationWarning)
         assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_nairobi():
@@ -72,10 +76,11 @@ def test_perth():
 def test_quito():
     """Test IBMQuitoDevice initialization."""
     with warnings.catch_warnings(record=True) as w:
-        ibm_devices.IBMQuitoDevice()
+        dev = ibm_devices.IBMQuitoDevice()
         assert len(w) == 1
         assert issubclass(w[-1].category, DeprecationWarning)
         assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 if __name__ == "__main__":
