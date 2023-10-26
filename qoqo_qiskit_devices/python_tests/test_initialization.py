@@ -11,6 +11,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
+import warnings
 import pytest
 import sys
 
@@ -19,42 +20,62 @@ from qoqo_qiskit_devices import ibm_devices
 
 def test_belem():
     """Test IBMBelemDevice initialization."""
-    belem = ibm_devices.IBMBelemDevice()
+    with warnings.catch_warnings(record=True) as w:
+        ibm_devices.IBMBelemDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "retired" in str(w[-1].message)
 
 
 def test_jakarta():
     """Test IBMJakartaDevice initialization."""
-    jakarta = ibm_devices.IBMJakartaDevice()
+    with warnings.catch_warnings(record=True) as w:
+        ibm_devices.IBMJakartaDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "retired" in str(w[-1].message)
 
 
 def test_lagos():
     """Test IBMLagosDevice initialization."""
-    lagos = ibm_devices.IBMLagosDevice()
+    ibm_devices.IBMLagosDevice()
 
 
 def test_lima():
     """Test IBMLimaDevice initialization."""
-    lima = ibm_devices.IBMLimaDevice()
+    with warnings.catch_warnings(record=True) as w:
+        ibm_devices.IBMLimaDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "retired" in str(w[-1].message)
 
 
 def test_manila():
     """Test IBMManilaDevice initialization."""
-    manila = ibm_devices.IBMManilaDevice()
+    with warnings.catch_warnings(record=True) as w:
+        ibm_devices.IBMManilaDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "retired" in str(w[-1].message)
 
 
 def test_nairobi():
     """Test IBMNairobiDevice initialization."""
-    nairobi = ibm_devices.IBMNairobiDevice()
+    ibm_devices.IBMNairobiDevice()
 
 
 def test_perth():
     """Test IBMPerthDevice initialization."""
-    perth = ibm_devices.IBMPerthDevice()
+    ibm_devices.IBMPerthDevice()
 
 
 def test_quito():
     """Test IBMQuitoDevice initialization."""
-    quito = ibm_devices.IBMQuitoDevice()
+    with warnings.catch_warnings(record=True) as w:
+        ibm_devices.IBMQuitoDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "retired" in str(w[-1].message)
 
 
 if __name__ == "__main__":

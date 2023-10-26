@@ -19,8 +19,8 @@ doctest = false
 
 [dependencies]
 qoqo = { version = "1.7", default-features=false}
-roqoqo = "1.6"
-qoqo-macros = "1.6"
+roqoqo = "1.7"
+qoqo-macros = "1.7"
 
 ndarray = "0.15"
 bincode = "1.3"

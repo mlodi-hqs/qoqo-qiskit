@@ -273,6 +273,7 @@ impl QoqoDevice for IBMManilaDevice {
             "PauliX".to_string(),
             "RotateZ".to_string(),
             "SqrtPauliX".to_string(),
+            "Identity".to_string(),
         ]
     }
 
