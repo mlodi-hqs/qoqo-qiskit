@@ -116,7 +116,7 @@ def set_qiskit_noise_information(
     return device
 
 
-def get_error_on_gate_model(
+def get_decoherence_on_gate_model(
     device: types.ModuleType, get_mocked_information: bool = False
 ) -> noise_models.DecoherenceOnGateModel:
     """Gets the DecoherenceOnGateModel qoqo noise model of an IBM device.

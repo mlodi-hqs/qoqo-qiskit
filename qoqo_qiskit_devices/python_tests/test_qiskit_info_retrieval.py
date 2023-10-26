@@ -19,7 +19,7 @@ import warnings
 from qoqo_qiskit_devices import (
     ibm_devices,
     set_qiskit_noise_information,
-    get_error_on_gate_model,
+    get_decoherence_on_gate_model,
 )
 
 
@@ -49,11 +49,11 @@ def test_info_update():
 
 
 def test_noise_model():
-    """Test get_error_on_gate_model method."""
+    """Test get_decoherence_on_gate_model method."""
     perth = ibm_devices.IBMPerthDevice()
 
     with warnings.catch_warnings(record=True) as w:
-        noise_model = get_error_on_gate_model(perth, get_mocked_information=True)
+        noise_model = get_decoherence_on_gate_model(perth, get_mocked_information=True)
 
         assert len(w) == 1
         assert issubclass(w[-1].category, UserWarning)
