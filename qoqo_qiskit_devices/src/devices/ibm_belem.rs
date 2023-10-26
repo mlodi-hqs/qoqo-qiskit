@@ -36,7 +36,7 @@ impl IBMBelemDeviceWrapper {
     #[new]
     pub fn new() -> Self {
         Python::with_gil(|py| {
-            py.run("import warnings; warnings.warn(\"Device ibmq_belem has been retired. Setting noise information is not possible.\", stacklevel=2)", None, None).unwrap();
+            py.run("import warnings; warnings.warn(\"Device ibmq_belem has been retired. Setting noise information is not possible.\", category=DeprecationWarning, stacklevel=2)", None, None).unwrap();
         });
         Self {
             internal: IBMBelemDevice::new(),
