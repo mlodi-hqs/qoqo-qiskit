@@ -39,6 +39,7 @@ impl IBMManilaDevice {
     ///
     /// An initiated IBMManilaDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
+    #[deprecated(since = "0.2.0", note = "Device ibmq_manila has been retired.")]
     pub fn new() -> Self {
         let mut device = Self {
             number_qubits: 5,

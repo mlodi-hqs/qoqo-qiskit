@@ -39,6 +39,7 @@ impl IBMLimaDevice {
     ///
     /// An initiated IBMLimaDevice with single and two-qubit gates and decoherence rates set to zero.
     ///
+    #[deprecated(since = "0.2.0", note = "Device ibmq_lima has been retired.")]
     pub fn new() -> Self {
         let mut device = Self {
             number_qubits: 5,
