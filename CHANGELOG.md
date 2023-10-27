@@ -2,6 +2,13 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.2.0
+
+* Added `get_decoherence_on_gate_model` function.
+* Updated to qoqo 1.7
+* Added deprecation warnings for retired devices (Belem, Jakarta, Lima, Manila, Quito)
+* Added `Identity` gate error info retrieval
+
 ### 0.1.10
 
 * Fixed linux deploy issues

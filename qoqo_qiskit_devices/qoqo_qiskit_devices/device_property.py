@@ -11,6 +11,9 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
+from qoqo import noise_models
+from struqture_py import spins
+
 from qiskit_ibm_provider import IBMProvider
 
 from .mocked_properties import MockedProperties
@@ -36,6 +39,8 @@ def _qiskit_gate_equivalent(gate: str) -> str:
         return "sx"
     elif gate == "CNOT":
         return "cx"
+    elif gate == "Identity":
+        return "id"
 
 
 def set_qiskit_noise_information(
@@ -109,3 +114,90 @@ def set_qiskit_noise_information(
         )
 
     return device
+
+
+def get_decoherence_on_gate_model(
+    device: types.ModuleType, get_mocked_information: bool = False
+) -> noise_models.DecoherenceOnGateModel:
+    """Gets the DecoherenceOnGateModel qoqo noise model of an IBM device.
+
+    Args:
+        device (ibm_devices): The qoqo_qiskit_devices referencing the IBM device.
+        get_mocked_information (bool): Whether the returned information is mocked or not.
+
+    Returns:
+        noise_models.DecoherenceOnGateModel: The qoqo noise model.
+    """
+    number_qubits = device.number_qubits()
+    noise_model = noise_models.DecoherenceOnGateModel()
+    if get_mocked_information:
+        properties = MockedProperties()
+    else:
+        properties = IBMProvider().get_backend(device.name()).properties()
+    warn = False
+    operators = ["+", "-", "Z"]
+    rate_factors = [0.5, 0.5, 0.25]
+
+    for ii in range(number_qubits):
+        for gate in ["SqrtPauliX", "PauliX"]:
+            qiskit_gate = _qiskit_gate_equivalent(gate)
+            gate_error = properties.gate_error(qiskit_gate, ii)
+            gate_time = properties.gate_property(
+                gate=qiskit_gate, qubits=ii, name="gate_length"
+            )[0]
+            depol_rate = gate_error / gate_time
+            depol_rates = [factor * depol_rate for factor in rate_factors]
+
+            lindblad_noise = spins.PlusMinusLindbladNoiseOperator()
+            for op, rate in zip(operators, depol_rates):
+                dp = spins.PlusMinusProduct().from_string(f"{ii}{op}")
+                lindblad_noise.add_operator_product((dp, dp), rate)
+
+            noise_model = noise_model.set_single_qubit_gate_error(
+                gate, ii, lindblad_noise
+            )
+
+    for gate in device.two_qubit_gate_names():
+        qiskit_gate = _qiskit_gate_equivalent(gate)
+        for edge in device.two_qubit_edges():
+            for ii, jj in [edge, tuple(reversed(edge))]:
+                gate_error = properties.gate_error(qiskit_gate, (ii, jj))
+                gate_time = properties.gate_property(
+                    gate=qiskit_gate, qubits=[ii, jj], name="gate_length"
+                )[0]
+                depol_rate = (5 / 6) * gate_error / gate_time
+                depol_rates = [factor * depol_rate for factor in rate_factors]
+
+                lindblad_noise = spins.PlusMinusLindbladNoiseOperator()
+                for kk in [ii, jj]:
+                    for op, rate in zip(operators, depol_rates):
+                        dp = spins.PlusMinusProduct().from_string(f"{kk}{op}")
+                        lindblad_noise.add_operator_product((dp, dp), rate)
+
+                noise_model = noise_model.set_two_qubit_gate_error(
+                    gate, ii, jj, lindblad_noise
+                )
+
+    for ii in range(number_qubits):
+        damping = 1 / properties.t1(qubit=ii)
+        dephasing = 1 / properties.t2(qubit=ii) - 1 / (2 * properties.t1(qubit=ii))
+        if dephasing < 0:
+            warn = True
+
+        lindblad_noise = spins.PlusMinusLindbladNoiseOperator()
+        dp = spins.PlusMinusProduct().from_string(f"{ii}Z")
+        lindblad_noise.add_operator_product((dp, dp), dephasing)
+        noise_model = noise_model.set_single_qubit_gate_error("Identity", ii, lindblad_noise)
+
+        lindblad_noise = spins.PlusMinusLindbladNoiseOperator()
+        dp = spins.PlusMinusProduct().from_string(f"{ii}+")
+        lindblad_noise.add_operator_product((dp, dp), damping)
+        noise_model = noise_model.set_single_qubit_gate_error("Identity", ii, lindblad_noise)
+
+    if warn:
+        warnings.warn(
+            "IBM's calibration data resulted in negative dephasing value(s).",
+            stacklevel=2,
+        )
+
+    return noise_model

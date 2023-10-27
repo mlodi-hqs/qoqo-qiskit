@@ -16,6 +16,7 @@
 //!
 //! Collection of IBM's qiskit devices interfaces implementing roqoqo's Device trait.
 
+#[allow(deprecated)]
 pub mod devices;
 pub use devices::{
     IBMBelemDevice, IBMDevice, IBMJakartaDevice, IBMLagosDevice, IBMLimaDevice, IBMManilaDevice,

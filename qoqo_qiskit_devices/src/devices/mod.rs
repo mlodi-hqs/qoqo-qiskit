@@ -10,18 +10,20 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[allow(deprecated)]
 mod ibm_belem;
 pub use ibm_belem::*;
 
+#[allow(deprecated)]
 mod ibm_jakarta;
 pub use ibm_jakarta::*;
 
 mod ibm_lagos;
 pub use ibm_lagos::*;
-
+#[allow(deprecated)]
 mod ibm_lima;
 pub use ibm_lima::*;
-
+#[allow(deprecated)]
 mod ibm_manila;
 pub use ibm_manila::*;
 
@@ -30,7 +32,7 @@ pub use ibm_nairobi::*;
 
 mod ibm_perth;
 pub use ibm_perth::*;
-
+#[allow(deprecated)]
 mod ibm_quito;
 pub use ibm_quito::*;
 

@@ -118,6 +118,7 @@ fn test_single_qubit_gate_names(device: IBMDevice) {
             "PauliX".to_string(),
             "RotateZ".to_string(),
             "SqrtPauliX".to_string(),
+            "Identity".to_string(),
         ]
     );
 }

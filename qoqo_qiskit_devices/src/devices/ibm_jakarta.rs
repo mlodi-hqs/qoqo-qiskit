@@ -35,6 +35,9 @@ impl IBMJakartaDeviceWrapper {
     /// Create a new IBMJakartaDevice instance.
     #[new]
     pub fn new() -> Self {
+        Python::with_gil(|py| {
+            py.run("import warnings; warnings.warn(\"Device ibmq_jakarta has been retired. Setting noise information is not possible.\", category=DeprecationWarning, stacklevel=2)", None, None).unwrap();
+        });
         Self {
             internal: IBMJakartaDevice::new(),
         }
