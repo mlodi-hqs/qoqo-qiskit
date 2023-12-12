@@ -2,6 +2,11 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.2.1
+
+* Updated to qoqo 1.8
+* Updated to Pyo3 0.20
+
 ### 0.2.0
 
 * Added `get_decoherence_on_gate_model` function.
