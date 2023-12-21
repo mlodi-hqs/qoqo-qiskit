@@ -9,9 +9,10 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Qoqo-qiskit backend package for compatibility and simulation purposes.
+"""qoqo-qiskit backend package for compatibility and simulation purposes.
 
-Translates qoqo operations and circuits to qiskit equivalents.
+Translates a qoqo Circuit instance into Qiskit's QuantumCircuit equivalent.
+Allows running a qoqo Circuit or QuantumProgram on a Qiskit backend (simulator or QPU).
 
 .. autosummary::
     :toctree: generated/
