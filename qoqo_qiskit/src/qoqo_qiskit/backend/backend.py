@@ -11,29 +11,36 @@
 # the License.
 """Qoqo-qiskit backend for simulation purposes."""
 
+import typing
+from typing import Any, Dict, List, Optional, Tuple, cast
+
 import numpy as np
-from qoqo import Circuit
-from qiskit_aer import AerSimulator
-from qiskit.providers import Backend
 from qiskit import QuantumCircuit, execute
+from qiskit.providers import Backend, Job
+from qiskit_aer import AerSimulator
+from qiskit_ibm_runtime.estimator import Estimator
+from qiskit_ibm_runtime.sampler import Sampler
+from qoqo import Circuit
 
 from qoqo_qiskit.interface import to_qiskit_circuit
 
-from typing import Tuple, Dict, List, cast, Any, Optional
+if typing.TYPE_CHECKING:
+    from qiskit_ibm_runtime.runtime_job import RuntimeJob
 
 
 class QoqoQiskitBackend:
-    """Simulate a Qoqo QuantumProgram on a Qiskit backend."""
+    """Run a qoqo QuantumProgram or Circuit on a Qiskit Backend."""
 
     def __init__(
         self, qiskit_backend: Backend = None, memory: bool = False, compilation: bool = True
     ) -> None:
-        """Init for Qiskit backend settings.
+        """QoqoQiskitBackend init for run setting.
 
         Args:
             qiskit_backend (Backend): Qiskit backend instance to use for the simulation.
-            memory (bool): Whether the output will return the actual single shots instead
-                           of an equivalent sequence taken from a result summary.
+                Defaults to using a local AerSimulator instance.
+            memory (bool): Whether the output should return the actual single shots instead
+                of an equivalent sequence taken from a result summary.
             compilation (bool): Whether the qiskit `compiler` should be used instead of `run`.
 
         Raises:
@@ -55,7 +62,7 @@ class QoqoQiskitBackend:
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
     ]:
-        """Simulate a Circuit on a Qiskit backend.
+        """Run a Circuit on the Qiskit backend.
 
         The default number of shots for the simulation is 200.
         Any kind of Measurement, Statevector or DensityMatrix instruction only works as intended if
@@ -97,7 +104,7 @@ class QoqoQiskitBackend:
             debugged_circuit = circuit
 
         # Qiskit conversion
-        res = to_qiskit_circuit(debugged_circuit)
+        res: Tuple[QuantumCircuit, Dict[str, int]] = to_qiskit_circuit(debugged_circuit)
         compiled_circuit: QuantumCircuit = res[0]
         run_options: Dict[str, Any] = res[1]
 
@@ -146,6 +153,7 @@ class QoqoQiskitBackend:
         if custom_shots != 0:
             shots = custom_shots
 
+        result: Job
         # Simulation
         if self.compilation:
             result = execute(
@@ -181,10 +189,10 @@ class QoqoQiskitBackend:
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
     ]:
-        """Run all circuits of a measurement with the Qiskit backend.
+        """Run all the Circuit instances of a measurement on the Qiskit backend.
 
         Args:
-            measurement: The measurement that is run.
+            measurement: The input measurement.
 
         Returns:
             Tuple[Dict[str, List[List[bool]]],\
@@ -219,10 +227,10 @@ class QoqoQiskitBackend:
         )
 
     def run_measurement(self, measurement: Any) -> Optional[Dict[str, float]]:
-        """Run a circuit with the Qiskit backend.
+        """Run all the Circuit instances of a measurement on the Qiskit backend.
 
         Args:
-            measurement: The measurement that is run.
+            measurement: The measurement input.
 
         Returns:
             Optional[Dict[str, float]]
