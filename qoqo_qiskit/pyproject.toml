@@ -103,6 +103,7 @@ ignore = [
     # "S403",  # not implemented in ruff (yet?!)
     # "S404",  # not implemented in ruff (yet?!)
     "PLR",
+    "S101",
     "S301",
 ]
 # Allow autofix for all enabled rules (when `--fix`) is provided.
@@ -121,7 +122,7 @@ exclude = [
     "old",
     "build",
     "dist",
-    "test_*"
+    # "test_*"  # is there a reason for this?
 ]
 
 [tool.ruff.mccabe]
