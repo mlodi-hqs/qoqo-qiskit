@@ -11,20 +11,18 @@
 # the License.
 """Test file for interface.py."""
 
-import pytest
 import sys
-
-from qoqo import Circuit
-from qoqo import operations as ops
-
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-
-from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
-
 from typing import Union
 
+import pytest
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
+from qoqo import Circuit
+from qoqo import operations as ops
+from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
 
-def test_basic_circuit():
+
+def test_basic_circuit() -> None:
+    """Test to_qiskit_circuit() with basic inputs."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.PauliX(1)
@@ -41,7 +39,8 @@ def test_basic_circuit():
     assert len(sim_dict["MeasurementInfo"]) == 0
 
 
-def test_qreg_creg_names():
+def test_qreg_creg_names() -> None:
+    """Test to_qiskit_circuit() registers."""
     circuit = Circuit()
     circuit += ops.DefinitionBit("cr", 2, is_output=True)
     circuit += ops.DefinitionBit("crr", 3, is_output=True)
@@ -56,7 +55,8 @@ def test_qreg_creg_names():
     assert out_circ == qc
 
 
-def test_setstatevector():
+def test_setstatevector() -> None:
+    """Test to_qiskit_circuit() with PragmaSetStateVector."""
     circuit = Circuit()
     circuit += ops.PragmaSetStateVector([0, 1])
 
@@ -80,7 +80,8 @@ def test_setstatevector():
     assert out_circ == qc
 
 
-def test_repeated_measurement():
+def test_repeated_measurement() -> None:
+    """Test to_qiskit_circuit() with PragmaRepeatedMeasurement."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.Hadamard(1)
@@ -100,7 +101,8 @@ def test_repeated_measurement():
     assert ("ri", 300, None) in sim_dict["MeasurementInfo"]["PragmaRepeatedMeasurement"]
 
 
-def test_measure_qubit():
+def test_measure_qubit() -> None:
+    """Test to_qiskit_circuit() with MeasureQubit."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.PauliZ(1)
@@ -121,7 +123,8 @@ def test_measure_qubit():
 
 
 @pytest.mark.parametrize("repetitions", [0, 2, 4, "test"])
-def test_pragma_loop(repetitions: Union[int, str]):
+def test_pragma_loop(repetitions: Union[int, str]) -> None:
+    """Test to_qiskit_circuit() with PragmaLoop."""
     inner_circuit = Circuit()
     inner_circuit += ops.PauliX(1)
     inner_circuit += ops.PauliY(2)
@@ -133,7 +136,7 @@ def test_pragma_loop(repetitions: Union[int, str]):
 
     qc = QuantumCircuit(4)
     qc.h(0)
-    if type(repetitions) != str:
+    if not isinstance(repetitions, str):
         for _ in range(repetitions):
             qc.x(1)
             qc.y(2)
@@ -146,7 +149,8 @@ def test_pragma_loop(repetitions: Union[int, str]):
         assert e.args == ("A symbolic PragmaLoop operation is not supported.",)
 
 
-def test_simulation_info():
+def test_simulation_info() -> None:
+    """Test to_qiskit_circuit() SimulationInfo options."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.CNOT(0, 1)
@@ -156,9 +160,10 @@ def test_simulation_info():
 
     _, sim_dict = to_qiskit_circuit(circuit)
 
-    assert sim_dict["SimulationInfo"]["PragmaGetStateVector"] == True
-    assert sim_dict["SimulationInfo"]["PragmaGetDensityMatrix"] == True
-    
+    assert sim_dict["SimulationInfo"]["PragmaGetStateVector"] is True
+    assert sim_dict["SimulationInfo"]["PragmaGetDensityMatrix"] is True
+
+
 # For pytest
 if __name__ == "__main__":
     pytest.main(sys.argv)

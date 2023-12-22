@@ -11,12 +11,11 @@
 # the License.
 """Qiskit interface for qoqo circuits."""
 
+from typing import Any, Dict, Optional, Tuple
+
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qoqo import Circuit
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-
 from qoqo_qasm import QasmBackend
-
-from typing import Tuple, Optional, Dict, Any
 
 
 def to_qiskit_circuit(

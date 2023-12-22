@@ -11,9 +11,11 @@
 # the License.
 """Test file for backend.py."""
 
-import pytest
 import sys
+from typing import Any, List
 
+import pytest
+from qiskit_aer import AerSimulator
 from qoqo import Circuit
 from qoqo import operations as ops
 from qoqo.measurements import (  # type:ignore
@@ -21,22 +23,18 @@ from qoqo.measurements import (  # type:ignore
     PauliZProduct,
     PauliZProductInput,
 )
-
-from qiskit_aer import AerSimulator
-
-from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
-
-from typing import List, Any
+from qoqo_qiskit.backend import QoqoQiskitBackend
 
 
-def test_constructor():
+def test_constructor() -> None:
+    """Test QoqoQiskitBackend constructor."""
     simulator = AerSimulator()
     try:
         _ = QoqoQiskitBackend()
         _ = QoqoQiskitBackend(simulator)
         _ = QoqoQiskitBackend(simulator, memory=True)
-    except:
-        assert False
+    except AssertionError:
+        raise
 
     with pytest.raises(TypeError) as exc:
         _ = QoqoQiskitBackend("wrong_name")
@@ -57,7 +55,8 @@ def test_constructor():
         [ops.RotateX(0, 0.23), ops.RotateY(1, 0.12), ops.RotateZ(2, 0.34)],
     ],
 )
-def test_run_circuit_errors(operations: List[Any]):
+def test_run_circuit_errors(operations: List[Any]) -> None:
+    """Test QoqoQiskitBackend.run_circuit() with incorrect inputs."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -69,7 +68,8 @@ def test_run_circuit_errors(operations: List[Any]):
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit(circuit)
     assert (
-        "The Circuit does not contain Measurement, PragmaGetStateVector or PragmaGetDensityMatrix operations. Simulation not possible."
+        "The Circuit does not contain Measurement, PragmaGetStateVector or "
+        + "PragmaGetDensityMatrix operations. Simulation not possible."
         in str(exc.value)
     )
 
@@ -82,7 +82,8 @@ def test_run_circuit_errors(operations: List[Any]):
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit(circuit_1)
     assert (
-        "The Circuit contains both a PragmaGetStateVector and a PragmaGetDensityMatrix instruction. Simulation not possible."
+        "The Circuit contains both a PragmaGetStateVector and a PragmaGetDensityMatrix "
+        + "instruction. Simulation not possible."
         in str(exc.value)
     )
 
@@ -104,8 +105,8 @@ def test_run_circuit_errors(operations: List[Any]):
 
     try:
         _ = backend.run_circuit(circuit_3)
-    except:
-        assert False, f"Correct Circuit failed on '.run_circuit()' call."
+    except AssertionError:
+        raise
 
 
 @pytest.mark.parametrize(
@@ -122,7 +123,8 @@ def test_run_circuit_errors(operations: List[Any]):
         [ops.RotateX(0, 0.23), ops.RotateY(1, 0.12), ops.RotateZ(2, 0.34)],
     ],
 )
-def test_run_circuit_results(operations: List[Any]):
+def test_run_circuit_results(operations: List[Any]) -> None:
+    """Test QoqoQiskitBackend.run_circuit() output format."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -184,7 +186,8 @@ def test_run_circuit_results(operations: List[Any]):
         [ops.RotateX(0, 0.23), ops.RotateY(1, 0.12), ops.RotateZ(2, 0.34)],
     ],
 )
-def test_measurement_register_classicalregister(operations: List[Any]):
+def test_measurement_register_classicalregister(operations: List[Any]) -> None:
+    """Test QoqoQiskitBackend.run_measurement_registers() with correct inputs."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -200,8 +203,8 @@ def test_measurement_register_classicalregister(operations: List[Any]):
 
     try:
         output = backend.run_measurement_registers(measurement=measurement)
-    except:
-        assert False
+    except AssertionError:
+        raise
 
     assert output[0]["ri"]
     assert len(output[0]["ri"][0]) == len(involved_qubits)
@@ -223,7 +226,8 @@ def test_measurement_register_classicalregister(operations: List[Any]):
         [ops.RotateX(0, 0.23), ops.RotateY(1, 0.12), ops.RotateZ(2, 0.34)],
     ],
 )
-def test_measurement(operations: List[Any]):
+def test_measurement(operations: List[Any]) -> None:
+    """Test QoqoQiskitBackend.run_measurement() with correct inputs."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -235,17 +239,18 @@ def test_measurement(operations: List[Any]):
     circuit += ops.DefinitionBit("ri", len(involved_qubits), True)
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    input = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
+    pinput = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
 
-    measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=input)
+    measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=pinput)
 
     try:
         _ = backend.run_measurement(measurement=measurement)
-    except:
-        assert False
+    except AssertionError:
+        raise
 
 
-def test_run_options():
+def test_run_options() -> None:
+    """Test QoqoQiskitBackend.run_circuit() with measurement pragmas."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -273,7 +278,8 @@ def test_run_options():
     assert len(result[0]["ro"]) == 250
 
 
-def test_debugged_circuit():
+def test_debugged_circuit() -> None:
+    """Test QoqoQiskitBackend.run_circuit() with repeated Definition pragmas."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -325,7 +331,8 @@ def test_debugged_circuit():
         ),
     ],
 )
-def test_deterministic_circuit(operations: List[Any], outcome: List[bool]):
+def test_deterministic_circuit(operations: List[Any], outcome: List[bool]) -> None:
+    """Test QoqoQiskitBackend.run_circuit() with deterministic inputs."""
     backend = QoqoQiskitBackend()
 
     circuit = Circuit()
@@ -342,7 +349,8 @@ def test_deterministic_circuit(operations: List[Any], outcome: List[bool]):
         assert el == outcome
 
 
-def test_memory():
+def test_memory() -> None:
+    """Test QoqoQiskitBackend.run_circuit() behaviour with memory flag set."""
     backend_no_mem = QoqoQiskitBackend(memory=False)
     backend_mem = QoqoQiskitBackend(memory=True)
 
@@ -360,10 +368,11 @@ def test_memory():
     result_mem = backend_mem.run_circuit(circuit)
 
     for el1, el2 in zip(result_no_mem, result_mem):
-        el1 == el2
+        assert el1 == el2
 
 
-def test_split():
+def test_split() -> None:
+    """Test QoqoQiskitBackend._split() method."""
     clas_regs = {}
     clas_regs["ro"] = 1
     clas_regs["ri"] = 2
