@@ -21,7 +21,9 @@ class MockedProperties:
         """Create a new MockedProperties instance."""
         pass
 
-    def gate_property(self, gate: str, qubits: Union[int, List[int]], name: str) -> float:
+    def gate_property(
+        self, gate: str, qubits: Union[int, List[int]], name: str
+    ) -> float:
         """Gate property mocked time.
 
         Args:
