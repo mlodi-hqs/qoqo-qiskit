@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_qiskit_devices"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
   'qoqo_calculator_pyo3>=1.1',
   'qoqo>=1.8',

@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.2.2
+
+* Updated qoqo_qiskit_devices' `get_decoherence_on_gate_model` docstring
+
 ### 0.2.1
 
 * Updated to qoqo 1.8
