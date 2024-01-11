@@ -121,6 +121,13 @@ def get_decoherence_on_gate_model(
 ) -> noise_models.DecoherenceOnGateModel:
     """Gets the DecoherenceOnGateModel qoqo noise model of an IBM device.
 
+    The paper that relates the gate fidelity to single-qubit damping + dephasing noise
+    is https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.129.150504.
+    The relevant equation is (12). As discussed below it, a heating noise (\\sigma^+)
+    would contribute similarly as damping noise (\\sigma^-). By combining all three channels
+    (damping, heating, dephasing), with proper front factors, one can also obtain a relation
+    between depolarising noise and gate fidelity.
+
     Args:
         device (ibm_devices): The qoqo_qiskit_devices referencing the IBM device.
         get_mocked_information (bool): Whether the returned information is mocked or not.
@@ -187,12 +194,16 @@ def get_decoherence_on_gate_model(
         lindblad_noise = spins.PlusMinusLindbladNoiseOperator()
         dp = spins.PlusMinusProduct().from_string(f"{ii}Z")
         lindblad_noise.add_operator_product((dp, dp), dephasing)
-        noise_model = noise_model.set_single_qubit_gate_error("Identity", ii, lindblad_noise)
+        noise_model = noise_model.set_single_qubit_gate_error(
+            "Identity", ii, lindblad_noise
+        )
 
         lindblad_noise = spins.PlusMinusLindbladNoiseOperator()
         dp = spins.PlusMinusProduct().from_string(f"{ii}+")
         lindblad_noise.add_operator_product((dp, dp), damping)
-        noise_model = noise_model.set_single_qubit_gate_error("Identity", ii, lindblad_noise)
+        noise_model = noise_model.set_single_qubit_gate_error(
+            "Identity", ii, lindblad_noise
+        )
 
     if warn:
         warnings.warn(
