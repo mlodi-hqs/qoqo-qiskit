@@ -32,7 +32,7 @@ dev = [
     'darglint',
     'bandit',
     'mypy',
-    'black<24',
+    'black',
     'ruff',
 ]
 docs = [
