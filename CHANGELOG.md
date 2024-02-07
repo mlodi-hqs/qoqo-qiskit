@@ -6,7 +6,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 * Updated to qoqo 1.9
 * Added support for Python 3.12
-* Pinned qiskit dependency to <=0.45
+* Pinned qiskit dependency to <0.46
 * Added deprecation warnings for retired devices (Lagos, Nairobi, Perth)
 
 ### 0.2.2
