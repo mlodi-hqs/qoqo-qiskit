@@ -22,4 +22,3 @@ jobs:
       windows: false
       # Run tests also on macos runners
       macos: true
-      python_3_12: false
