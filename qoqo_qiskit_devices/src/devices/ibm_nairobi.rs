@@ -35,6 +35,9 @@ impl IBMNairobiDeviceWrapper {
     /// Create a new IBMNairobiDevice instance.
     #[new]
     pub fn new() -> Self {
+        Python::with_gil(|py| {
+            py.run("import warnings; warnings.warn(\"Device ibm_nairobi has been retired. Setting noise information is not possible.\", category=DeprecationWarning, stacklevel=2)", None, None).unwrap();
+        });
         Self {
             internal: IBMNairobiDevice::new(),
         }
