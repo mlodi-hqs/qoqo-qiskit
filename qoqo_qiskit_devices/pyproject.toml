@@ -7,7 +7,7 @@ dependencies = [
   'qiskit<0.46',
   'qiskit-ibm-provider',
   'struqture_py',
-  'setuptools; python_version>=3.12',
+  "setuptools; python_version>='3.12'",
 ]
 license = { text = "Apache-2.0 AND Apache-2.0 with LLVM-exception AND MIT AND Unicode-DFS-2016 AND BSD-2-Clause AND BSD-3-CLause" }
 maintainers = [
