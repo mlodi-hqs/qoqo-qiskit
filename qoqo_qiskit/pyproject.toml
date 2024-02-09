@@ -98,6 +98,7 @@ ignore = [
     # "S403",  # not implemented in ruff (yet?!)
     # "S404",  # not implemented in ruff (yet?!)
     "PLR",
+    # "S101",
     "S301",
 ]
 # Allow autofix for all enabled rules (when `--fix`) is provided.
