@@ -29,8 +29,8 @@ def test_info_update():
 
     assert belem.single_qubit_gate_time("PauliX", 0) == 1.0
     assert belem.two_qubit_gate_time("CNOT", 0, 1) == 1.0
-    assert belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) == None
-    assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
+    assert belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) is None
+    assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) is None
     assert np.all(belem.qubit_decoherence_rates(0) == 0.0)
 
     with warnings.catch_warnings(record=True) as w:
@@ -42,9 +42,9 @@ def test_info_update():
         assert belem.single_qubit_gate_time("PauliX", 0) != 1.0
         assert belem.two_qubit_gate_time("CNOT", 0, 1) != 1.0
         assert (
-            belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) == None
+            belem.three_qubit_gate_time("ControlledControlledPauliZ", 0, 1, 2) is None
         )
-        assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) == None
+        assert belem.multi_qubit_gate_time("MultiQubitMS", [0, 1, 2, 3]) is None
         assert np.any(belem.qubit_decoherence_rates(0) != 0.0)
 
 

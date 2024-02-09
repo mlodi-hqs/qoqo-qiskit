@@ -40,7 +40,12 @@ def test_jakarta():
 
 def test_lagos():
     """Test IBMLagosDevice initialization."""
-    ibm_devices.IBMLagosDevice()
+    with warnings.catch_warnings(record=True) as w:
+        dev = ibm_devices.IBMLagosDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, DeprecationWarning)
+        assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_lima():
@@ -65,12 +70,22 @@ def test_manila():
 
 def test_nairobi():
     """Test IBMNairobiDevice initialization."""
-    ibm_devices.IBMNairobiDevice()
+    with warnings.catch_warnings(record=True) as w:
+        dev = ibm_devices.IBMNairobiDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, DeprecationWarning)
+        assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_perth():
     """Test IBMPerthDevice initialization."""
-    ibm_devices.IBMPerthDevice()
+    with warnings.catch_warnings(record=True) as w:
+        dev = ibm_devices.IBMPerthDevice()
+        assert len(w) == 1
+        assert issubclass(w[-1].category, DeprecationWarning)
+        assert "retired" in str(w[-1].message)
+        assert dev.name() in str(w[-1].message)
 
 
 def test_quito():

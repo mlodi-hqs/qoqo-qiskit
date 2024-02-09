@@ -49,7 +49,8 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     def run_circuit(
-        self, circuit: Circuit
+        self,
+        circuit: Circuit,
     ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
@@ -175,7 +176,8 @@ class QoqoQiskitBackend:
         )
 
     def run_measurement_registers(
-        self, measurement: Any
+        self,
+        measurement: Any,
     ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
@@ -285,7 +287,8 @@ class QoqoQiskitBackend:
         return splitted
 
     def _setup_registers(
-        self, circuit: Circuit
+        self,
+        circuit: Circuit,
     ) -> Tuple[
         Dict[str, int],
         Dict[str, List[List[bool]]],

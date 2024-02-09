@@ -13,4 +13,3 @@
 #[allow(deprecated)]
 #[cfg(test)]
 mod device;
-pub use device::*;

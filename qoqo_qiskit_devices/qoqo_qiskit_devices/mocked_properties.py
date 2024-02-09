@@ -34,7 +34,7 @@ class MockedProperties:
         Returns:
             float: Gate property mocked time.
         """
-        return (50.0, 0)
+        return (0.00000005, 0)
 
     def gate_error(self, gate: str, qubits: Union[int, List[int]]) -> float:
         """Mocked gate error.
@@ -57,7 +57,7 @@ class MockedProperties:
         Returns:
             float: T1 mocked time.
         """
-        return 100.0
+        return 0.00012
 
     def t2(self, qubit: int) -> float:
         """T2 mocked time.
@@ -68,4 +68,4 @@ class MockedProperties:
         Returns:
             float: T2 mocked time.
         """
-        return 400.0
+        return 0.00048
