@@ -154,7 +154,20 @@ def test_pragma_loop(repetitions: Union[int, str]) -> None:
 
 def test_pragma_sleep() -> None:
     """Test PragmaSleep operation."""
-    pass
+    qoqo_circuit = Circuit()
+    qoqo_circuit += ops.PragmaSleep([0, 3], 1.0)
+    qoqo_circuit += ops.PauliX(2)
+    qoqo_circuit += ops.PragmaSleep([4], 0.004)
+
+    qr = QuantumRegister(5, "q")
+    qiskit_circuit = QuantumCircuit(qr)
+    qiskit_circuit.delay(1.0, qr[0], unit="s")
+    qiskit_circuit.delay(1.0, qr[3], unit="s")
+    qiskit_circuit.x(qr[2])
+    qiskit_circuit.delay(0.004, qr[4], unit="s")
+
+    out_circ, _ = to_qiskit_circuit(qoqo_circuit)
+    assert out_circ == qiskit_circuit
 
 
 def test_simulation_info() -> None:
