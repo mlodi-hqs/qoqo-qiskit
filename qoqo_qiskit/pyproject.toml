@@ -12,7 +12,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "qoqo>=1.9",
-    "qoqo_qasm>=0.9.2",
+    "qoqo_qasm>=0.9.6",
     "qiskit<0.46",
     "qiskit_aer>=0.13.2",
     "numpy",
