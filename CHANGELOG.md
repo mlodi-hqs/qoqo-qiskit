@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.2.4
+
+* Added support for `PragmaSleep`
+
 ### 0.2.3
 
 * Updated to qoqo 1.9
@@ -64,7 +68,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 ### 0.1.2
 
-* Added support for PragmaLoop
+* Added support for `PragmaLoop`
 
 ### 0.1.1
 

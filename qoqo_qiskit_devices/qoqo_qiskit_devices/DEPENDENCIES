@@ -727,7 +727,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-bytemuck 1.14.2
+bytemuck 1.14.3
 https://github.com/Lokathor/bytemuck
 by Lokathor <zefria@gmail.com>
 A crate for mucking around with piles of bytes.
@@ -5533,7 +5533,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-num-integer 0.1.45
+num-integer 0.1.46
 https://github.com/rust-num/num-integer
 by The Rust Project Developers
 Integer traits and functions
@@ -6015,7 +6015,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-num-traits 0.2.17
+num-traits 0.2.18
 https://github.com/rust-num/num-traits
 by The Rust Project Developers
 Numeric traits for generic mathematics
@@ -9915,7 +9915,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_qiskit_devices 0.2.3
+qoqo_qiskit_devices 0.2.4
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for qoqo python quantum computing toolkit
@@ -11960,7 +11960,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_qiskit_devices 0.2.3
+roqoqo_qiskit_devices 0.2.4
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for roqoqo rust quantum computing toolkit

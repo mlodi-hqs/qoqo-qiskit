@@ -24,7 +24,8 @@ from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
 from typing import Union
 
 
-def test_basic_circuit():
+def test_basic_circuit() -> None:
+    """Test basic circuit conversion."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.PauliX(1)
@@ -41,7 +42,8 @@ def test_basic_circuit():
     assert len(sim_dict["MeasurementInfo"]) == 0
 
 
-def test_qreg_creg_names():
+def test_qreg_creg_names() -> None:
+    """Test qreg and creg qiskit names."""
     circuit = Circuit()
     circuit += ops.DefinitionBit("cr", 2, is_output=True)
     circuit += ops.DefinitionBit("crr", 3, is_output=True)
@@ -56,7 +58,8 @@ def test_qreg_creg_names():
     assert out_circ == qc
 
 
-def test_setstatevector():
+def test_setstatevector() -> None:
+    """Test PragmaSetStateVector operation."""
     circuit = Circuit()
     circuit += ops.PragmaSetStateVector([0, 1])
 
@@ -80,7 +83,8 @@ def test_setstatevector():
     assert out_circ == qc
 
 
-def test_repeated_measurement():
+def test_repeated_measurement() -> None:
+    """Test PragmaRepeatedMeasurement operation."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.Hadamard(1)
@@ -100,7 +104,8 @@ def test_repeated_measurement():
     assert ("ri", 300, None) in sim_dict["MeasurementInfo"]["PragmaRepeatedMeasurement"]
 
 
-def test_measure_qubit():
+def test_measure_qubit() -> None:
+    """Test MeasureQubit operation."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.PauliZ(1)
@@ -121,7 +126,8 @@ def test_measure_qubit():
 
 
 @pytest.mark.parametrize("repetitions", [0, 2, 4, "test"])
-def test_pragma_loop(repetitions: Union[int, str]):
+def test_pragma_loop(repetitions: Union[int, str]) -> None:
+    """Test PragmaLoop operation."""
     inner_circuit = Circuit()
     inner_circuit += ops.PauliX(1)
     inner_circuit += ops.PauliY(2)
@@ -133,7 +139,7 @@ def test_pragma_loop(repetitions: Union[int, str]):
 
     qc = QuantumCircuit(4)
     qc.h(0)
-    if type(repetitions) != str:
+    if not isinstance(repetitions, str):
         for _ in range(repetitions):
             qc.x(1)
             qc.y(2)
@@ -146,7 +152,26 @@ def test_pragma_loop(repetitions: Union[int, str]):
         assert e.args == ("A symbolic PragmaLoop operation is not supported.",)
 
 
-def test_simulation_info():
+def test_pragma_sleep() -> None:
+    """Test PragmaSleep operation."""
+    qoqo_circuit = Circuit()
+    qoqo_circuit += ops.PragmaSleep([0, 3], 1.0)
+    qoqo_circuit += ops.PauliX(2)
+    qoqo_circuit += ops.PragmaSleep([4], 0.004)
+
+    qr = QuantumRegister(5, "q")
+    qiskit_circuit = QuantumCircuit(qr)
+    qiskit_circuit.delay(1.0, qr[0], unit="s")
+    qiskit_circuit.delay(1.0, qr[3], unit="s")
+    qiskit_circuit.x(qr[2])
+    qiskit_circuit.delay(0.004, qr[4], unit="s")
+
+    out_circ, _ = to_qiskit_circuit(qoqo_circuit)
+    assert out_circ == qiskit_circuit
+
+
+def test_simulation_info() -> None:
+    """Test SimulationInfo dictionary."""
     circuit = Circuit()
     circuit += ops.Hadamard(0)
     circuit += ops.CNOT(0, 1)
@@ -156,9 +181,10 @@ def test_simulation_info():
 
     _, sim_dict = to_qiskit_circuit(circuit)
 
-    assert sim_dict["SimulationInfo"]["PragmaGetStateVector"] == True
-    assert sim_dict["SimulationInfo"]["PragmaGetDensityMatrix"] == True
-    
+    assert sim_dict["SimulationInfo"]["PragmaGetStateVector"]
+    assert sim_dict["SimulationInfo"]["PragmaGetDensityMatrix"]
+
+
 # For pytest
 if __name__ == "__main__":
     pytest.main(sys.argv)
