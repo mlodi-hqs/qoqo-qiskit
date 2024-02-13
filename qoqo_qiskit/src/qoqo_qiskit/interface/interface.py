@@ -44,12 +44,14 @@ def to_qiskit_circuit(
     #   - PragmaLoop
     #   - MeasureQubit
     filtered_circuit = Circuit()
+    to_fix = False
     circuit_info: Dict[str, Any] = {}
     circuit_info["MeasurementInfo"] = {}
     circuit_info["SimulationInfo"] = {}
     circuit_info["SimulationInfo"]["PragmaGetStateVector"] = False
     circuit_info["SimulationInfo"]["PragmaGetDensityMatrix"] = False
     initial_statevector = []
+
     for op in circuit:
         if "PragmaSetStateVector" in op.tags():
             initial_statevector = op.statevector()
@@ -83,6 +85,9 @@ def to_qiskit_circuit(
                     filtered_circuit += op.circuit()
             else:
                 raise ValueError("A symbolic PragmaLoop operation is not supported.")
+        elif "PragmaSleep" in op.tags():
+            to_fix = True
+            filtered_circuit += op
         else:
             filtered_circuit += op
 
@@ -93,6 +98,10 @@ def to_qiskit_circuit(
     # QASM -> Qiskit transformation
     return_circuit = QuantumCircuit()
     from_qasm_circuit = QuantumCircuit.from_qasm_str(input_qasm_str)
+
+    # Fixing custom gates qiskit translation
+    if to_fix:
+        from_qasm_circuit = _custom_gates_fix(from_qasm_circuit)
 
     # Handling PragmaSetStateVector
     if len(initial_statevector) != 0:
@@ -110,3 +119,24 @@ def to_qiskit_circuit(
         return_circuit = from_qasm_circuit
 
     return (return_circuit, circuit_info)
+
+
+def _custom_gates_fix(from_qasm_circuit: QuantumCircuit) -> QuantumCircuit:
+    """Transforms the custom gates imported by qiskit via QASM to correct qiskit Instructions.
+
+    In case of incompatibilities, this step allows to directly keep the already transformed
+    QuantumCircuit and modify the Instruction references imported via QASM.
+
+    Args:
+        from_qasm_circuit (QuantumCircuit): the qiskit QuantumCircuit to modify.
+
+    Returns:
+        QuantumCircuit: the modified qiskit QuantumCircuit.
+    """
+    out_circuit = from_qasm_circuit.copy_empty_like()
+    for inst, qargs, cargs in from_qasm_circuit.data:
+        if inst.name == "pragmasleep":
+            out_circuit.delay(inst.params[0], qargs[0], unit="s")
+        else:
+            out_circuit.append(inst, qargs, cargs)
+    return out_circuit
