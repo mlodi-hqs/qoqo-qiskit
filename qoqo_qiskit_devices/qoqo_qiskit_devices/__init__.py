@@ -18,4 +18,8 @@
 """
 
 from .qoqo_qiskit_devices import *
-from .device_property import set_qiskit_noise_information, get_decoherence_on_gate_model
+from .device_property import (
+    set_qiskit_device_information,
+    get_decoherence_on_gate_model,
+    get_noise_models,
+)

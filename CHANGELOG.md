@@ -2,6 +2,12 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.2.5
+
+* Changed function name from set_qiskit_noise_information to set_qiskit_device_information
+* Removed noise information from set_qiskit_device_information
+* Added get_noise_models function
+
 ### 0.2.4
 
 * Added support for `PragmaSleep`

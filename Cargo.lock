@@ -456,7 +456,7 @@ dependencies = [
 
 [[package]]
 name = "qoqo_qiskit_devices"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "bincode",
  "ndarray",
@@ -572,7 +572,7 @@ dependencies = [
 
 [[package]]
 name = "roqoqo_qiskit_devices"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "ndarray",
  "roqoqo",
