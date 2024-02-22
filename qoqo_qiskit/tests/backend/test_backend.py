@@ -63,6 +63,12 @@ def test_run_circuit_errors(operations: List[Any]) -> None:
     """Test QoqoQiskitBackend.run_circuit method errors."""
     backend = QoqoQiskitBackend()
 
+    with pytest.raises(TypeError) as exc:
+        _ = backend.run_circuit("error")
+    assert (
+        "The input is not a valid Qoqo Circuit instance." in str(exc.value)
+    )
+
     circuit = Circuit()
     involved_qubits = set()
     for op in operations:
