@@ -11,11 +11,15 @@
 # the License.
 """Queued Jobs."""
 
+from __future__ import annotations
+
+import json
+from typing import Any, Dict, List, Optional, Tuple
+
 from qiskit.providers import Job, JobStatus
+from qiskit_ibm_runtime import QiskitRuntimeService
 
 from .post_processing import _transform_job_result
-
-from typing import Any, List, Tuple, Dict, Optional
 
 
 class QueuedCircuitRun:
@@ -60,6 +64,53 @@ class QueuedCircuitRun:
                 Dict[str, List[List[complex]]],
             ]
         ] = None
+
+    def to_json(self) -> str:
+        """Convert self to a JSON string.
+
+        Returns:
+            str: self as a JSON string.
+        """
+        if self._qoqo_result is None:
+            qoqo_result = None
+        else:
+            qoqo_result = self._qoqo_result
+
+        json_dict = {
+            "job_id": self._job.job_id(),
+            "memory": self._memory,
+            "sim_type": self._sim_type,
+            "initially_setup_registers": self._initially_setup_registers,
+            "qoqo_result": qoqo_result,
+        }
+
+        return json.dumps(json_dict)
+
+    @staticmethod
+    def from_json(string: str) -> QueuedCircuitRun:
+        """Convert a JSON string to an instance of QueuedCircuitRun.
+
+        Args:
+            string (str): JSON string to convert.
+
+        Returns:
+            QueuedCircuitRun: The converted instance.
+        """
+        json_dict = json.loads(string)
+
+        service = QiskitRuntimeService()
+        job = service.job(json_dict["job_id"])
+
+        instance = QueuedCircuitRun(
+            job=job,
+            memory=json_dict["memory"],
+            sim_type=json_dict["sim_type"],
+            register_info=json_dict["initially_setup_registers"],
+        )
+        if json_dict["qoqo_result"] is not None:
+            instance._qoqo_result = json_dict["qoqo_result"]
+
+        return instance
 
     def poll_result(
         self,
