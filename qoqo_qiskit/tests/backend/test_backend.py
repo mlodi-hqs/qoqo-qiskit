@@ -25,6 +25,7 @@ from qoqo.measurements import (  # type:ignore
 from qiskit_aer import AerSimulator
 
 from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
+from qoqo_qiskit.backend.post_processing import _split
 
 from typing import List, Any
 
@@ -373,20 +374,14 @@ def test_memory() -> None:
 
 
 def test_split() -> None:
-    """Test QoqoQiskitBackend._split method."""
+    """Test post_processing._split method."""
     clas_regs = {}
     clas_regs["ro"] = 1
     clas_regs["ri"] = 2
     shot_result_ws = "01 1"
     shot_result_no_ws = "011"
 
-    backend_no_mem = QoqoQiskitBackend(memory=False)
-    backend_mem = QoqoQiskitBackend(memory=True)
-
-    assert backend_mem._split(shot_result_ws, clas_regs) == backend_mem._split(
-        shot_result_no_ws, clas_regs
-    )
-    assert backend_no_mem._split(shot_result_ws, clas_regs) == backend_no_mem._split(
+    assert _split(shot_result_ws, clas_regs) == _split(
         shot_result_no_ws, clas_regs
     )
 
