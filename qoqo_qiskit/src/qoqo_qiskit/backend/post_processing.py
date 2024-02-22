@@ -14,6 +14,7 @@
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
+from qiskit.result import Result
 from qoqo import Circuit
 
 
@@ -69,7 +70,7 @@ def _split(element: str, clas_regs_sizes: Dict[str, int]) -> List[str]:
 def _transform_job_result(
     memory: bool,
     sim_type: str,
-    job: Any,
+    result: Result,
     clas_regs_sizes: Dict[str, int],
     output_bit_register_dict: Dict[str, List[List[bool]]],
     _output_float_register_dict: Dict[str, List[List[float]]],
@@ -81,20 +82,20 @@ def _transform_job_result(
 ]:
     if sim_type == "automatic":
         if memory:
-            transformed_counts = _counts_to_registers(job.get_memory(), True, clas_regs_sizes)
+            transformed_counts = _counts_to_registers(result.get_memory(), True, clas_regs_sizes)
         else:
-            transformed_counts = _counts_to_registers(job.get_counts(), False, clas_regs_sizes)
+            transformed_counts = _counts_to_registers(result.get_counts(), False, clas_regs_sizes)
         for i, reg in enumerate(output_bit_register_dict):
             reversed_list = []
             for shot in transformed_counts[i]:
                 reversed_list.append(shot[::-1])
             output_bit_register_dict[reg] = reversed_list
     elif sim_type == "statevector":
-        vector = list(np.asarray(job.data(0)["statevector"]).flatten())
+        vector = list(np.asarray(result.data(0)["statevector"]).flatten())
         for reg in output_complex_register_dict:
             output_complex_register_dict[reg].append(vector)
     elif sim_type == "density_matrix":
-        vector = list(np.asarray(job.data(0)["density_matrix"]).flatten())
+        vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
         for reg in output_complex_register_dict:
             output_complex_register_dict[reg].append(vector)
 
