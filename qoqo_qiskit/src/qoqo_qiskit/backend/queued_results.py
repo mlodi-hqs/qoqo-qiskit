@@ -14,10 +14,11 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
+from qoqo import measurements
 
 from .post_processing import _transform_job_result
 
@@ -30,7 +31,7 @@ class QueuedCircuitRun:
         job: Job,
         memory: bool,
         sim_type: str,
-        register_info: Tuple[
+        registers_info: Tuple[
             Dict[str, int],
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
@@ -45,18 +46,17 @@ class QueuedCircuitRun:
                 of `job.get_counts()`.
             sim_type (str): The simulation type. This can be "automatic", "statevector"
                 or "density_matrix".
-            register_info (Tuple[Any]): The initially setup registers.
-                These will be updated with the job result.
+            registers_info (Tuple[Any]): The initially setup registers.
         """
         self._job: Job = job
         self._memory: bool = memory
         self._sim_type: str = sim_type
-        self._initially_setup_registers: Tuple[
+        self._registers_info: Tuple[
             Dict[str, int],
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
             Dict[str, List[List[complex]]],
-        ] = register_info
+        ] = registers_info
         self._qoqo_result: Optional[
             Tuple[
                 Dict[str, List[List[bool]]],
@@ -71,17 +71,12 @@ class QueuedCircuitRun:
         Returns:
             str: self as a JSON string.
         """
-        if self._qoqo_result is None:
-            qoqo_result = None
-        else:
-            qoqo_result = self._qoqo_result
-
         json_dict = {
             "job_id": self._job.job_id(),
             "memory": self._memory,
             "sim_type": self._sim_type,
-            "initially_setup_registers": self._initially_setup_registers,
-            "qoqo_result": qoqo_result,
+            "registers_info": self._registers_info,
+            "qoqo_result": self._qoqo_result,
         }
 
         return json.dumps(json_dict)
@@ -105,7 +100,7 @@ class QueuedCircuitRun:
             job=job,
             memory=json_dict["memory"],
             sim_type=json_dict["sim_type"],
-            register_info=json_dict["initially_setup_registers"],
+            registers_info=json_dict["registers_info"],
         )
         if json_dict["qoqo_result"] is not None:
             instance._qoqo_result = json_dict["qoqo_result"]
@@ -141,10 +136,10 @@ class QueuedCircuitRun:
                     self._memory,
                     self._sim_type,
                     result,
-                    self._initially_setup_registers[0],
-                    self._initially_setup_registers[1],
-                    self._initially_setup_registers[2],
-                    self._initially_setup_registers[3],
+                    self._registers_info[0],
+                    self._registers_info[1],
+                    self._registers_info[2],
+                    self._registers_info[3],
                 )
                 return self._qoqo_result
             elif status == JobStatus.ERROR:
@@ -162,7 +157,51 @@ class QueuedProgramRun:
         """Initialise the QueuedProgramRun class.
 
         Args:
-            measurement: the qoqo Measurement to run
-            queued_circuits: the list of associated queued circuits
+            measurement (qoqo.measurements): The qoqo Measurement to run.
+            queued_circuits (List[QueuedCircuitRun]): The list of associated queued circuits.
+        """
+        self._measurement = measurement
+        self._queued_circuits: List[QueuedCircuitRun] = queued_circuits
+
+    def to_json(self) -> str:
+        """Convert self to a JSON string.
+
+        Returns:
+            str: self as a JSON string.
+        """
+        pass
+
+    @staticmethod
+    def from_json(string: str) -> QueuedProgramRun:
+        """Convert a JSON string to an instance of QueuedProgramRun.
+
+        Args:
+            string (str): JSON string to convert.
+
+        Returns:
+            QueuedProgramRun: The converted instance.
+        """
+        pass
+
+    def poll_result(
+        self,
+    ) -> Optional[
+        Union[
+            Tuple[
+                Dict[str, List[List[bool]]],
+                Dict[str, List[List[float]]],
+                Dict[str, List[List[complex]]],
+            ]
+        ]
+    ]:
+        """Poll the result.
+
+        Returns:
+            Union[Tuple[Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]]]]: Result if the run was successful.
+
+        Raises:
+            RuntimeError: The job failed or was cancelled.
         """
         pass
