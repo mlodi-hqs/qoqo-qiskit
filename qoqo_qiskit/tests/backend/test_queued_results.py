@@ -156,7 +156,7 @@ def test_poll_result() -> None:
     )
 
     # Making sure that the simulations are finished
-    time.sleep(2)
+    time.sleep(1)
 
     res_qcr, _, _ = qcr_0.poll_result()
     res_qpr, _, _ = qpr.poll_result()

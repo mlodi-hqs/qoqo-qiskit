@@ -12,7 +12,7 @@
 """Test backend.py file."""
 
 import sys
-from typing import Any, List
+from typing import Any, List, TYPE_CHECKING
 
 import pytest
 from qiskit_aer import AerSimulator
@@ -25,6 +25,9 @@ from qoqo.measurements import (  # type:ignore
 )
 from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
 from qoqo_qiskit.backend.post_processing import _split
+
+if TYPE_CHECKING:
+    from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 
 
 def test_constructor() -> None:
@@ -385,12 +388,47 @@ def test_split() -> None:
     assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
 
 
-def test_run_circuit_queued() -> None:
-    pass
+@pytest.mark.parametrize("memory", [True, False])
+def test_run_circuit_queued(memory: bool) -> None:
+    """Test QoqoQiskitBackend.run_circuit_queued method."""
+    backend = QoqoQiskitBackend(memory=memory)
+
+    circuit = Circuit()
+    circuit += ops.Hadamard(0)
+    circuit += ops.Hadamard(1)
+    circuit += ops.DefinitionBit("ro", 2, True)
+    circuit += ops.PragmaRepeatedMeasurement("ro", 50)
+
+    qcr: QueuedCircuitRun = backend.run_circuit_queued(circuit)
+
+    assert qcr._memory == memory
+    assert qcr._sim_type == "automatic"
+    assert "ro" in qcr._registers_info[0]
+    assert "ro" in qcr._registers_info[1]
 
 
-def test_run_measurement_queued() -> None:
-    pass
+@pytest.mark.parametrize("memory", [True, False])
+def test_run_measurement_queued(memory: bool) -> None:
+    """Test QoqoQiskitBackend.run_measurement_queued method."""
+    backend = QoqoQiskitBackend(memory=memory)
+
+    circuit_0 = Circuit()
+    circuit_0 += ops.Hadamard(0)
+    circuit_0 += ops.Hadamard(1)
+    circuit_0 += ops.DefinitionBit("ro", 2, True)
+    circuit_0 += ops.PragmaRepeatedMeasurement("ro", 50)
+    circuit_1 = Circuit()
+    circuit_1 += ops.Hadamard(0)
+    circuit_1 += ops.Hadamard(1)
+    circuit_1 += ops.DefinitionBit("ri", 2, True)
+    circuit_1 += ops.PragmaRepeatedMeasurement("ri", 50)
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_0, circuit_1])
+
+    qpr: QueuedProgramRun = backend.run_measurement_queued(measurement=measurement)
+
+    assert qpr._measurement == measurement
+    assert len(qpr._queued_circuits) == 2
 
 
 # For pytest
