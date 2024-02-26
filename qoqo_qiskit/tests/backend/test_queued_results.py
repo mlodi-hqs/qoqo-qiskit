@@ -11,6 +11,7 @@
 # the License.
 """Test queued_results.py file."""
 
+import time
 import json
 import sys
 from typing import Dict, List, Tuple
@@ -26,6 +27,7 @@ from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgr
 def _mocked_run(
     sim_type: str = "automatic",
     register_name: str = "ri",
+    memory: bool = False,
 ) -> Tuple[
     Job,
     str,
@@ -41,7 +43,7 @@ def _mocked_run(
     circuit += ops.Hadamard(0)
     if sim_type == "automatic":
         circuit += ops.DefinitionBit(register_name, 1, True)
-        circuit += ops.PragmaRepeatedMeasurement(register_name, 1)
+        circuit += ops.PragmaRepeatedMeasurement(register_name, 10)
     elif sim_type == "density_matrix":
         circuit += ops.DefinitionComplex(register_name, 1, True)
         circuit += ops.PragmaGetDensityMatrix(register_name, None)
@@ -49,7 +51,7 @@ def _mocked_run(
         circuit += ops.DefinitionComplex(register_name, 1, True)
         circuit += ops.PragmaGetStateVector(register_name, None)
 
-    backend = QoqoQiskitBackend()
+    backend = QoqoQiskitBackend(memory=memory)
 
     (
         job,
@@ -131,7 +133,37 @@ def test_from_to_json(sim_type: str) -> None:
 
 def test_poll_result() -> None:
     """Test QueuedCircuitRun and QueuedProgramRun `.poll_result()` method."""
-    pass
+    run_0 = _mocked_run(register_name="ri", sim_type="automatic", memory="True")
+    run_1 = _mocked_run(register_name="ro", sim_type="automatic", memory="False")
+
+    qcr_0 = QueuedCircuitRun(
+        job=run_0[0],
+        memory=True,
+        sim_type=run_0[1],
+        registers_info=run_0[2],
+    )
+    qcr_1 = QueuedCircuitRun(
+        job=run_1[0],
+        memory=False,
+        sim_type=run_1[1],
+        registers_info=run_1[2],
+    )
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[run_0[3], run_1[3]])
+    qpr = QueuedProgramRun(
+        measurement=measurement,
+        queued_circuits=[qcr_0, qcr_1],
+    )
+
+    # Making sure that the simulations are finished
+    time.sleep(2)
+
+    res_qcr, _, _ = qcr_0.poll_result()
+    res_qpr, _, _ = qpr.poll_result()
+
+    assert res_qcr["ri"]
+    assert res_qpr["ro"]
+    assert res_qpr["ri"]
 
 
 # For pytest
