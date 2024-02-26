@@ -105,7 +105,7 @@ def test_toffoli_circuit_basic_gates() -> None:
 
 
 def test_medium_circuit_backend() -> None:
-    """Test toffoli circuit conversion with a backend transpiler."""
+    """Test medium circuit conversion with a backend transpiler."""
     circuit = Circuit()
     circuit += ops.PauliX(0)
     circuit += ops.ControlledPauliZ(0, 1)
