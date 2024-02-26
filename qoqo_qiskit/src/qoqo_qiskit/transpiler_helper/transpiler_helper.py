@@ -73,7 +73,8 @@ def transpile_with_qiskit(
                 "ignore_backend_supplied_default_methods"
             )
             or False,
-            # num_processes=transpiler_args.get("num_processes"), in the documentation but not in the code.
+            # num_processes=transpiler_args.get("num_processes")
+            # in the documentation but not in the code.
         )
 
     def qiskit_to_qoqo_circuit(qiskit_circuit: QuantumCircuit) -> Circuit:
