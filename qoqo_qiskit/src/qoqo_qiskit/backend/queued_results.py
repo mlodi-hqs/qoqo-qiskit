@@ -159,17 +159,63 @@ class QueuedProgramRun:
         Args:
             measurement (qoqo.measurements): The qoqo Measurement to run.
             queued_circuits (List[QueuedCircuitRun]): The list of associated queued circuits.
+
+        Raises:
+            TypeError: The measurement type is unknown.
         """
-        self._measurement = measurement
+        if (
+            isinstance(measurement, measurements.PauliZProduct)
+            or isinstance(measurement, measurements.CheatedPauliZProduct)
+            or isinstance(measurement, measurements.Cheated)
+            or isinstance(measurement, measurements.ClassicalRegister)
+        ):
+            self._measurement = measurement
+        else:
+            raise TypeError("Unknown measurement type.")
         self._queued_circuits: List[QueuedCircuitRun] = queued_circuits
+        self._registers: Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ] = ({}, {}, {})
+        for circuit in self._queued_circuits:
+            if circuit._qoqo_result is not None:
+                self._registers[0].update(circuit._qoqo_result[0])
+                self._registers[1].update(circuit._qoqo_result[1])
+                self._registers[2].update(circuit._qoqo_result[2])
 
     def to_json(self) -> str:
         """Convert self to a JSON string.
 
         Returns:
             str: self as a JSON string.
+
+        Raises:
+            TypeError: The measurement type is unknown.
         """
-        pass
+        queued_circuits_serialised: List[str] = []
+        for circuit in self._queued_circuits:
+            queued_circuits_serialised.append(circuit.to_json())
+
+        if isinstance(self._measurement, measurements.PauliZProduct):
+            measurement_type = "PauliZProduct"
+        elif isinstance(self._measurement, measurements.CheatedPauliZProduct):
+            measurement_type = "CheatedPauliZProduct"
+        elif isinstance(self._measurement, measurements.Cheated):
+            measurement_type = "Cheated"
+        elif isinstance(self._measurement, measurements.ClassicalRegister):
+            measurement_type = "ClassicalRegister"
+        else:
+            raise TypeError("Unknown measurement type")
+
+        json_dict = {
+            "measurement_type": measurement_type,
+            "measurement": self._measurement.to_json(),
+            "queued_circuits": queued_circuits_serialised,
+            "registers": self._registers,
+        }
+
+        return json.dumps(json_dict)
 
     @staticmethod
     def from_json(string: str) -> QueuedProgramRun:
@@ -178,10 +224,42 @@ class QueuedProgramRun:
         Args:
             string (str): JSON string to convert.
 
+        Raises:
+            TypeError: The measurement type is unknown.
+
         Returns:
             QueuedProgramRun: The converted instance.
         """
-        pass
+        json_dict = json.loads(string)
+
+        queued_circuits_deserialised: List[QueuedCircuitRun] = []
+        registers: Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ] = ({}, {}, {})
+        for circuit in json_dict["queued_circuits"]:
+            circ_instance = QueuedCircuitRun.from_json(circuit)
+            queued_circuits_deserialised.append(circ_instance)
+            if circ_instance._qoqo_result is not None:
+                registers[0].update(circ_instance._qoqo_result[0])
+                registers[1].update(circ_instance._qoqo_result[1])
+                registers[2].update(circ_instance._qoqo_result[2])
+
+        if json_dict["measurement_type"] == "PauliZProduct":
+            measurement = measurements.PauliZProduct.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "CheatedPauliZProduct":
+            measurement = measurements.CheatedPauliZProduct.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "Cheated":
+            measurement = measurements.Cheated.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "ClassicalRegister":
+            measurement = measurements.ClassicalRegister.from_json(json_dict["measurement"])
+        else:
+            raise TypeError("Unknown measurement type")
+
+        instance = QueuedProgramRun(measurement, queued_circuits_deserialised)
+        instance._registers = registers
+        return instance
 
     def poll_result(
         self,
@@ -199,9 +277,26 @@ class QueuedProgramRun:
         Returns:
             Union[Tuple[Dict[str, List[List[bool]]],
                     Dict[str, List[List[float]]],
-                    Dict[str, List[List[complex]]]]]: Result if the run was successful.
+                    Dict[str, List[List[complex]]]]]: Result if all runs were successful.
 
         Raises:
-            RuntimeError: The job failed or was cancelled.
+            RuntimeError: The jobs failed or were cancelled.
         """
-        pass
+        all_finished = [False] * len(self._queued_circuits)
+        for i, queued_circuit in enumerate(self._queued_circuits):
+            res = queued_circuit.poll_result()
+            if res is not None:
+                self._registers[0].update(res[0])  # add results to bit registers
+                self._registers[1].update(res[1])  # add results to float registers
+                self._registers[2].update(res[2])  # add results to complex registers
+                all_finished[i] = True
+
+        if not all(all_finished):
+            return None
+        else:
+            if isinstance(self._measurement, measurements.ClassicalRegister):
+                return self._registers
+            else:
+                return self._measurement.evaluate(
+                    self._registers[0], self._registers[1], self._registers[2]
+                )
