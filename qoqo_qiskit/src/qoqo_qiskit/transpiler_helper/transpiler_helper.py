@@ -11,9 +11,8 @@
 # the License.
 """Helper to use qiskit transpiler for qoqo circuits."""
 
-from enum import Enum
 from qoqo_qasm import QasmBackend, qasm_str_to_circuit
-from qoqo import Circuit, QuantumProgram, measurements
+from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import (
     PauliZProduct,
     ClassicalRegister,
@@ -22,7 +21,6 @@ from qoqo.measurements import (
 )
 from qiskit import QuantumCircuit, transpile
 from qiskit.qasm2 import dumps
-from qiskit.providers import Backend
 
 
 def transpile_with_qiskit(

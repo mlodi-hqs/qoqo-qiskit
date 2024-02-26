@@ -11,7 +11,6 @@
 # the License.
 """Test file for interface.py."""
 
-from qiskit import Aer
 from qoqo import Circuit, CircuitDag, QuantumProgram
 from qoqo import operations as ops
 from qoqo.measurements import PauliZProduct, PauliZProductInput  # type:ignore
