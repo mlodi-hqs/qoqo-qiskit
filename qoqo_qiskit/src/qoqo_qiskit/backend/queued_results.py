@@ -21,6 +21,7 @@ from qiskit_ibm_runtime import QiskitRuntimeService
 from qoqo import measurements
 
 from .post_processing import _transform_job_result
+from .utils import is_valid_uuid4
 
 
 class QueuedCircuitRun:
@@ -93,8 +94,15 @@ class QueuedCircuitRun:
         """
         json_dict = json.loads(string)
 
-        service = QiskitRuntimeService()
-        job = service.job(json_dict["job_id"])
+        # If id is valid uuid4, then the job was locally executed via qiskit_aer.AerSimulator()
+        if is_valid_uuid4(json_dict["job_id"]):
+            raise ValueError(
+                "The job was executed locally via qiskit_aer.AerSimulator(). "
+                "Retrieval is not possible."
+            )
+        else:
+            service = QiskitRuntimeService()
+            job = service.job(json_dict["job_id"])
 
         instance = QueuedCircuitRun(
             job=job,
