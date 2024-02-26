@@ -151,9 +151,9 @@ class QueuedCircuitRun:
                 )
                 return self._qoqo_result
             elif status == JobStatus.ERROR:
-                RuntimeError("The job failed.")
+                raise RuntimeError("The job failed.")
             else:
-                RuntimeError("The job was cancelled.")
+                raise RuntimeError("The job was cancelled.")
         else:
             return None
 
