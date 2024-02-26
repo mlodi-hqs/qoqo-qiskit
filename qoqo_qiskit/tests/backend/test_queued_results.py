@@ -85,8 +85,8 @@ def test_constructors() -> None:
 
 
 @pytest.mark.parametrize("sim_type", ["automatic", "density_matrix", "statevector"])
-def test_to_json(sim_type: str) -> None:
-    """Test QueuedCircuitRun and QueuedProgramRun `.to_json()` method."""
+def test_from_to_json(sim_type: str) -> None:
+    """Test QueuedCircuitRun and QueuedProgramRun `.to_json()` and `.from_json()` method."""
     run = _mocked_run(sim_type)
     qcr = QueuedCircuitRun(
         job=run[0],
@@ -120,10 +120,13 @@ def test_to_json(sim_type: str) -> None:
     ]
     assert serialized_json_qpr["registers"] == [{}, {}, {}]
 
+    with pytest.raises(ValueError) as exc:
+        _ = QueuedCircuitRun.from_json(serialized_qcr)
+    assert "Retrieval is not possible." in str(exc.value)
 
-def test_from_json() -> None:
-    """Test QueuedCircuitRun and QueuedProgramRun `.from_json()` method."""
-    pass
+    with pytest.raises(ValueError) as exc:
+        _ = QueuedProgramRun.from_json(serialized_qpr)
+    assert "Retrieval is not possible." in str(exc.value)
 
 
 def test_poll_result() -> None:
