@@ -9,11 +9,13 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Test file for backend.py."""
+"""Test backend.py file."""
+
+import sys
+from typing import Any, List
 
 import pytest
-import sys
-
+from qiskit_aer import AerSimulator
 from qoqo import Circuit
 from qoqo import operations as ops
 from qoqo.measurements import (  # type:ignore
@@ -21,13 +23,8 @@ from qoqo.measurements import (  # type:ignore
     PauliZProduct,
     PauliZProductInput,
 )
-
-from qiskit_aer import AerSimulator
-
 from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
 from qoqo_qiskit.backend.post_processing import _split
-
-from typing import List, Any
 
 
 def test_constructor() -> None:
@@ -65,9 +62,7 @@ def test_run_circuit_errors(operations: List[Any]) -> None:
 
     with pytest.raises(TypeError) as exc:
         _ = backend.run_circuit("error")
-    assert (
-        "The input is not a valid Qoqo Circuit instance." in str(exc.value)
-    )
+    assert "The input is not a valid Qoqo Circuit instance." in str(exc.value)
 
     circuit = Circuit()
     involved_qubits = set()
@@ -387,9 +382,15 @@ def test_split() -> None:
     shot_result_ws = "01 1"
     shot_result_no_ws = "011"
 
-    assert _split(shot_result_ws, clas_regs) == _split(
-        shot_result_no_ws, clas_regs
-    )
+    assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
+
+
+def test_run_circuit_queued() -> None:
+    pass
+
+
+def test_run_measurement_queued() -> None:
+    pass
 
 
 # For pytest
