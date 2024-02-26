@@ -19,7 +19,7 @@ from qiskit.providers.job import Job
 from qiskit_aer import AerSimulator
 from qoqo import Circuit
 
-from qoqo_qiskit.backend.queued_results import QueuedCircuitRun
+from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
 
 from .post_processing import _transform_job_result
@@ -227,9 +227,7 @@ class QoqoQiskitBackend:
         shots: int,
     ) -> Job:
         if self.compilation:
-            job = execute(
-                compiled_circuit, self.qiskit_backend, shots=shots, memory=self.memory
-            )
+            job = execute(compiled_circuit, self.qiskit_backend, shots=shots, memory=self.memory)
         else:
             job = self.qiskit_backend.run(compiled_circuit, shots=shots)
         return job
@@ -287,7 +285,7 @@ class QoqoQiskitBackend:
         self,
         circuit: Circuit,
     ) -> QueuedCircuitRun:
-        """Run a Circuit on a Qiskit backend and return a queued Job Result.
+        """Run a Circuit on a Qiskit backend and return a queued Run.
 
         The default number of shots for the simulation is 200.
         Any kind of Measurement, Statevector or DensityMatrix instruction only works as intended if
@@ -392,3 +390,29 @@ class QoqoQiskitBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+    def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
+        """Run a qoqo measurement on a Qiskit backend and return a queued Job Result.
+
+        The default number of shots for the simulation is 200.
+        Any kind of Measurement, Statevector or DensityMatrix instruction only works as intended if
+        they are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            measurement (qoqo.measurements): the measurement to simulate.
+
+        Returns:
+            QueuedProgramRun
+        """
+        queued_circuits = []
+        constant_circuit = measurement.constant_circuit()
+        for circuit in measurement.circuits():
+            if constant_circuit is None:
+                run_circuit = circuit
+            else:
+                run_circuit = constant_circuit + circuit
+
+            queued_circuits.append(self.run_circuit_queued(run_circuit))
+        return QueuedProgramRun(measurement, queued_circuits)
