@@ -9,8 +9,6 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Test folder for qoqo_qiskit."""
+"""Test folder for qoqo_qiskit: transpiler-helper module."""
 
-from tests.backend import test_backend
-from tests.interface import test_interface
 from tests.transpiler_helper import test_transpiler_helper
