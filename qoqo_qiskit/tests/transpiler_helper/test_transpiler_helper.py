@@ -45,21 +45,18 @@ def test_medium_circuit_basic_gates() -> None:
     circuit_res = Circuit()
     circuit_res += ops.RotateZ(1, 1.57079632679)
     circuit_res += ops.SqrtPauliX(1)
-    circuit_res += ops.RotateZ(1, 3.14159265358)
+    circuit_res += ops.RotateZ(1, 1.57079632679)
     circuit_res += ops.ControlledPauliZ(0, 1)
+    circuit_res += ops.RotateZ(1, 1.57079632679)
     circuit_res += ops.SqrtPauliX(1)
     circuit_res += ops.RotateZ(1, 1.57079632679)
 
     transpiled_circuit = transpile_with_qiskit(circuit, [{"basis_gates": ["sx", "rz", "cz"]}])
-    transpiled_circuit_dag = CircuitDag()
-    circuit_res_dag = CircuitDag()
-    transpiled_circuit_dag.from_circuit(transpiled_circuit)
-    circuit_res_dag.from_circuit(circuit_res)
 
-    assert transpiled_circuit_dag == circuit_res_dag
+    assert transpiled_circuit == circuit_res
 
 
-def test_basic_circuit_basic_backend() -> None:
+def test_basic_circuit_backend() -> None:
     """Test basic circuit conversion with a backend transpiler."""
     circuit = Circuit()
     circuit += ops.PauliX(0)
@@ -101,41 +98,36 @@ def test_toffoli_circuit_basic_gates() -> None:
     )
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
-    transpiled_circuit_dag.from_circuit(transpiled_circuit)
-    circuit_res_dag.from_circuit(circuit_res)
+    transpiled_circuit_dag = transpiled_circuit_dag.from_circuit(transpiled_circuit)
+    circuit_res_dag = circuit_res_dag.from_circuit(circuit_res)
 
     assert transpiled_circuit_dag == circuit_res_dag
 
 
-def test_toffoli_circuit_backend() -> None:
+def test_medium_circuit_backend() -> None:
     """Test toffoli circuit conversion with a backend transpiler."""
     circuit = Circuit()
-    circuit += ops.Toffoli(0, 1, 2)
+    circuit += ops.PauliX(0)
+    circuit += ops.ControlledPauliZ(0, 1)
+    circuit += ops.PauliX(1)
 
     circuit_res = Circuit()
-    circuit_res += ops.Hadamard(2)
-    circuit_res += ops.CNOT(1, 2)
-    circuit_res += ops.RotateZ(2, -0.78539816339)
-    circuit_res += ops.CNOT(0, 2)
-    circuit_res += ops.TGate(2)
-    circuit_res += ops.CNOT(1, 2)
-    circuit_res += ops.TGate(1)
-    circuit_res += ops.RotateZ(2, -0.78539816339)
-    circuit_res += ops.CNOT(0, 2)
+    circuit_res += ops.PauliX(0)
+    circuit_res += ops.RotateZ(1, 1.57079632679)
+    circuit_res += ops.SqrtPauliX(1)
+    circuit_res += ops.RotateZ(1, 1.57079632679)
     circuit_res += ops.CNOT(0, 1)
-    circuit_res += ops.TGate(2)
-    circuit_res += ops.TGate(0)
-    circuit_res += ops.RotateZ(1, -0.78539816339)
-    circuit_res += ops.Hadamard(2)
-    circuit_res += ops.CNOT(0, 1)
+    circuit_res += ops.RotateZ(1, -1.57079632679)
+    circuit_res += ops.SqrtPauliX(1)
+    circuit_res += ops.RotateZ(1, 1.57079632679)
 
     backend = GenericBackendV2(5)
     transpiled_circuit = transpile_with_qiskit(circuit, [{"backend": backend}])
 
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
-    transpiled_circuit_dag.from_circuit(transpiled_circuit)
-    circuit_res_dag.from_circuit(circuit_res)
+    transpiled_circuit_dag = transpiled_circuit_dag.from_circuit(transpiled_circuit)
+    circuit_res_dag = circuit_res_dag.from_circuit(circuit_res)
 
     assert transpiled_circuit_dag == circuit_res_dag
 
@@ -150,32 +142,27 @@ def test_multiple_circuits_backend() -> None:
     circuit_res_1 += ops.PauliX(0)
 
     circuit_2 = Circuit()
-    circuit_2 += ops.Toffoli(0, 1, 2)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.ControlledPauliZ(0, 1)
+    circuit_2 += ops.PauliX(1)
 
     circuit_res_2 = Circuit()
-    circuit_res_2 += ops.Hadamard(2)
-    circuit_res_2 += ops.CNOT(1, 2)
-    circuit_res_2 += ops.RotateZ(2, -0.78539816339)
-    circuit_res_2 += ops.CNOT(0, 2)
-    circuit_res_2 += ops.TGate(2)
-    circuit_res_2 += ops.CNOT(1, 2)
-    circuit_res_2 += ops.TGate(1)
-    circuit_res_2 += ops.RotateZ(2, -0.78539816339)
-    circuit_res_2 += ops.CNOT(0, 2)
+    circuit_res_2 += ops.PauliX(0)
+    circuit_res_2 += ops.RotateZ(1, 1.57079632679)
+    circuit_res_2 += ops.SqrtPauliX(1)
+    circuit_res_2 += ops.RotateZ(1, 1.57079632679)
     circuit_res_2 += ops.CNOT(0, 1)
-    circuit_res_2 += ops.TGate(2)
-    circuit_res_2 += ops.TGate(0)
-    circuit_res_2 += ops.RotateZ(1, -0.78539816339)
-    circuit_res_2 += ops.Hadamard(2)
-    circuit_res_2 += ops.CNOT(0, 1)
+    circuit_res_2 += ops.RotateZ(1, -1.57079632679)
+    circuit_res_2 += ops.SqrtPauliX(1)
+    circuit_res_2 += ops.RotateZ(1, 1.57079632679)
 
     backend = GenericBackendV2(5)
     transpiled_circuits = transpile_with_qiskit([circuit_1, circuit_2], [{"backend": backend}])
 
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
-    transpiled_circuit_dag.from_circuit(transpiled_circuits[1])
-    circuit_res_dag.from_circuit(circuit_res_2)
+    transpiled_circuit_dag = transpiled_circuit_dag.from_circuit(transpiled_circuits[1])
+    circuit_res_dag = circuit_res_dag.from_circuit(circuit_res_2)
 
     assert transpiled_circuits[0] == circuit_res_1 and transpiled_circuit_dag == circuit_res_dag
 
@@ -203,8 +190,8 @@ def assert_quantum_program_equal(
     ):
         circuit_dag_1 = CircuitDag()
         circuit_dag_2 = CircuitDag()
-        circuit_dag_1.from_circuit(circuit_1)
-        circuit_dag_2.from_circuit(circuit_2)
+        circuit_dag_1 = circuit_dag_1.from_circuit(circuit_1)
+        circuit_dag_2 = circuit_dag_2.from_circuit(circuit_2)
         assert circuit_dag_1 == circuit_dag_2
 
 
@@ -224,8 +211,9 @@ def test_basic_program_basic_gates() -> None:
     circuit_res_2 = Circuit()
     circuit_res_2 += ops.RotateZ(1, 1.57079632679)
     circuit_res_2 += ops.SqrtPauliX(1)
-    circuit_res_2 += ops.RotateZ(1, 3.14159265358)
+    circuit_res_2 += ops.RotateZ(1, 1.57079632679)
     circuit_res_2 += ops.ControlledPauliZ(0, 1)
+    circuit_res_2 += ops.RotateZ(1, 1.57079632679)
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.57079632679)
 
@@ -240,7 +228,7 @@ def test_basic_program_basic_gates() -> None:
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
 
     transpiled_program = transpile_program_with_qiskit(
-        quantum_program, [{"basis_gates": ["sx", "rz", "crz"]}]
+        quantum_program, [{"basis_gates": ["sx", "rz", "cz"]}]
     )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)
@@ -253,39 +241,32 @@ def test_quantum_program_backend() -> None:
     circuit_1 += ops.Identity(0)
 
     circuit_res_1 = Circuit()
-    circuit_res_1 += ops.SqrtPauliX(0)
-    circuit_res_1 += ops.SqrtPauliX(0)
+    circuit_res_1 += ops.PauliX(0)
 
     circuit_2 = Circuit()
-    circuit_2 += ops.CNOT(0, 1)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.ControlledPauliZ(0, 1)
+    circuit_2 += ops.PauliX(1)
 
     circuit_res_2 = Circuit()
+    circuit_res_2 += ops.PauliX(0)
     circuit_res_2 += ops.RotateZ(1, 1.57079632679)
     circuit_res_2 += ops.SqrtPauliX(1)
-    circuit_res_2 += ops.RotateZ(1, 3.14159265358)
-    circuit_res_2 += ops.ControlledPauliZ(0, 1)
+    circuit_res_2 += ops.RotateZ(1, 1.57079632679)
+    circuit_res_2 += ops.CNOT(0, 1)
+    circuit_res_2 += ops.RotateZ(1, -1.57079632679)
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.57079632679)
 
     circuit_3 = Circuit()
-    circuit_3 += ops.Toffoli(0, 1, 2)
+    circuit_3 += ops.TGate(0)
+    circuit_3 += ops.CNOT(0, 1)
+    circuit_3 += ops.TGate(1)
 
     circuit_res_3 = Circuit()
-    circuit_res_3 += ops.Hadamard(2)
-    circuit_res_3 += ops.CNOT(1, 2)
-    circuit_res_3 += ops.RotateZ(2, -0.78539816339)
-    circuit_res_3 += ops.CNOT(0, 2)
-    circuit_res_3 += ops.TGate(2)
-    circuit_res_3 += ops.CNOT(1, 2)
-    circuit_res_3 += ops.TGate(1)
-    circuit_res_3 += ops.RotateZ(2, -0.78539816339)
-    circuit_res_3 += ops.CNOT(0, 2)
+    circuit_res_3 += ops.RotateZ(0, 0.78539816339)
     circuit_res_3 += ops.CNOT(0, 1)
-    circuit_res_3 += ops.TGate(2)
-    circuit_res_3 += ops.TGate(0)
-    circuit_res_3 += ops.RotateZ(1, -0.78539816339)
-    circuit_res_3 += ops.Hadamard(2)
-    circuit_res_3 += ops.CNOT(0, 1)
+    circuit_res_3 += ops.RotateZ(1, 0.78539816339)
 
     measurement_input = PauliZProductInput(1, False)
     measurement = PauliZProduct(

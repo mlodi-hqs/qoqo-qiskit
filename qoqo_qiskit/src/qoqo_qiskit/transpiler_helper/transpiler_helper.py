@@ -29,7 +29,7 @@ def transpile_with_qiskit(
     """Use qiskit transpilers to transpile a qoqo circuit.
 
     Args:
-        circuits (Circuit | ): qoqo circuit(s) to transpile.
+        circuits (Circuit | List[Circuits]): qoqo circuit(s) to transpile.
         transpilers (list[dict[str, str]]): transpilers to use.
 
     Returns:
