@@ -118,7 +118,6 @@ def transpile_with_qiskit(
         Returns:
             Circuit: converted qoqo circuit.
         """
-        print(qiskit_circuit)
         qiskit_qasm_circuit = dumps(qiskit_circuit)
         qiskit_qasm_circuit = replace_math_expressions(qiskit_qasm_circuit)
         qiskit_qasm_circuit += "\n"
