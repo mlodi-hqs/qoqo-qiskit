@@ -1,4 +1,4 @@
-# Copyright © 2023 HQS Quantum Simulations GmbH.
+# Copyright © 2024 HQS Quantum Simulations GmbH.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -14,8 +14,7 @@
 from qoqo import Circuit, CircuitDag, QuantumProgram
 from qoqo import operations as ops
 from qoqo.measurements import PauliZProduct, PauliZProductInput  # type:ignore
-from qiskit.providers.fake_provider import GenericBackendV2
-
+from qiskit.providers.fake_provider import FakeManilaV2
 from qoqo_qiskit.transpiler_helper.transpiler_helper import (
     transpile_with_qiskit,
     transpile_program_with_qiskit,
@@ -65,7 +64,7 @@ def test_basic_circuit_backend() -> None:
     circuit_res = Circuit()
     circuit_res += ops.PauliX(0)
 
-    backend = GenericBackendV2(5)
+    backend = FakeManilaV2()
     transpiled_circuit = transpile_with_qiskit(circuit, [{"backend": backend}])
 
     assert transpiled_circuit == circuit_res
@@ -121,7 +120,7 @@ def test_medium_circuit_backend() -> None:
     circuit_res += ops.SqrtPauliX(1)
     circuit_res += ops.RotateZ(1, 1.57079632679)
 
-    backend = GenericBackendV2(5)
+    backend = FakeManilaV2()
     transpiled_circuit = transpile_with_qiskit(circuit, [{"backend": backend}])
 
     transpiled_circuit_dag = CircuitDag()
@@ -156,7 +155,7 @@ def test_multiple_circuits_backend() -> None:
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.57079632679)
 
-    backend = GenericBackendV2(5)
+    backend = FakeManilaV2()
     transpiled_circuits = transpile_with_qiskit([circuit_1, circuit_2], [{"backend": backend}])
 
     transpiled_circuit_dag = CircuitDag()
@@ -280,7 +279,7 @@ def test_quantum_program_backend() -> None:
     quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
 
-    backend = GenericBackendV2(5)
+    backend = FakeManilaV2()
     transpiled_program = transpile_program_with_qiskit(quantum_program, [{"backend": backend}])
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)

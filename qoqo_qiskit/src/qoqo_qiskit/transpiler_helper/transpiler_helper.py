@@ -1,4 +1,4 @@
-# Copyright © 2023 HQS Quantum Simulations GmbH.
+# Copyright © 2024 HQS Quantum Simulations GmbH.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
 # the License.
 """Helper to use qiskit transpiler for qoqo circuits."""
 
+import re
+from numpy import pi
 from qoqo_qasm import QasmBackend, qasm_str_to_circuit
 from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import (
@@ -21,6 +23,38 @@ from qoqo.measurements import (
 )
 from qiskit import QuantumCircuit, transpile
 from qiskit.qasm2 import dumps
+
+
+def replace_math_expressions(input_string: str) -> str:
+    """Replace all math expressions in the given string with their values.
+
+    Args:
+        input_string (str): String to replace math expressions in.
+
+    Returns:
+        str: String with all math expressions replaced.
+    """
+
+    def repl(match: re.Match) -> str:
+        """Replace the given math expression by its value.
+
+        Args:
+            match (re.Match): the match to replace: n * pi|m / k, all optional
+
+        Returns:
+            str: the value of the given expression.
+        """
+        if match.group(2) is None and match.group(5) is None:
+            return str(match.group(0))
+        left_number = float(match.group(2)) if match.group(2) is not None else 1.0
+        middle_number = 1
+        if match.group(3) is not None:
+            middle_number = float(match.group(3)) if match.group(3) != "pi" else pi
+        right_number = float(match.group(5)) if match.group(5) is not None else 1.0
+        return str(round(left_number * middle_number / right_number, 12))[:-1]
+
+    pat = r"(([\d.]+)?\*)?(pi|[\d.]+)(\/?([\d.]+))?"
+    return re.sub(pat, repl, input_string)
 
 
 def transpile_with_qiskit(
@@ -73,8 +107,6 @@ def transpile_with_qiskit(
                 "ignore_backend_supplied_default_methods"
             )
             or False,
-            # num_processes=transpiler_args.get("num_processes")
-            # in the documentation but not in the code.
         )
 
     def qiskit_to_qoqo_circuit(qiskit_circuit: QuantumCircuit) -> Circuit:
@@ -86,11 +118,9 @@ def transpile_with_qiskit(
         Returns:
             Circuit: converted qoqo circuit.
         """
+        print(qiskit_circuit)
         qiskit_qasm_circuit = dumps(qiskit_circuit)
-        qiskit_qasm_circuit = qiskit_qasm_circuit.replace("3*pi/4", "2.35619449019")
-        qiskit_qasm_circuit = qiskit_qasm_circuit.replace("pi/4", "0.78539816339")
-        qiskit_qasm_circuit = qiskit_qasm_circuit.replace("pi/2", "1.57079632679")
-        qiskit_qasm_circuit = qiskit_qasm_circuit.replace("pi", "3.14159265359")
+        qiskit_qasm_circuit = replace_math_expressions(qiskit_qasm_circuit)
         qiskit_qasm_circuit += "\n"
         return qasm_str_to_circuit(qiskit_qasm_circuit)
 
