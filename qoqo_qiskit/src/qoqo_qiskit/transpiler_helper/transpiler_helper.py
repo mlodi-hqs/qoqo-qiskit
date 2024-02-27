@@ -11,7 +11,7 @@
 # the License.
 """Helper to use qiskit transpiler for qoqo circuits."""
 
-import re
+from re import Match, sub
 from numpy import pi
 from qoqo_qasm import QasmBackend, qasm_str_to_circuit
 from qoqo import Circuit, QuantumProgram
@@ -35,11 +35,11 @@ def replace_math_expressions(input_string: str) -> str:
         str: String with all math expressions replaced.
     """
 
-    def repl(match: re.Match) -> str:
+    def repl(match: Match) -> str:
         """Replace the given math expression by its value.
 
         Args:
-            match (re.Match): the match to replace: n * pi|m / k, all optional
+            match (Match): the match to replace: n * pi|m / k, all optional
 
         Returns:
             str: the value of the given expression.
@@ -54,7 +54,7 @@ def replace_math_expressions(input_string: str) -> str:
         return str(round(left_number * middle_number / right_number, 12))[:-1]
 
     pat = r"(([\d.]+)?\*)?(pi|[\d.]+)(\/?([\d.]+))?"
-    return re.sub(pat, repl, input_string)
+    return sub(pat, repl, input_string)
 
 
 def transpile_with_qiskit(
