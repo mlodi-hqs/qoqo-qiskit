@@ -47,7 +47,7 @@ def replace_math_expressions(input_string: str) -> str:
         if match.group(2) is None and match.group(5) is None and match.group(3) != "pi":
             return str(match.group(0))
         left_number = float(match.group(2)) if match.group(2) is not None else 1.0
-        middle_number = 1
+        middle_number = 1.0
         if match.group(3) is not None:
             middle_number = float(match.group(3)) if match.group(3) != "pi" else pi
         right_number = float(match.group(5)) if match.group(5) is not None else 1.0
