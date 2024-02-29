@@ -11,22 +11,28 @@
 # the License.
 """Qoqo-qiskit backend for simulation purposes."""
 
-import numpy as np
-from qoqo import Circuit
-from qiskit_aer import AerSimulator
-from qiskit.providers import Backend
-from qiskit import QuantumCircuit, execute
+from typing import Any, Dict, List, Optional, Tuple, cast
 
+from qiskit import QuantumCircuit, execute
+from qiskit.providers import Backend
+from qiskit.providers.job import Job
+from qiskit_aer import AerSimulator
+from qoqo import Circuit
+
+from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
 
-from typing import Tuple, Dict, List, cast, Any, Optional
+from .post_processing import _transform_job_result
 
 
 class QoqoQiskitBackend:
     """Simulate a Qoqo QuantumProgram on a Qiskit backend."""
 
     def __init__(
-        self, qiskit_backend: Backend = None, memory: bool = False, compilation: bool = True
+        self,
+        qiskit_backend: Backend = None,
+        memory: bool = False,
+        compilation: bool = True,
     ) -> None:
         """Init for Qiskit backend settings.
 
@@ -47,6 +53,165 @@ class QoqoQiskitBackend:
             self.qiskit_backend = qiskit_backend
         self.memory = memory
         self.compilation = compilation
+
+    # Internal _run_circuit method
+    def _run_circuit(self, circuit: Circuit) -> Tuple[
+        Job,
+        str,
+        Dict[str, int],
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        if not isinstance(circuit, Circuit):
+            raise TypeError("The input is not a valid Qoqo Circuit instance.")
+
+        (
+            clas_regs_lengths,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        ) = self._set_up_registers(circuit)
+
+        (compiled_circuit, run_options) = self._compile_circuit(circuit)
+
+        self._handle_errors(run_options)
+
+        (shots, sim_type) = self._handle_simulation_options(run_options, compiled_circuit)
+
+        job = self._job_execution(compiled_circuit, shots)
+
+        return (
+            job,
+            sim_type,
+            clas_regs_lengths,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
+
+    def _set_up_registers(
+        self,
+        circuit: Circuit,
+    ) -> Tuple[
+        Dict[str, int],
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        clas_regs_lengths: Dict[str, int] = {}
+
+        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
+        output_float_register_dict: Dict[str, List[List[float]]] = {}
+        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
+
+        for bit_def in circuit.filter_by_tag("DefinitionBit"):
+            clas_regs_lengths[bit_def.name()] = bit_def.length()
+            if bit_def.is_output():
+                output_bit_register_dict[bit_def.name()] = []
+        for float_def in circuit.filter_by_tag("DefinitionFloat"):
+            if float_def.is_output():
+                output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
+        for complex_def in circuit.filter_by_tag("DefinitionComplex"):
+            if complex_def.is_output():
+                output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
+        return (
+            clas_regs_lengths,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
+
+    def _compile_circuit(
+        self,
+        circuit: Circuit,
+    ) -> Tuple[QuantumCircuit, Dict[str, Any]]:
+        try:
+            defs = circuit.definitions()
+            doubles = [defs[0]]
+            for op in defs:
+                if op not in doubles:
+                    doubles.append(op)
+            debugged_circuit = Circuit()
+            for def_bit in doubles:
+                debugged_circuit += def_bit
+            for op in circuit:
+                if op not in doubles:
+                    debugged_circuit += op
+        except IndexError:
+            debugged_circuit = circuit
+
+        # Qiskit conversion
+        res = to_qiskit_circuit(debugged_circuit)
+        compiled_circuit: QuantumCircuit = res[0]
+        run_options: Dict[str, Any] = res[1]
+
+        return compiled_circuit, run_options
+
+    def _handle_errors(
+        self,
+        run_options: Dict[str, Any],
+    ) -> None:
+        # Raise ValueError:
+        #   - if no measurement of any kind and no Pragmas are involved
+        if (
+            not run_options["MeasurementInfo"]
+            and not run_options["SimulationInfo"]["PragmaGetStateVector"]
+            and not run_options["SimulationInfo"]["PragmaGetDensityMatrix"]
+        ):
+            raise ValueError(
+                "The Circuit does not contain Measurement, PragmaGetStateVector"
+                " or PragmaGetDensityMatrix operations. Simulation not possible."
+            )
+        #   - if both StateVector and DensityMatrix pragmas are involved
+        if (
+            run_options["SimulationInfo"]["PragmaGetStateVector"]
+            and run_options["SimulationInfo"]["PragmaGetDensityMatrix"]
+        ):
+            raise ValueError(
+                "The Circuit contains both a PragmaGetStateVector"
+                " and a PragmaGetDensityMatrix instruction. Simulation not possible."
+            )
+        #   - if more than 1 type of measurement is involved
+        if len(run_options["MeasurementInfo"]) > 1:
+            raise ValueError("Only input Circuits containing one type of measurement.")
+
+    def _handle_simulation_options(
+        self,
+        run_options: Dict[str, Any],
+        compiled_circuit: QuantumCircuit,
+    ) -> Tuple[int, str]:
+        shots = 200
+        custom_shots = 0
+        sim_type = "automatic"
+        if run_options["SimulationInfo"]["PragmaGetStateVector"]:
+            compiled_circuit.save_statevector()
+            sim_type = "statevector"
+        elif run_options["SimulationInfo"]["PragmaGetDensityMatrix"]:
+            compiled_circuit.save_density_matrix()
+            sim_type = "density_matrix"
+        if "PragmaRepeatedMeasurement" in run_options["MeasurementInfo"]:
+            for el in run_options["MeasurementInfo"]["PragmaRepeatedMeasurement"]:
+                if el[1] > custom_shots:
+                    custom_shots = el[1]
+        if "PragmaSetNumberOfMeasurements" in run_options["SimulationInfo"]:
+            for el in run_options["SimulationInfo"]["PragmaSetNumberOfMeasurements"]:
+                if el[1] > custom_shots:
+                    custom_shots = el[1]
+        if custom_shots != 0:
+            shots = custom_shots
+        return shots, sim_type
+
+    def _job_execution(
+        self,
+        compiled_circuit: Circuit,
+        shots: int,
+    ) -> Job:
+        if self.compilation:
+            job = execute(compiled_circuit, self.qiskit_backend, shots=shots, memory=self.memory)
+        else:
+            job = self.qiskit_backend.run(compiled_circuit, shots=shots)
+        return job
 
     def run_circuit(
         self,
@@ -73,107 +238,70 @@ class QoqoQiskitBackend:
                   Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.
 
         Raises:
-            ValueError: the Circuit does not contain Measurement operations
+            ValueError: Incorrect Measurement or Pragma operations.
         """
         (
-            clas_regs_sizes,
+            job,
+            sim_type,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
-        ) = self._setup_registers(circuit)
+        ) = self._run_circuit(circuit)
 
-        try:
-            defs = circuit.definitions()
-            doubles = [defs[0]]
-            for op in defs:
-                if op not in doubles:
-                    doubles.append(op)
-            debugged_circuit = Circuit()
-            for def_bit in doubles:
-                debugged_circuit += def_bit
-            for op in circuit:
-                if op not in doubles:
-                    debugged_circuit += op
-        except IndexError:
-            debugged_circuit = circuit
-
-        # Qiskit conversion
-        res = to_qiskit_circuit(debugged_circuit)
-        compiled_circuit: QuantumCircuit = res[0]
-        run_options: Dict[str, Any] = res[1]
-
-        # Raise ValueError:
-        #   - if no measurement of any kind and no Pragmas are involved
-        if (
-            not run_options["MeasurementInfo"]
-            and not run_options["SimulationInfo"]["PragmaGetStateVector"]
-            and not run_options["SimulationInfo"]["PragmaGetDensityMatrix"]
-        ):
-            raise ValueError(
-                "The Circuit does not contain Measurement, PragmaGetStateVector"
-                " or PragmaGetDensityMatrix operations. Simulation not possible."
-            )
-        #   - if both StateVector and DensityMatrix pragmas are involved
-        if (
-            run_options["SimulationInfo"]["PragmaGetStateVector"]
-            and run_options["SimulationInfo"]["PragmaGetDensityMatrix"]
-        ):
-            raise ValueError(
-                "The Circuit contains both a PragmaGetStateVector"
-                " and a PragmaGetDensityMatrix instruction. Simulation not possible."
-            )
-        #   - if more than 1 type of measurement is involved
-        if len(run_options["MeasurementInfo"]) > 1:
-            raise ValueError("Only input Circuits containing one type of measurement.")
-
-        # Handle simulation Options
-        shots = 200
-        custom_shots = 0
-        sim_type = "automatic"
-        if run_options["SimulationInfo"]["PragmaGetStateVector"]:
-            compiled_circuit.save_statevector()
-            sim_type = "statevector"
-        elif run_options["SimulationInfo"]["PragmaGetDensityMatrix"]:
-            compiled_circuit.save_density_matrix()
-            sim_type = "density_matrix"
-        if "PragmaRepeatedMeasurement" in run_options["MeasurementInfo"]:
-            for el in run_options["MeasurementInfo"]["PragmaRepeatedMeasurement"]:
-                if el[1] > custom_shots:
-                    custom_shots = el[1]
-        if "PragmaSetNumberOfMeasurements" in run_options["SimulationInfo"]:
-            for el in run_options["SimulationInfo"]["PragmaSetNumberOfMeasurements"]:
-                if el[1] > custom_shots:
-                    custom_shots = el[1]
-        if custom_shots != 0:
-            shots = custom_shots
-
-        # Simulation
-        if self.compilation:
-            result = execute(
-                compiled_circuit, self.qiskit_backend, shots=shots, memory=self.memory
-            ).result()
-        else:
-            result = self.qiskit_backend.run(compiled_circuit, shots=shots)
+        result = job.result()
 
         # Result transformation
-        (
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        ) = self._transform_result(
+        return _transform_job_result(
+            self.memory,
             sim_type,
             result,
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
         )
 
-        return (
+    def run_circuit_queued(
+        self,
+        circuit: Circuit,
+    ) -> QueuedCircuitRun:
+        """Run a Circuit on a Qiskit backend and return a queued Run.
+
+        The default number of shots for the simulation is 200.
+        Any kind of Measurement, Statevector or DensityMatrix instruction only works as intended if
+        they are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuit (Circuit): the Circuit to simulate.
+
+        Returns:
+            QueuedCircuitRun
+        """
+        (
+            job,
+            sim_type,
+            clas_regs_lengths,
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        ) = self._run_circuit(circuit)
+
+        register_info: Tuple[
+            Dict[str, int],
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ] = (
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+        return QueuedCircuitRun(job, self.memory, sim_type, register_info)
 
     def run_measurement_registers(
         self,
@@ -220,7 +348,10 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def run_measurement(self, measurement: Any) -> Optional[Dict[str, float]]:
+    def run_measurement(
+        self,
+        measurement: Any,
+    ) -> Optional[Dict[str, float]]:
         """Run a circuit with the Qiskit backend.
 
         Args:
@@ -241,133 +372,28 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def _counts_to_registers(
-        self, counts: Any, mem: bool, clas_regs_sizes: Dict[str, int]
-    ) -> List[List[List[bool]]]:
-        bit_map: List[List[List[bool]]] = []
-        reg_num = 0
-        for key in clas_regs_sizes:
-            reg_num += clas_regs_sizes[key]
-        for _ in range(reg_num):
-            bit_map.append([])
-        for key in counts:
-            splitted = self._split(key, clas_regs_sizes)
-            for i, measurement in enumerate(splitted):
-                transf_measurement = self._bit_to_bool(measurement)
-                if mem:
-                    bit_map[i].append(transf_measurement)
-                else:
-                    for _ in range(counts[key]):
-                        bit_map[i].append(transf_measurement)
-        return bit_map
+    def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
+        """Run a qoqo measurement on a Qiskit backend and return a queued Job Result.
 
-    def _are_measurement_operations_in(self, circuit: Circuit) -> bool:
-        for op in circuit:
-            if "Measurement" in op.tags():
-                return True
-        return False
+        The default number of shots for the simulation is 200.
+        Any kind of Measurement, Statevector or DensityMatrix instruction only works as intended if
+        they are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
 
-    def _bit_to_bool(self, element: str) -> List[bool]:
-        ret = []
-        for char in element:
-            ret.append(char.lower() in ("1"))
-        return ret
+        Args:
+            measurement (qoqo.measurements): the measurement to simulate.
 
-    def _split(self, element: str, clas_regs_sizes: Dict[str, int]) -> List[str]:
-        splitted: list[str] = []
-        if " " in element:
-            splitted = element.split()
-            splitted.reverse()
-        else:
-            element = element[::-1]
-            for key in clas_regs_sizes:
-                splitted.append(element[: clas_regs_sizes[key] :])
-                splitted[-1] = splitted[-1][::-1]
-                element = element[clas_regs_sizes[key] :]
-        return splitted
-
-    def _setup_registers(
-        self,
-        circuit: Circuit,
-    ) -> Tuple[
-        Dict[str, int],
-        Dict[str, List[List[bool]]],
-        Dict[str, List[List[float]]],
-        Dict[str, List[List[complex]]],
-    ]:
-        clas_regs_sizes: Dict[str, int] = {}
-
-        # Initializing the classical registers for calculation and output
-        internal_bit_register_dict: Dict[str, List[bool]] = {}
-        internal_float_register_dict: Dict[str, List[float]] = {}
-        internal_complex_register_dict: Dict[str, List[complex]] = {}
-
-        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
-        output_float_register_dict: Dict[str, List[List[float]]] = {}
-        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
-
-        for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            internal_bit_register_dict[bit_def.name()] = [False for _ in range(bit_def.length())]
-            clas_regs_sizes[bit_def.name()] = bit_def.length()
-            if bit_def.is_output():
-                output_bit_register_dict[bit_def.name()] = []
-        for float_def in circuit.filter_by_tag("DefinitionFloat"):
-            internal_float_register_dict[float_def.name()] = [
-                0.0 for _ in range(float_def.length())
-            ]
-            if float_def.is_output():
-                output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
-        for complex_def in circuit.filter_by_tag("DefinitionComplex"):
-            internal_complex_register_dict[complex_def.name()] = [
-                complex(0.0) for _ in range(complex_def.length())
-            ]
-            if complex_def.is_output():
-                output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
-        return (
-            clas_regs_sizes,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        )
-
-    def _transform_result(
-        self,
-        sim_type: str,
-        result: Any,
-        clas_regs_sizes: Dict[str, int],
-        output_bit_register_dict: Dict[str, List[List[bool]]],
-        _output_float_register_dict: Dict[str, List[List[float]]],
-        output_complex_register_dict: Dict[str, List[List[complex]]],
-    ) -> Tuple[
-        Dict[str, List[List[bool]]],
-        Dict[str, List[List[float]]],
-        Dict[str, List[List[complex]]],
-    ]:
-        if sim_type == "automatic":
-            if self.memory:
-                transformed_counts = self._counts_to_registers(
-                    result.get_memory(), True, clas_regs_sizes
-                )
+        Returns:
+            QueuedProgramRun
+        """
+        queued_circuits = []
+        constant_circuit = measurement.constant_circuit()
+        for circuit in measurement.circuits():
+            if constant_circuit is None:
+                run_circuit = circuit
             else:
-                transformed_counts = self._counts_to_registers(
-                    result.get_counts(), False, clas_regs_sizes
-                )
-            for i, reg in enumerate(output_bit_register_dict):
-                reversed_list = []
-                for shot in transformed_counts[i]:
-                    reversed_list.append(shot[::-1])
-                output_bit_register_dict[reg] = reversed_list
-        elif sim_type == "statevector":
-            vector = list(np.asarray(result.data(0)["statevector"]).flatten())
-            for reg in output_complex_register_dict:
-                output_complex_register_dict[reg].append(vector)
-        elif sim_type == "density_matrix":
-            vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
-            for reg in output_complex_register_dict:
-                output_complex_register_dict[reg].append(vector)
+                run_circuit = constant_circuit + circuit
 
-        return (
-            output_bit_register_dict,
-            _output_float_register_dict,
-            output_complex_register_dict,
-        )
+            queued_circuits.append(self.run_circuit_queued(run_circuit))
+        return QueuedProgramRun(measurement, queued_circuits)

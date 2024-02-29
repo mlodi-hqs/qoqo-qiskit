@@ -11,17 +11,14 @@
 # the License.
 """Test file for interface.py."""
 
-import pytest
 import sys
+from typing import Union
 
+import pytest
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qoqo import Circuit
 from qoqo import operations as ops
-
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-
 from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
-
-from typing import Union
 
 
 def test_basic_circuit() -> None:

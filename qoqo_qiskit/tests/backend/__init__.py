@@ -11,4 +11,4 @@
 # the License.
 """Test folder for qoqo_qiskit: backend module."""
 
-from tests.backend import test_backend
+from tests.backend import test_backend, test_queued_results

@@ -12,15 +12,15 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
+import types
+import warnings
+from typing import Tuple
+
+from qiskit_ibm_provider import IBMProvider
 from qoqo import noise_models
 from struqture_py import spins
 
-from qiskit_ibm_provider import IBMProvider
-
 from .mocked_properties import MockedProperties
-
-import types
-import warnings
 
 
 def _qiskit_gate_equivalent(gate: str) -> str:
@@ -200,8 +200,10 @@ def get_decoherence_on_gate_model(
 
 def get_noise_models(
     device: types.ModuleType, get_mocked_information: bool = False
-) -> (noise_models.ContinuousDecoherenceModel, noise_models.DecoherenceOnGateModel):
-    """Get the DecoherenceOnGateModel and DecoherenceOnGateModel qoqo noise models of an IBMDevice.
+) -> Tuple[
+    noise_models.ContinuousDecoherenceModel, noise_models.DecoherenceOnGateModel
+]:
+    """Get the ContinuousDecoherenceModel and DecoherenceOnGateModel qoqo noise models of an IBMDevice.
 
     The paper that relates the gate fidelity to single-qubit damping + dephasing noise
     is https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.129.150504.
