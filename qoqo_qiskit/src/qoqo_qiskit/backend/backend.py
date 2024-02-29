@@ -55,9 +55,7 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(
-        self, circuit: Circuit
-    ) -> Tuple[
+    def _run_circuit(self, circuit: Circuit) -> Tuple[
         Job,
         str,
         Dict[str, int],
