@@ -19,16 +19,16 @@ from qoqo import Circuit
 
 
 def _counts_to_registers(
-    counts: Any, mem: bool, clas_regs_sizes: Dict[str, int]
+    counts: Any, mem: bool, clas_regs_lengths: Dict[str, int]
 ) -> List[List[List[bool]]]:
     bit_map: List[List[List[bool]]] = []
     reg_num = 0
-    for key in clas_regs_sizes:
-        reg_num += clas_regs_sizes[key]
+    for key in clas_regs_lengths:
+        reg_num += clas_regs_lengths[key]
     for _ in range(reg_num):
         bit_map.append([])
     for key in counts:
-        splitted = _split(key, clas_regs_sizes)
+        splitted = _split(key, clas_regs_lengths)
         for i, measurement in enumerate(splitted):
             transf_measurement = _bit_to_bool(measurement)
             if mem:
@@ -53,17 +53,17 @@ def _bit_to_bool(element: str) -> List[bool]:
     return ret
 
 
-def _split(element: str, clas_regs_sizes: Dict[str, int]) -> List[str]:
+def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
     splitted: list[str] = []
     if " " in element:
         splitted = element.split()
         splitted.reverse()
     else:
         element = element[::-1]
-        for key in clas_regs_sizes:
-            splitted.append(element[: clas_regs_sizes[key] :])
+        for key in clas_regs_lengths:
+            splitted.append(element[: clas_regs_lengths[key] :])
             splitted[-1] = splitted[-1][::-1]
-            element = element[clas_regs_sizes[key] :]
+            element = element[clas_regs_lengths[key] :]
     return splitted
 
 
@@ -71,7 +71,7 @@ def _transform_job_result(
     memory: bool,
     sim_type: str,
     result: Result,
-    clas_regs_sizes: Dict[str, int],
+    clas_regs_lengths: Dict[str, int],
     output_bit_register_dict: Dict[str, List[List[bool]]],
     _output_float_register_dict: Dict[str, List[List[float]]],
     output_complex_register_dict: Dict[str, List[List[complex]]],
@@ -82,9 +82,11 @@ def _transform_job_result(
 ]:
     if sim_type == "automatic":
         if memory:
-            transformed_counts = _counts_to_registers(result.get_memory(), True, clas_regs_sizes)
+            transformed_counts = _counts_to_registers(result.get_memory(), True, clas_regs_lengths)
         else:
-            transformed_counts = _counts_to_registers(result.get_counts(), False, clas_regs_sizes)
+            transformed_counts = _counts_to_registers(
+                result.get_counts(), False, clas_regs_lengths
+            )
         for i, reg in enumerate(output_bit_register_dict):
             reversed_list = []
             for shot in transformed_counts[i]:

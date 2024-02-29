@@ -54,8 +54,10 @@ class QoqoQiskitBackend:
         self.memory = memory
         self.compilation = compilation
 
-    # Internal _run_circuit method, for async support
-    def _run_circuit(self, circuit: Circuit) -> Tuple[
+    # Internal _run_circuit method
+    def _run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[
         Job,
         str,
         Dict[str, int],
@@ -66,36 +68,31 @@ class QoqoQiskitBackend:
         if not isinstance(circuit, Circuit):
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
-        # Initial register setup
         (
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
-        ) = self._setup_registers(circuit)
+        ) = self._set_up_registers(circuit)
 
-        # Circuit compilation
         (compiled_circuit, run_options) = self._compile_circuit(circuit)
 
-        # Error handling
         self._handle_errors(run_options)
 
-        # Handle simulation Options
         (shots, sim_type) = self._handle_simulation_options(run_options, compiled_circuit)
 
-        # Job Execution
         job = self._job_execution(compiled_circuit, shots)
 
         return (
             job,
             sim_type,
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
         )
 
-    def _setup_registers(
+    def _set_up_registers(
         self,
         circuit: Circuit,
     ) -> Tuple[
@@ -104,36 +101,24 @@ class QoqoQiskitBackend:
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
     ]:
-        clas_regs_sizes: Dict[str, int] = {}
-
-        # Initializing the classical registers for calculation and output
-        internal_bit_register_dict: Dict[str, List[bool]] = {}
-        internal_float_register_dict: Dict[str, List[float]] = {}
-        internal_complex_register_dict: Dict[str, List[complex]] = {}
+        clas_regs_lengths: Dict[str, int] = {}
 
         output_bit_register_dict: Dict[str, List[List[bool]]] = {}
         output_float_register_dict: Dict[str, List[List[float]]] = {}
         output_complex_register_dict: Dict[str, List[List[complex]]] = {}
 
         for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            internal_bit_register_dict[bit_def.name()] = [False for _ in range(bit_def.length())]
-            clas_regs_sizes[bit_def.name()] = bit_def.length()
+            clas_regs_lengths[bit_def.name()] = bit_def.length()
             if bit_def.is_output():
                 output_bit_register_dict[bit_def.name()] = []
         for float_def in circuit.filter_by_tag("DefinitionFloat"):
-            internal_float_register_dict[float_def.name()] = [
-                0.0 for _ in range(float_def.length())
-            ]
             if float_def.is_output():
                 output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
-            internal_complex_register_dict[complex_def.name()] = [
-                complex(0.0) for _ in range(complex_def.length())
-            ]
             if complex_def.is_output():
                 output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
         return (
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
@@ -260,7 +245,7 @@ class QoqoQiskitBackend:
         (
             job,
             sim_type,
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
@@ -273,7 +258,7 @@ class QoqoQiskitBackend:
             self.memory,
             sim_type,
             result,
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
@@ -300,7 +285,7 @@ class QoqoQiskitBackend:
         (
             job,
             sim_type,
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,
@@ -312,7 +297,7 @@ class QoqoQiskitBackend:
             Dict[str, List[List[float]]],
             Dict[str, List[List[complex]]],
         ] = (
-            clas_regs_sizes,
+            clas_regs_lengths,
             output_bit_register_dict,
             output_float_register_dict,
             output_complex_register_dict,

@@ -56,14 +56,14 @@ def _mocked_run(
     (
         job,
         sim_type,
-        clas_regs_sizes,
+        clas_regs_lengths,
         output_bit_register_dict,
         output_float_register_dict,
         output_complex_register_dict,
     ) = backend._run_circuit(circuit)
 
     register_info = (
-        clas_regs_sizes,
+        clas_regs_lengths,
         output_bit_register_dict,
         output_float_register_dict,
         output_complex_register_dict,
