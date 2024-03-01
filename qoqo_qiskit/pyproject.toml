@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_qiskit"
-version = "0.2.5"
+version = "0.3.0"
 license = { file = "LICENSE" }
 authors = [
     { name = "HQS Quantum Simulation GmbH", email = "info@quantumsimulations.de" },
@@ -12,9 +12,10 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "qoqo>=1.9",
-    "qoqo_qasm>=0.9.6",
-    "qiskit<0.46",
-    "qiskit_aer>=0.13.2",
+    "qoqo_qasm>=0.9.6",         # minimum version for PragmaSleep support
+    "qiskit<0.46",              # no 1.0 yet
+    "qiskit_aer>=0.13.2",       # minimum version for Python 3.12 support
+    "qiskit_ibm_runtime>=0.15", # minimum version for IBMBackend.run() support
     "numpy",
 ]
 

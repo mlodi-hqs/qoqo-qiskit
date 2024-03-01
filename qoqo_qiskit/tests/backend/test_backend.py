@@ -9,11 +9,13 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Test file for backend.py."""
+"""Test backend.py file."""
+
+import sys
+from typing import Any, List, TYPE_CHECKING
 
 import pytest
-import sys
-
+from qiskit_aer import AerSimulator
 from qoqo import Circuit
 from qoqo import operations as ops
 from qoqo.measurements import (  # type:ignore
@@ -21,12 +23,11 @@ from qoqo.measurements import (  # type:ignore
     PauliZProduct,
     PauliZProductInput,
 )
-
-from qiskit_aer import AerSimulator
-
 from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
+from qoqo_qiskit.backend.post_processing import _split
 
-from typing import List, Any
+if TYPE_CHECKING:
+    from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 
 
 def test_constructor() -> None:
@@ -61,6 +62,10 @@ def test_constructor() -> None:
 def test_run_circuit_errors(operations: List[Any]) -> None:
     """Test QoqoQiskitBackend.run_circuit method errors."""
     backend = QoqoQiskitBackend()
+
+    with pytest.raises(TypeError) as exc:
+        _ = backend.run_circuit("error")
+    assert "The input is not a valid Qoqo Circuit instance." in str(exc.value)
 
     circuit = Circuit()
     involved_qubits = set()
@@ -373,22 +378,57 @@ def test_memory() -> None:
 
 
 def test_split() -> None:
-    """Test QoqoQiskitBackend._split method."""
+    """Test post_processing._split method."""
     clas_regs = {}
     clas_regs["ro"] = 1
     clas_regs["ri"] = 2
     shot_result_ws = "01 1"
     shot_result_no_ws = "011"
 
-    backend_no_mem = QoqoQiskitBackend(memory=False)
-    backend_mem = QoqoQiskitBackend(memory=True)
+    assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
 
-    assert backend_mem._split(shot_result_ws, clas_regs) == backend_mem._split(
-        shot_result_no_ws, clas_regs
-    )
-    assert backend_no_mem._split(shot_result_ws, clas_regs) == backend_no_mem._split(
-        shot_result_no_ws, clas_regs
-    )
+
+@pytest.mark.parametrize("memory", [True, False])
+def test_run_circuit_queued(memory: bool) -> None:
+    """Test QoqoQiskitBackend.run_circuit_queued method."""
+    backend = QoqoQiskitBackend(memory=memory)
+
+    circuit = Circuit()
+    circuit += ops.Hadamard(0)
+    circuit += ops.Hadamard(1)
+    circuit += ops.DefinitionBit("ro", 2, True)
+    circuit += ops.PragmaRepeatedMeasurement("ro", 50)
+
+    qcr: QueuedCircuitRun = backend.run_circuit_queued(circuit)
+
+    assert qcr._memory == memory
+    assert qcr._sim_type == "automatic"
+    assert "ro" in qcr._registers_info[0]
+    assert "ro" in qcr._registers_info[1]
+
+
+@pytest.mark.parametrize("memory", [True, False])
+def test_run_measurement_queued(memory: bool) -> None:
+    """Test QoqoQiskitBackend.run_measurement_queued method."""
+    backend = QoqoQiskitBackend(memory=memory)
+
+    circuit_0 = Circuit()
+    circuit_0 += ops.Hadamard(0)
+    circuit_0 += ops.Hadamard(1)
+    circuit_0 += ops.DefinitionBit("ro", 2, True)
+    circuit_0 += ops.PragmaRepeatedMeasurement("ro", 50)
+    circuit_1 = Circuit()
+    circuit_1 += ops.Hadamard(0)
+    circuit_1 += ops.Hadamard(1)
+    circuit_1 += ops.DefinitionBit("ri", 2, True)
+    circuit_1 += ops.PragmaRepeatedMeasurement("ri", 50)
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_0, circuit_1])
+
+    qpr: QueuedProgramRun = backend.run_measurement_queued(measurement=measurement)
+
+    assert qpr._measurement == measurement
+    assert len(qpr._queued_circuits) == 2
 
 
 # For pytest

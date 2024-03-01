@@ -11,6 +11,6 @@
 # the License.
 """Test folder for qoqo_qiskit."""
 
-from tests.backend import test_backend
+from tests.backend import test_backend, test_queued_results
 from tests.interface import test_interface
 from tests.transpiler_helper import test_transpiler_helper
