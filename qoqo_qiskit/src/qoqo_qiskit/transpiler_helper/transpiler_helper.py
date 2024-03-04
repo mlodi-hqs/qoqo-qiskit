@@ -11,8 +11,6 @@
 # the License.
 """Helper to use qiskit transpiler for qoqo circuits."""
 
-from re import Match, sub
-from numpy import pi
 from qoqo_qasm import QasmBackend, qasm_str_to_circuit
 from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import (
@@ -23,16 +21,17 @@ from qoqo.measurements import (
 )
 from qiskit import QuantumCircuit, transpile
 from qiskit.qasm2 import dumps
+from typing import Dict
 
 
 def transpile_with_qiskit(
-    circuits: Circuit | list[Circuit], transpilers: list[dict[str, str]]
+    circuits: Circuit | list[Circuit], transpilers: list[Dict[str, str]]
 ) -> Circuit:
     """Use qiskit transpilers to transpile a qoqo circuit.
 
     Args:
         circuits (Circuit | List[Circuits]): qoqo circuit(s) to transpile.
-        transpilers (list[dict[str, str]]): transpilers to use.
+        transpilers (list[Dict[str, str]]): transpilers to use.
 
     Returns:
         Circuit: transpiled qoqo circuit.
@@ -85,13 +84,13 @@ def transpile_with_qiskit(
 
 
 def transpile_program_with_qiskit(
-    quantum_program: QuantumProgram, transpilers: list[dict[str, str]]
+    quantum_program: QuantumProgram, transpilers: list[Dict[str, str]]
 ) -> QuantumProgram:
     """Use qiskit transpilers to transpile a QuantumProgram.
 
     Args:
         quantum_program (QuantumProgram): QuantumProgram to transpile.
-        transpilers (list[dict[str, str]]): transpilers to use.
+        transpilers (list[Dict[str, str]]): transpilers to use.
 
     Returns:
         QuantumProgram: transpiled QuantumProgram.
