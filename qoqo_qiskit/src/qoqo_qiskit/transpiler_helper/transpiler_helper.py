@@ -21,17 +21,17 @@ from qoqo.measurements import (
 )
 from qiskit import QuantumCircuit, transpile
 from qiskit.qasm2 import dumps
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 
 def transpile_with_qiskit(
-    circuits: Union[Circuit, list[Circuit]], transpilers: list[Dict[str, str]]
+    circuits: Union[Circuit, List[Circuit]], transpilers: List[Dict[str, str]]
 ) -> Circuit:
     """Use qiskit transpilers to transpile a qoqo circuit.
 
     Args:
-        circuits (Union[Circuit, list[Circuit]]): qoqo circuit(s) to transpile.
-        transpilers (list[Dict[str, str]]): transpilers to use.
+        circuits (Union[Circuit, List[Circuit]]): qoqo circuit(s) to transpile.
+        transpilers (List[Dict[str, str]]): transpilers to use.
 
     Returns:
         Circuit: transpiled qoqo circuit.
@@ -84,13 +84,13 @@ def transpile_with_qiskit(
 
 
 def transpile_program_with_qiskit(
-    quantum_program: QuantumProgram, transpilers: list[Dict[str, str]]
+    quantum_program: QuantumProgram, transpilers: List[Dict[str, str]]
 ) -> QuantumProgram:
     """Use qiskit transpilers to transpile a QuantumProgram.
 
     Args:
         quantum_program (QuantumProgram): QuantumProgram to transpile.
-        transpilers (list[Dict[str, str]]): transpilers to use.
+        transpilers (List[Dict[str, str]]): transpilers to use.
 
     Returns:
         QuantumProgram: transpiled QuantumProgram.
@@ -105,13 +105,13 @@ def transpile_program_with_qiskit(
     transpiled_circuits = transpile_with_qiskit(circuits, transpilers)
 
     def recreate_measurement(
-        quantum_program: QuantumProgram, transpiled_circuits: list[Circuit]
+        quantum_program: QuantumProgram, transpiled_circuits: List[Circuit]
     ) -> PauliZProduct | ClassicalRegister | CheatedPauliZProduct | Cheated:
         """Recreate a measurement QuantumProgram using the transpiled circuits.
 
         Args:
             quantum_program (QuantumProgram): quantumProgram to transpile.
-            transpiled_circuits (list[Circuit]): transpiled circuits.
+            transpiled_circuits (List[Circuit]): transpiled circuits.
 
         Returns:
             Measurement: measurement
