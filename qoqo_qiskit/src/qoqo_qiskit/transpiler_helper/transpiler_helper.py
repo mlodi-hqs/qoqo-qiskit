@@ -106,7 +106,7 @@ def transpile_program_with_qiskit(
 
     def recreate_measurement(
         quantum_program: QuantumProgram, transpiled_circuits: List[Circuit]
-    ) -> PauliZProduct | ClassicalRegister | CheatedPauliZProduct | Cheated:
+    ) -> Union[PauliZProduct, ClassicalRegister, CheatedPauliZProduct, Cheated]:
         """Recreate a measurement QuantumProgram using the transpiled circuits.
 
         Args:
@@ -114,7 +114,7 @@ def transpile_program_with_qiskit(
             transpiled_circuits (List[Circuit]): transpiled circuits.
 
         Returns:
-            Measurement: measurement
+            Union[PauliZProduct, ClassicalRegister, CheatedPauliZProduct, Cheated]: measurement
 
         Raises:
             TypeError: if the measurement type is not supported.
