@@ -21,16 +21,16 @@ from qoqo.measurements import (
 )
 from qiskit import QuantumCircuit, transpile
 from qiskit.qasm2 import dumps
-from typing import Dict
+from typing import Dict, Union
 
 
 def transpile_with_qiskit(
-    circuits: Circuit | list[Circuit], transpilers: list[Dict[str, str]]
+    circuits: Union[Circuit, list[Circuit]], transpilers: list[Dict[str, str]]
 ) -> Circuit:
     """Use qiskit transpilers to transpile a qoqo circuit.
 
     Args:
-        circuits (Circuit | List[Circuits]): qoqo circuit(s) to transpile.
+        circuits (Union[Circuit, list[Circuit]]): qoqo circuit(s) to transpile.
         transpilers (list[Dict[str, str]]): transpilers to use.
 
     Returns:
