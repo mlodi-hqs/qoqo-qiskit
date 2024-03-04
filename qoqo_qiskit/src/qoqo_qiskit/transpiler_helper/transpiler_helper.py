@@ -77,21 +77,8 @@ def transpile_with_qiskit(
             or False,
         )
 
-    def qiskit_to_qoqo_circuit(qiskit_circuit: QuantumCircuit) -> Circuit:
-        """Convert a qiskit circuit to a qoqo circuit.
-
-        Args:
-            qiskit_circuit (QuantumCircuit): qiskit circuit to convert.
-
-        Returns:
-            Circuit: converted qoqo circuit.
-        """
-        qiskit_qasm_circuit = dumps(qiskit_circuit)
-        qiskit_qasm_circuit += "\n"
-        return qasm_str_to_circuit(qiskit_qasm_circuit)
-
     transpiled_qoqo_circuits = [
-        qiskit_to_qoqo_circuit(transpiled_qiskit_circuit)
+        qasm_str_to_circuit(dumps(transpiled_qiskit_circuit) + "\n")
         for transpiled_qiskit_circuit in qiskit_circuits
     ]
     return transpiled_qoqo_circuits if circuits_is_list else transpiled_qoqo_circuits[0]
