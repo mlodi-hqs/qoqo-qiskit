@@ -77,7 +77,7 @@ def transpile_with_qiskit(
         )
 
     transpiled_qoqo_circuits = [
-        qasm_str_to_circuit(dumps(transpiled_qiskit_circuit) + "\n")
+        qasm_str_to_circuit(dumps(transpiled_qiskit_circuit))
         for transpiled_qiskit_circuit in qiskit_circuits
     ]
     return transpiled_qoqo_circuits if circuits_is_list else transpiled_qoqo_circuits[0]
