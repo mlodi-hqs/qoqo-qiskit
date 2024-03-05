@@ -191,7 +191,6 @@ def assert_quantum_program_equal(
         circuit_dag_2 = CircuitDag()
         circuit_dag_1 = circuit_dag_1.from_circuit(circuit_1)
         circuit_dag_2 = circuit_dag_2.from_circuit(circuit_2)
-        print(circuit_1, circuit_2)
         assert circuit_dag_1 == circuit_dag_2
 
 
