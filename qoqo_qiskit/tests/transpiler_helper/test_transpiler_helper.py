@@ -13,7 +13,15 @@
 
 from qoqo import Circuit, CircuitDag, QuantumProgram
 from qoqo import operations as ops
-from qoqo.measurements import PauliZProduct, PauliZProductInput  # type:ignore
+from qoqo.measurements import (  # type:ignore
+    PauliZProduct,
+    PauliZProductInput,
+    ClassicalRegister,
+    CheatedPauliZProduct,
+    CheatedPauliZProductInput,
+    Cheated,
+    CheatedInput,
+)
 from qiskit.providers.fake_provider import FakeManilaV2
 from qoqo_qiskit.transpiler_helper.transpiler_helper import (
     transpile_with_qiskit,
@@ -179,7 +187,8 @@ def assert_quantum_program_equal(
         AssertionError: if the quantum programs are not equal
     """
     assert quantum_program_1.input_parameter_names() == quantum_program2.input_parameter_names()
-    assert quantum_program_1.measurement().input() == quantum_program2.measurement().input()
+    if not isinstance(quantum_program_1.measurement(), ClassicalRegister):
+        assert quantum_program_1.measurement().input() == quantum_program2.measurement().input()
     assert (
         quantum_program_1.measurement().constant_circuit()
         == quantum_program2.measurement().constant_circuit()
@@ -216,12 +225,9 @@ def test_basic_program_basic_gates() -> None:
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
 
-    measurement_input = PauliZProductInput(1, False)
-    measurement = PauliZProduct(
-        constant_circuit=None, circuits=[circuit_1, circuit_2], input=measurement_input
-    )
-    measurement_res = PauliZProduct(
-        constant_circuit=None, circuits=[circuit_res_1, circuit_res_2], input=measurement_input
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+    measurement_res = ClassicalRegister(
+        constant_circuit=None, circuits=[circuit_res_1, circuit_res_2]
     )
     quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
@@ -263,11 +269,11 @@ def test_program_with_constant_circuit_basic_gates() -> None:
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
 
-    measurement_input = PauliZProductInput(1, False)
-    measurement = PauliZProduct(
+    measurement_input = CheatedPauliZProductInput()
+    measurement = CheatedPauliZProduct(
         constant_circuit=constant_circuit, circuits=[circuit_1, circuit_2], input=measurement_input
     )
-    measurement_res = PauliZProduct(
+    measurement_res = CheatedPauliZProduct(
         constant_circuit=None,
         circuits=[circuit_res_1, circuit_res_2],
         input=measurement_input,
@@ -316,11 +322,11 @@ def test_quantum_program_backend() -> None:
     circuit_res_3 += ops.CNOT(0, 1)
     circuit_res_3 += ops.RotateZ(1, 0.7853981633974483)
 
-    measurement_input = PauliZProductInput(1, False)
-    measurement = PauliZProduct(
+    measurement_input = CheatedInput(1)
+    measurement = Cheated(
         constant_circuit=None, circuits=[circuit_1, circuit_2, circuit_3], input=measurement_input
     )
-    measurement_res = PauliZProduct(
+    measurement_res = Cheated(
         constant_circuit=None,
         circuits=[circuit_res_1, circuit_res_2, circuit_res_3],
         input=measurement_input,
