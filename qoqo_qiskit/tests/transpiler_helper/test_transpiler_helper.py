@@ -191,6 +191,7 @@ def assert_quantum_program_equal(
         circuit_dag_2 = CircuitDag()
         circuit_dag_1 = circuit_dag_1.from_circuit(circuit_1)
         circuit_dag_2 = circuit_dag_2.from_circuit(circuit_2)
+        print(circuit_1, circuit_2)
         assert circuit_dag_1 == circuit_dag_2
 
 
@@ -222,6 +223,55 @@ def test_basic_program_basic_gates() -> None:
     )
     measurement_res = PauliZProduct(
         constant_circuit=None, circuits=[circuit_res_1, circuit_res_2], input=measurement_input
+    )
+    quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
+    quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
+
+    transpiled_program = transpile_program_with_qiskit(
+        quantum_program, [{"basis_gates": ["sx", "rz", "cz"]}]
+    )
+
+    assert_quantum_program_equal(transpiled_program, quantum_program_res)
+
+
+def test_program_with_constant_circuit_basic_gates() -> None:
+    """Test basic program conversion with a BaseGates transpiler."""
+    constant_circuit = Circuit()
+    constant_circuit += ops.Hadamard(0)
+    constant_circuit += ops.Hadamard(1)
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.Identity(0)
+
+    circuit_res_1 = Circuit()
+    circuit_res_1 += ops.RotateZ(0, -1.5707963267948966)
+    circuit_res_1 += ops.SqrtPauliX(0)
+    circuit_res_1 += ops.RotateZ(0, 1.5707963267948966)
+    circuit_res_1 += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res_1 += ops.SqrtPauliX(1)
+    circuit_res_1 += ops.RotateZ(1, 1.5707963267948966)
+
+    circuit_2 = Circuit()
+    circuit_2 += ops.CNOT(0, 1)
+
+    circuit_res_2 = Circuit()
+    circuit_res_2 += ops.RotateZ(0, 1.5707963267948966)
+    circuit_res_2 += ops.SqrtPauliX(0)
+    circuit_res_2 += ops.RotateZ(0, 1.5707963267948966)
+    circuit_res_2 += ops.ControlledPauliZ(0, 1)
+    circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res_2 += ops.SqrtPauliX(1)
+    circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
+
+    measurement_input = PauliZProductInput(1, False)
+    measurement = PauliZProduct(
+        constant_circuit=constant_circuit, circuits=[circuit_1, circuit_2], input=measurement_input
+    )
+    measurement_res = PauliZProduct(
+        constant_circuit=None,
+        circuits=[circuit_res_1, circuit_res_2],
+        input=measurement_input,
     )
     quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
@@ -270,6 +320,73 @@ def test_quantum_program_backend() -> None:
     measurement_input = PauliZProductInput(1, False)
     measurement = PauliZProduct(
         constant_circuit=None, circuits=[circuit_1, circuit_2, circuit_3], input=measurement_input
+    )
+    measurement_res = PauliZProduct(
+        constant_circuit=None,
+        circuits=[circuit_res_1, circuit_res_2, circuit_res_3],
+        input=measurement_input,
+    )
+    quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
+    quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
+
+    backend = FakeManilaV2()
+    transpiled_program = transpile_program_with_qiskit(quantum_program, [{"backend": backend}])
+
+    assert_quantum_program_equal(transpiled_program, quantum_program_res)
+
+
+def test_quantum_program_with_constant_circuit_backend() -> None:
+    """Test basic program conversion with a BaseGates transpiler."""
+    constant_circuit = Circuit()
+    constant_circuit += ops.Hadamard(0)
+    constant_circuit += ops.Hadamard(1)
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.Identity(0)
+
+    circuit_res_1 = Circuit()
+    circuit_res_1 += ops.RotateZ(0, -1.5707963267948966)
+    circuit_res_1 += ops.SqrtPauliX(0)
+    circuit_res_1 += ops.RotateZ(0, 1.5707963267948966)
+    circuit_res_1 += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res_1 += ops.SqrtPauliX(1)
+    circuit_res_1 += ops.RotateZ(1, 1.5707963267948966)
+
+    circuit_2 = Circuit()
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.ControlledPauliZ(0, 1)
+    circuit_2 += ops.PauliX(1)
+
+    circuit_res_2 = Circuit()
+    circuit_res_2 += ops.RotateZ(0, -1.5707963267948966)
+    circuit_res_2 += ops.SqrtPauliX(0)
+    circuit_res_2 += ops.RotateZ(0, 1.5707963267948966)
+    circuit_res_2 += ops.CNOT(0, 1)
+    circuit_res_2 += ops.RotateZ(1, -1.5707963267948966)
+    circuit_res_2 += ops.SqrtPauliX(1)
+    circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
+
+    circuit_3 = Circuit()
+    circuit_3 += ops.TGate(0)
+    circuit_3 += ops.CNOT(0, 1)
+    circuit_3 += ops.TGate(1)
+
+    circuit_res_3 = Circuit()
+    circuit_res_3 += ops.RotateZ(0, 1.5707963267948966)
+    circuit_res_3 += ops.SqrtPauliX(0)
+    circuit_res_3 += ops.RotateZ(0, 2.356194490192345)
+    circuit_res_3 += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res_3 += ops.SqrtPauliX(1)
+    circuit_res_3 += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res_3 += ops.CNOT(0, 1)
+    circuit_res_3 += ops.RotateZ(1, 0.7853981633974483)
+
+    measurement_input = PauliZProductInput(1, False)
+    measurement = PauliZProduct(
+        constant_circuit=constant_circuit,
+        circuits=[circuit_1, circuit_2, circuit_3],
+        input=measurement_input,
     )
     measurement_res = PauliZProduct(
         constant_circuit=None,
