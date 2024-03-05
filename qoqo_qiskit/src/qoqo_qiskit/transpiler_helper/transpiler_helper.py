@@ -13,7 +13,7 @@
 
 from qoqo_qasm import QasmBackend, qasm_str_to_circuit
 from qoqo import Circuit, QuantumProgram
-from qoqo.measurements import (
+from qoqo.measurements import (  # type:ignore
     PauliZProduct,
     ClassicalRegister,
     CheatedPauliZProduct,
