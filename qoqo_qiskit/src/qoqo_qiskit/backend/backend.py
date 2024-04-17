@@ -11,13 +11,14 @@
 # the License.
 """Qoqo-qiskit backend for simulation purposes."""
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from qiskit import QuantumCircuit, execute
 from qiskit.providers import Backend
 from qiskit.providers.job import Job
 from qiskit_aer import AerSimulator
-from qoqo import Circuit
+from qoqo import Circuit, QuantumProgram
+from qoqo.measurements import ClassicalRegister  # type:ignore
 
 from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
@@ -371,6 +372,63 @@ class QoqoQiskitBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+    def run_program(self, program: QuantumProgram, params_values: List[List[float]]) -> Optional[
+        List[
+            Union[
+                Tuple[
+                    Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]],
+                ],
+                Dict[str, float],
+            ]
+        ]
+    ]:
+        """Run a qoqo quantum program on an IBM backend multiple times.
+
+        It can handle QuantumProgram instances containing any kind of measurement. The list of
+        lists of parameters will be used to call `program.run(self, params)` or
+        `program.run_registers(self, params)` as many times as the number of sublists.
+        The return type will change accordingly.
+
+        If no parameters values are provided, a normal call `program.run(self, [])` call
+        will be executed.
+
+        Args:
+            program (QuantumProgram): the qoqo quantum program to run.
+            params_values (List[List[float]]): the parameters values to pass to the quantum
+                program.
+
+        Returns:
+            Optional[
+                List[
+                    Union[
+                        Tuple[
+                            Dict[str, List[List[bool]]],
+                            Dict[str, List[List[float]]],
+                            Dict[str, List[List[complex]]],
+                        ],
+                        Dict[str, float],
+                    ]
+                ]
+            ]: list of dictionaries (or tuples of dictionaries) containing the
+                run results.
+        """
+        returned_results = []
+
+        if isinstance(program.measurement(), ClassicalRegister):
+            if not params_values:
+                returned_results.append(program.run_registers(self, []))
+            for params in params_values:
+                returned_results.append(program.run_registers(self, params))
+        else:
+            if not params_values:
+                returned_results.append(program.run(self, []))
+            for params in params_values:
+                returned_results.append(program.run(self, params))
+
+        return returned_results
 
     def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
         """Run a qoqo measurement on a Qiskit backend and return a queued Job Result.
