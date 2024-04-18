@@ -2,9 +2,13 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
-### 0.4.0
+### 0.4.1
 
 * Added `transpiler_helper` submodule
+
+### 0.4.0
+
+* Added `run_program()`, `run_program_queued()` allowing for multiple runs in one call thanks to a list of lists of parameter values
 
 ### 0.3.0
 

@@ -212,7 +212,7 @@ LICENSE:
 
 
 ====================================================
-autocfg 1.1.0
+autocfg 1.2.0
 https://github.com/cuviper/autocfg
 by Josh Stone <cuviper@gmail.com>
 Automatic cfg for Rust compiler features
@@ -727,7 +727,7 @@ limitations under the License.
 
 
 ====================================================
-bytemuck 1.14.3
+bytemuck 1.15.0
 https://github.com/Lokathor/bytemuck
 by Lokathor <zefria@gmail.com>
 A crate for mucking around with piles of bytes.
@@ -1285,7 +1285,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-either 1.10.0
+either 1.11.0
 https://github.com/rayon-rs/either
 by bluss
 The enum `Either` with variants `Left` and `Right` is a general purpose sum type with two cases.
@@ -2009,7 +2009,7 @@ limitations under the License.
 
 
 ====================================================
-getrandom 0.2.12
+getrandom 0.2.14
 https://github.com/rust-random/getrandom
 by The Rand Project Developers
 A small cross-platform library for retrieving random data from system source
@@ -2733,7 +2733,7 @@ limitations under the License.
 
 
 ====================================================
-indexmap 2.2.5
+indexmap 2.2.6
 https://github.com/indexmap-rs/indexmap
 by 
 A hash table with consistent order and fast iteration.
@@ -2974,7 +2974,7 @@ limitations under the License.
 
 
 ====================================================
-indoc 2.0.4
+indoc 2.0.5
 https://github.com/dtolnay/indoc
 by David Tolnay <dtolnay@gmail.com>
 Indented document literals
@@ -3643,7 +3643,7 @@ limitations under the License.
 
 
 ====================================================
-itoa 1.0.10
+itoa 1.0.11
 https://github.com/dtolnay/itoa
 by David Tolnay <dtolnay@gmail.com>
 Fast integer primitive to string conversion
@@ -4801,7 +4801,7 @@ limitations under the License.
 
 
 ====================================================
-memoffset 0.9.0
+memoffset 0.9.1
 https://github.com/Gilnaa/memoffset
 by Gilad Naaman <gilad.naaman@gmail.com>
 offset_of functionality for Rust structs.
@@ -4830,7 +4830,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ====================================================
-nalgebra 0.32.4
+nalgebra 0.32.5
 https://nalgebra.org
 by Sébastien Crozet <developer@crozet.re>
 General-purpose linear algebra library with transformations and statically-sized or dynamically-sized matrices.
@@ -7925,7 +7925,7 @@ limitations under the License.
 
 
 ====================================================
-proc-macro2 1.0.78
+proc-macro2 1.0.81
 https://github.com/dtolnay/proc-macro2
 by David Tolnay <dtolnay@gmail.com>, Alex Crichton <alex@alexcrichton.com>
 A substitute implementation of the compiler's `proc_macro` API to decouple token-based libraries from the procedural macro use case.
@@ -9284,7 +9284,7 @@ LICENSE-APACHE:
 
 
 ====================================================
-qoqo 1.10.0
+qoqo 1.11.0
 https://github.com/HQSquantumsimulations/qoqo
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Quantum computing circuit toolkit. Python interface of roqoqo
@@ -9496,7 +9496,7 @@ LICENSE:
 
 
 ====================================================
-qoqo-macros 1.10.0
+qoqo-macros 1.11.0
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for the qoqo crate
 License: Apache-2.0
@@ -10131,7 +10131,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_qiskit_devices 0.4.0
+qoqo_qiskit_devices 0.4.1
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for qoqo python quantum computing toolkit
@@ -10343,7 +10343,7 @@ LICENSE:
 
 
 ====================================================
-quote 1.0.35
+quote 1.0.36
 https://github.com/dtolnay/quote
 by David Tolnay <dtolnay@gmail.com>
 Quasi-quoting macro quote!(...)
@@ -11753,7 +11753,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-roqoqo 1.10.0
+roqoqo 1.11.0
 https://github.com/HQSquantumsimulations/qoqo
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Rust Quantum Computing Toolkit by HQS
@@ -11965,7 +11965,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo-derive 1.10.0
+roqoqo-derive 1.11.0
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for the roqoqo crate
 License: Apache-2.0
@@ -12176,7 +12176,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_qiskit_devices 0.4.0
+roqoqo_qiskit_devices 0.4.1
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for roqoqo rust quantum computing toolkit
@@ -13251,7 +13251,7 @@ limitations under the License.
 
 
 ====================================================
-serde 1.0.197
+serde 1.0.198
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A generic serialization/deserialization framework
@@ -13465,7 +13465,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-serde_derive 1.0.197
+serde_derive 1.0.198
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 Macros 1.1 implementation of #[derive(Serialize, Deserialize)]
@@ -13918,7 +13918,7 @@ limitations under the License.
 
 
 ====================================================
-serde_json 1.0.114
+serde_json 1.0.116
 https://github.com/serde-rs/json
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A JSON serialization file format
@@ -14344,7 +14344,7 @@ LICENSE:
 
 
 ====================================================
-smallvec 1.13.1
+smallvec 1.13.2
 https://github.com/servo/rust-smallvec
 by The Servo Project Developers
 'Small vector' optimization: store up to a small number of items on the stack
@@ -14585,7 +14585,7 @@ limitations under the License.
 
 
 ====================================================
-struqture 1.6.0
+struqture 1.6.1
 by HQS Quantum Simulations <info@quantumsimulations.de>
 HQS tool for representing operators, Hamiltonians and open systems.
 License: Apache-2.0
@@ -14796,13 +14796,13 @@ LICENSE:
 
 
 ====================================================
-struqture-py 1.6.0
+struqture-py 1.6.1
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Python interface of struqture, the HQS tool for representing operators, Hamiltonians and open systems.
 License: Apache-2.0
 
 ====================================================
-struqture-py-macros 1.6.0
+struqture-py-macros 1.6.1
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for struqture-py crate.
 License: Apache-2.0
@@ -15252,7 +15252,7 @@ limitations under the License.
 
 
 ====================================================
-syn 2.0.52
+syn 2.0.60
 https://github.com/dtolnay/syn
 by David Tolnay <dtolnay@gmail.com>
 Parser for Rust source code
@@ -15793,7 +15793,7 @@ SOFTWARE.
 
 
 ====================================================
-thiserror 1.0.57
+thiserror 1.0.58
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 derive(Error)
@@ -16007,7 +16007,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-thiserror-impl 1.0.57
+thiserror-impl 1.0.58
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 Implementation detail of the `thiserror` crate
@@ -17904,7 +17904,7 @@ limitations under the License.
 
 
 ====================================================
-wide 0.7.15
+wide 0.7.16
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.
