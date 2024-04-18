@@ -2,7 +2,7 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
-### 0.4.1
+### 0.5.0
 
 * Added `transpiler_helper` submodule
 
