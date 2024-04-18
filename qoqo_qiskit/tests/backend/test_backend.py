@@ -11,12 +11,12 @@
 # the License.
 """Test backend.py file."""
 
-import sys
-from typing import Any, List, TYPE_CHECKING
+import sys, time
+from typing import Any, List
 
 import pytest
 from qiskit_aer import AerSimulator
-from qoqo import Circuit
+from qoqo import Circuit, QuantumProgram
 from qoqo import operations as ops
 from qoqo.measurements import (  # type:ignore
     ClassicalRegister,
@@ -26,8 +26,7 @@ from qoqo.measurements import (  # type:ignore
 from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
 from qoqo_qiskit.backend.post_processing import _split
 
-if TYPE_CHECKING:
-    from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
+from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 
 
 def test_constructor() -> None:
@@ -387,6 +386,61 @@ def test_split() -> None:
 
     assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
 
+def test_run_program() -> None:
+    """Test QoqoQiskitBackend.run_program method."""
+    backend = QoqoQiskitBackend()
+    
+    init_circuit = Circuit()
+    init_circuit += ops.RotateX(0, "angle_0")
+    init_circuit += ops.RotateY(0, "angle_1")
+
+    z_circuit = Circuit()
+    z_circuit += ops.DefinitionBit("ro_z", 1, is_output=True)
+    z_circuit += ops.PragmaRepeatedMeasurement("ro_z", 1000, None)
+
+    x_circuit = Circuit()
+    x_circuit += ops.DefinitionBit("ro_x", 1, is_output=True)
+    x_circuit += ops.Hadamard(0)
+    x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
+
+    measurement_input = PauliZProductInput(1, False)
+    z_basis_index = measurement_input.add_pauliz_product("ro_z", [0,])
+    x_basis_index = measurement_input.add_pauliz_product("ro_x", [0,])
+    measurement_input.add_linear_exp_val(
+        "<H>", {x_basis_index: 0.1, z_basis_index: 0.2},
+    )
+
+    measurement = PauliZProduct(
+        constant_circuit=init_circuit,
+        circuits=[z_circuit, x_circuit],
+        input=measurement_input,
+    )
+
+    program = QuantumProgram(
+        measurement=measurement,
+        input_parameter_names=["angle_0", "angle_1"],
+    )
+
+    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+
+    assert len(res) == 3
+    for el in res:
+        assert float(el['<H>'])
+    
+    init_circuit += ops.DefinitionBit("ro", 1, True)
+    init_circuit += ops.PragmaRepeatedMeasurement("ro", 1000, None)
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[init_circuit, init_circuit])
+
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+
+    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+
+    assert len(res) == 3
+    assert res[0][0]
+    assert not res[0][1]
+    assert not res[0][2]
+
 
 @pytest.mark.parametrize("memory", [True, False])
 def test_run_circuit_queued(memory: bool) -> None:
@@ -430,6 +484,71 @@ def test_run_measurement_queued(memory: bool) -> None:
     assert qpr._measurement == measurement
     assert len(qpr._queued_circuits) == 2
 
+def test_run_program_queued() -> None:
+    """Test QoqoQiskitBackend.run_program_queued method."""
+    backend = QoqoQiskitBackend()
+
+    init_circuit = Circuit()
+    init_circuit += ops.RotateX(0, "angle_0")
+    init_circuit += ops.RotateY(0, "angle_1")
+
+    z_circuit = Circuit()
+    z_circuit += ops.DefinitionBit("ro_z", 1, is_output=True)
+    z_circuit += ops.PragmaRepeatedMeasurement("ro_z", 1000, None)
+
+    x_circuit = Circuit()
+    x_circuit += ops.DefinitionBit("ro_x", 1, is_output=True)
+    x_circuit += ops.Hadamard(0)
+    x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
+
+    measurement_input = PauliZProductInput(1, False)
+    z_basis_index = measurement_input.add_pauliz_product(
+        "ro_z",
+        [
+            0,
+        ],
+    )
+    x_basis_index = measurement_input.add_pauliz_product(
+        "ro_x",
+        [
+            0,
+        ],
+    )
+    measurement_input.add_linear_exp_val(
+        "<H>",
+        {x_basis_index: 0.1, z_basis_index: 0.2},
+    )
+
+    measurement = PauliZProduct(
+        constant_circuit=init_circuit,
+        circuits=[z_circuit, x_circuit],
+        input=measurement_input,
+    )
+
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_program_queued(program=program, params_values=[[0.4]])
+    assert "Wrong number of parameters 2 parameters expected 1 parameters given." in str(exc.value)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_program_queued(program=program, params_values=[])
+    assert "Wrong parameters value: no parameters values provided but input QuantumProgram has 2 input parameter names." in str(exc.value)
+
+    queued_jobs = backend.run_program_queued(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
+    )
+
+    assert len(queued_jobs) == 3
+
+    for queued in queued_jobs:
+        while queued.poll_result() is None:
+            time.sleep(1)
+
+        serialised = queued.to_json()
+        with pytest.raises(ValueError) as exc:
+            _ = QueuedProgramRun.from_json(serialised)
+        assert "Retrieval is not possible." in str(exc.value)
 
 # For pytest
 if __name__ == "__main__":
