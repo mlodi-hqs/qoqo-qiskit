@@ -188,9 +188,21 @@ class QueuedProgramRun:
         ] = ({}, {}, {})
         for circuit in self._queued_circuits:
             if circuit._qoqo_result is not None:
-                self._registers[0].update(circuit._qoqo_result[0])
-                self._registers[1].update(circuit._qoqo_result[1])
-                self._registers[2].update(circuit._qoqo_result[2])
+                for key, value_bools in circuit._qoqo_result[0].items():
+                    if key in self._registers[0]:
+                        self._registers[0][key].extend(value_bools)
+                    else:
+                        self._registers[0][key] = value_bools
+                for key, value_floats in circuit._qoqo_result[1].items():
+                    if key in self._registers[1]:
+                        self._registers[1][key].extend(value_floats)
+                    else:
+                        self._registers[1][key] = value_floats
+                for key, value_complexes in circuit._qoqo_result[2].items():
+                    if key in self._registers[2]:
+                        self._registers[2][key].extend(value_complexes)
+                    else:
+                        self._registers[2][key] = value_complexes
 
     def to_json(self) -> str:
         """Convert self to a JSON string.
@@ -250,9 +262,21 @@ class QueuedProgramRun:
             circ_instance = QueuedCircuitRun.from_json(circuit)
             queued_circuits_deserialised.append(circ_instance)
             if circ_instance._qoqo_result is not None:
-                registers[0].update(circ_instance._qoqo_result[0])
-                registers[1].update(circ_instance._qoqo_result[1])
-                registers[2].update(circ_instance._qoqo_result[2])
+                for key, value_bools in circ_instance._qoqo_result[0].items():
+                    if key in registers[0]:
+                        registers[0][key].extend(value_bools)
+                    else:
+                        registers[0][key] = value_bools
+                for key, value_floats in circ_instance._qoqo_result[1].items():
+                    if key in registers[1]:
+                        registers[1][key].extend(value_floats)
+                    else:
+                        registers[1][key] = value_floats
+                for key, value_complexes in circ_instance._qoqo_result[2].items():
+                    if key in registers[2]:
+                        registers[2][key].extend(value_complexes)
+                    else:
+                        registers[2][key] = value_complexes
 
         if json_dict["measurement_type"] == "PauliZProduct":
             measurement = measurements.PauliZProduct.from_json(json_dict["measurement"])
@@ -294,9 +318,21 @@ class QueuedProgramRun:
         for i, queued_circuit in enumerate(self._queued_circuits):
             res = queued_circuit.poll_result()
             if res is not None:
-                self._registers[0].update(res[0])  # add results to bit registers
-                self._registers[1].update(res[1])  # add results to float registers
-                self._registers[2].update(res[2])  # add results to complex registers
+                for key, value_bools in res[0].items():
+                    if key in self._registers[0]:
+                        self._registers[0][key].extend(value_bools)
+                    else:
+                        self._registers[0][key] = value_bools
+                for key, value_floats in res[1].items():
+                    if key in self._registers[1]:
+                        self._registers[1][key].extend(value_floats)
+                    else:
+                        self._registers[1][key] = value_floats
+                for key, value_complexes in res[2].items():
+                    if key in self._registers[2]:
+                        self._registers[2][key].extend(value_complexes)
+                    else:
+                        self._registers[2][key] = value_complexes
                 all_finished[i] = True
 
         if not all(all_finished):
