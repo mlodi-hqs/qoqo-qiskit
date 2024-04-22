@@ -15793,7 +15793,7 @@ SOFTWARE.
 
 
 ====================================================
-thiserror 1.0.58
+thiserror 1.0.59
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 derive(Error)
@@ -16007,7 +16007,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-thiserror-impl 1.0.58
+thiserror-impl 1.0.59
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 Implementation detail of the `thiserror` crate

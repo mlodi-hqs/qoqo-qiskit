@@ -386,6 +386,40 @@ def test_split() -> None:
 
     assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
 
+def test_overwrite() -> None:
+    """Tests overwriting registers."""
+    backend = QoqoQiskitBackend()
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.DefinitionBit("same", 1, True)
+    circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.MeasureQubit(0, "same", 0)
+    circuit_1 += ops.PragmaSetNumberOfMeasurements(2, "same")
+
+    circuit_2 = Circuit()
+    circuit_2 += ops.DefinitionBit("same", 1, True)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.MeasureQubit(0, "same", 0)
+    circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
+
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+
+    try:
+        output = backend.run_measurement_registers(measurement=measurement)
+    except Exception:
+        assert False
+
+    # output should look like ({'same': [[True], [True], [False], [False]]}, {}, {})
+    assert len(output[0]["same"]) == 4
+    assert output[0]["same"][0][0]
+    assert output[0]["same"][1][0]
+    assert not output[0]["same"][2][0]
+    assert not output[0]["same"][3][0]
+    assert not output[1]
+    assert not output[2]
+
 def test_run_program() -> None:
     """Test QoqoQiskitBackend.run_program method."""
     backend = QoqoQiskitBackend()

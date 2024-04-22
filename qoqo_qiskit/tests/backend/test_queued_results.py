@@ -166,6 +166,54 @@ def test_poll_result() -> None:
     assert res_qpr["ri"]
 
 
+def test_overwrite() -> None:
+    """Test overwriting registers."""
+    run_0 = _mocked_run(memory="True")
+    run_1 = _mocked_run()
+
+    qcr_0 = QueuedCircuitRun(
+        job=run_0[0],
+        memory=True,
+        sim_type=run_0[1],
+        registers_info=run_0[2],
+    )
+    qcr_1 = QueuedCircuitRun(
+        job=run_1[0],
+        memory=False,
+        sim_type=run_1[1],
+        registers_info=run_1[2],
+    )
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[run_0[3], run_1[3]])
+    qpr = QueuedProgramRun(
+        measurement=measurement,
+        queued_circuits=[qcr_0, qcr_1],
+    )
+
+    # Making sure that the simulations are finished
+    time.sleep(1)
+
+    res_qpr, _, _ = qpr.poll_result()
+
+    assert len(res_qpr["ri"]) == 20
+
+    run_2 = _mocked_run()
+    qcr_2 = QueuedCircuitRun(
+        job=run_2[0],
+        memory=False,
+        sim_type=run_2[1],
+        registers_info=run_2[2],
+    )
+    qcr_2.poll_result()
+
+    qpr = QueuedProgramRun(
+        measurement=measurement,
+        queued_circuits=[qcr_0, qcr_1, qcr_2],
+    )
+
+    assert len(qpr._registers[0]["ri"]) == 30
+
+
 # For pytest
 if __name__ == "__main__":
     pytest.main(sys.argv)
