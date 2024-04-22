@@ -339,9 +339,21 @@ class QoqoQiskitBackend:
                 tmp_complex_register_dict,
             ) = self.run_circuit(run_circuit)
 
-            output_bit_register_dict.update(tmp_bit_register_dict)
-            output_float_register_dict.update(tmp_float_register_dict)
-            output_complex_register_dict.update(tmp_complex_register_dict)
+            for key, value_bools in tmp_bit_register_dict.items():
+                if key in output_bit_register_dict:
+                    output_bit_register_dict[key].extend(value_bools)
+                else:
+                    output_bit_register_dict[key] = value_bools
+            for key, value_floats in tmp_float_register_dict.items():
+                if key in output_float_register_dict:
+                    output_float_register_dict[key].extend(value_floats)
+                else:
+                    output_float_register_dict[key] = value_floats
+            for key, value_complexes in tmp_complex_register_dict.items():
+                if key in output_complex_register_dict:
+                    output_complex_register_dict[key].extend(value_complexes)
+                else:
+                    output_complex_register_dict[key] = value_complexes
 
         return (
             output_bit_register_dict,

@@ -10131,7 +10131,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_qiskit_devices 0.4.0
+qoqo_qiskit_devices 0.4.1
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for qoqo python quantum computing toolkit
@@ -12176,7 +12176,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_qiskit_devices 0.4.0
+roqoqo_qiskit_devices 0.4.1
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for roqoqo rust quantum computing toolkit
@@ -15252,7 +15252,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-syn 2.0.59
+syn 2.0.60
 https://github.com/dtolnay/syn
 by David Tolnay <dtolnay@gmail.com>
 Parser for Rust source code
@@ -15793,7 +15793,7 @@ SOFTWARE.
 
 
 ====================================================
-thiserror 1.0.58
+thiserror 1.0.59
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 derive(Error)
@@ -16007,7 +16007,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-thiserror-impl 1.0.58
+thiserror-impl 1.0.59
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 Implementation detail of the `thiserror` crate
