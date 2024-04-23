@@ -137,7 +137,7 @@ def _custom_gates_fix(from_qasm_circuit: QuantumCircuit) -> QuantumCircuit:
     for inst, qargs, cargs in from_qasm_circuit.data:
         if inst.name == "pragmasleep":
             out_circuit.delay(inst.params[0], qargs[0], unit="s")
-        if inst.name == "rxy":
+        elif inst.name == "rxy":
             out_circuit.r(inst.params[0], inst.params[1], qargs[0])
         else:
             out_circuit.append(inst, qargs, cargs)
