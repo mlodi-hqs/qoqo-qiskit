@@ -149,12 +149,13 @@ def test_pragma_loop(repetitions: Union[int, str]) -> None:
         assert e.args == ("A symbolic PragmaLoop operation is not supported.",)
 
 
-def test_pragma_sleep() -> None:
-    """Test PragmaSleep operation."""
+def test_custom_gates_fix() -> None:
+    """Test _custom_gates_fix method."""
     qoqo_circuit = Circuit()
     qoqo_circuit += ops.PragmaSleep([0, 3], 1.0)
     qoqo_circuit += ops.PauliX(2)
     qoqo_circuit += ops.PragmaSleep([4], 0.004)
+    qoqo_circuit += ops.RotateXY(3, 0.1, 0.1)
 
     qr = QuantumRegister(5, "q")
     qiskit_circuit = QuantumCircuit(qr)
@@ -162,6 +163,7 @@ def test_pragma_sleep() -> None:
     qiskit_circuit.delay(1.0, qr[3], unit="s")
     qiskit_circuit.x(qr[2])
     qiskit_circuit.delay(0.004, qr[4], unit="s")
+    qiskit_circuit.r(0.1, 0.1, qr[3])
 
     out_circ, _ = to_qiskit_circuit(qoqo_circuit)
     assert out_circ == qiskit_circuit
