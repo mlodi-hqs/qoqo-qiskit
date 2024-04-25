@@ -27,12 +27,13 @@ pub use devices::*;
 ///
 /// Provides the devices that are used to execute quantum program on the IBM backend.
 #[pymodule]
-fn qoqo_qiskit_devices(_py: Python, module: &PyModule) -> PyResult<()> {
+fn qoqo_qiskit_devices(_py: Python, module: &Bound<PyModule>) -> PyResult<()> {
     let wrapper = wrap_pymodule!(devices::ibm_devices);
     module.add_wrapped(wrapper)?;
 
-    let system = PyModule::import(_py, "sys")?;
-    let system_modules: &PyDict = system.getattr("modules")?.downcast()?;
+    let system = PyModule::import_bound(_py, "sys")?;
+    let binding = system.getattr("modules")?;
+    let system_modules: &Bound<PyDict> = binding.downcast()?;
     system_modules.set_item(
         "qoqo_qiskit_devices.devices",
         module.getattr("ibm_devices")?,

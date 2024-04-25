@@ -60,42 +60,42 @@ pub fn qoqo_qiskit_device_from_ibmq_identifier(identifier: &str) -> PyResult<Py<
     Python::with_gil(|py| -> PyResult<Py<PyAny>> {
         match identifier {
             "ibm_lagos" => Ok(py
-                .get_type::<IBMLagosDeviceWrapper>()
+                .get_type_bound::<IBMLagosDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibm_nairobi" => Ok(py
-                .get_type::<IBMNairobiDeviceWrapper>()
+                .get_type_bound::<IBMNairobiDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibm_perth" => Ok(py
-                .get_type::<IBMPerthDeviceWrapper>()
+                .get_type_bound::<IBMPerthDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_belem" => Ok(py
-                .get_type::<IBMBelemDeviceWrapper>()
+                .get_type_bound::<IBMBelemDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_jakarta" => Ok(py
-                .get_type::<IBMJakartaDeviceWrapper>()
+                .get_type_bound::<IBMJakartaDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_lima" => Ok(py
-                .get_type::<IBMLimaDeviceWrapper>()
+                .get_type_bound::<IBMLimaDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_manila" => Ok(py
-                .get_type::<IBMManilaDeviceWrapper>()
+                .get_type_bound::<IBMManilaDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_quito" => Ok(py
-                .get_type::<IBMQuitoDeviceWrapper>()
+                .get_type_bound::<IBMQuitoDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
@@ -108,7 +108,7 @@ pub fn qoqo_qiskit_device_from_ibmq_identifier(identifier: &str) -> PyResult<Py<
 
 /// IBM Devices
 #[pymodule]
-pub fn ibm_devices(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn ibm_devices(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
     let _ = m.add_function(wrap_pyfunction!(
         qoqo_qiskit_device_from_ibmq_identifier,
         m
