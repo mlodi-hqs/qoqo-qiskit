@@ -11,6 +11,7 @@
 # the License.
 """Qoqo-qiskit backend for simulation purposes."""
 
+from dataclasses import astuple
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from qiskit import QuantumCircuit, execute
@@ -23,6 +24,7 @@ from qoqo.measurements import ClassicalRegister  # type:ignore
 from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
 
+from ..models import RegistersWithLengths
 from .post_processing import _transform_job_result
 
 
@@ -56,23 +58,17 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(self, circuit: Circuit) -> Tuple[
+    def _run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[
         Job,
         str,
-        Dict[str, int],
-        Dict[str, List[List[bool]]],
-        Dict[str, List[List[float]]],
-        Dict[str, List[List[complex]]],
+        RegistersWithLengths,
     ]:
         if not isinstance(circuit, Circuit):
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
-        (
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        ) = self._set_up_registers(circuit)
+        output_registers = self._set_up_registers(circuit)
 
         (compiled_circuit, run_options) = self._compile_circuit(circuit)
 
@@ -82,46 +78,29 @@ class QoqoQiskitBackend:
 
         job = self._job_execution(compiled_circuit, shots)
 
-        return (
-            job,
-            sim_type,
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        )
+        return (job, sim_type, output_registers)
 
     def _set_up_registers(
         self,
         circuit: Circuit,
-    ) -> Tuple[
-        Dict[str, int],
-        Dict[str, List[List[bool]]],
-        Dict[str, List[List[float]]],
-        Dict[str, List[List[complex]]],
-    ]:
-        clas_regs_lengths: Dict[str, int] = {}
-
-        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
-        output_float_register_dict: Dict[str, List[List[float]]] = {}
-        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
+    ) -> RegistersWithLengths:
+        output_registers = RegistersWithLengths()
 
         for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            clas_regs_lengths[bit_def.name()] = bit_def.length()
+            output_registers.clas_regs_lengths[bit_def.name()] = bit_def.length()
             if bit_def.is_output():
-                output_bit_register_dict[bit_def.name()] = []
+                output_registers.registers.bit_register_dict[bit_def.name()] = []
         for float_def in circuit.filter_by_tag("DefinitionFloat"):
             if float_def.is_output():
-                output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
+                output_registers.registers.float_register_dict[float_def.name()] = cast(
+                    List[List[float]], []
+                )
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
             if complex_def.is_output():
-                output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
-        return (
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        )
+                output_registers.registers.complex_register_dict[complex_def.name()] = cast(
+                    List[List[complex]], []
+                )
+        return output_registers
 
     def _compile_circuit(
         self,
@@ -241,27 +220,19 @@ class QoqoQiskitBackend:
         Raises:
             ValueError: Incorrect Measurement or Pragma operations.
         """
-        (
-            job,
-            sim_type,
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        ) = self._run_circuit(circuit)
+        (job, sim_type, output_registers) = self._run_circuit(circuit)
 
         result = job.result()
 
         # Result transformation
-        return _transform_job_result(
+        transformed = _transform_job_result(
             self.memory,
             sim_type,
             result,
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
+            output_registers,
         )
+
+        return astuple(transformed)
 
     def run_circuit_queued(
         self,
@@ -385,7 +356,9 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def run_program(self, program: QuantumProgram, params_values: List[List[float]]) -> Optional[
+    def run_program(
+        self, program: QuantumProgram, params_values: List[List[float]]
+    ) -> Optional[
         List[
             Union[
                 Tuple[
