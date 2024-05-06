@@ -33,7 +33,13 @@ class Registers:
 
 @dataclass
 class RegistersWithLengths:
-    """Registers, with classical registers lengths."""
+    """Registers, with classical registers lengths.
 
+    The registers are used to store classical information during the execution of a
+    roqoqo circuit and to provide a unified output interface for the different backends.
+
+    Defined by three dictionaries, representing bit, float and complex registers.
+    """
+
+    registers: Registers = field(default_factory=Registers)
     clas_regs_lengths: Dict[str, int] = field(default_factory=dict)
-    registers: Registers
