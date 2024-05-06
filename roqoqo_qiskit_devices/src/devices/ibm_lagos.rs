@@ -292,7 +292,7 @@ impl QoqoDevice for IBMLagosDevice {
     ///
     #[allow(unused_variables)]
     fn two_qubit_gate_time(&self, hqslang: &str, control: &usize, target: &usize) -> Option<f64> {
-        match self.two_qubit_gates.get(&hqslang.to_string()) {
+        match self.two_qubit_gates.get(hqslang) {
             Some(x) => x.get(&(*control, *target)).copied(),
             None => None,
         }
