@@ -11,11 +11,14 @@
 # the License.
 """Results post-processing utilities."""
 
+from dataclasses import astuple
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
 from qiskit.result import Result
 from qoqo import Circuit
+
+from ..models import RegistersWithLengths
 
 
 def _counts_to_registers(
@@ -68,13 +71,7 @@ def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
 
 
 def _transform_job_result(
-    memory: bool,
-    sim_type: str,
-    result: Result,
-    clas_regs_lengths: Dict[str, int],
-    output_bit_register_dict: Dict[str, List[List[bool]]],
-    _output_float_register_dict: Dict[str, List[List[float]]],
-    output_complex_register_dict: Dict[str, List[List[complex]]],
+    memory: bool, sim_type: str, result: Result, output_registers: RegistersWithLengths
 ) -> Tuple[
     Dict[str, List[List[bool]]],
     Dict[str, List[List[float]]],
@@ -82,27 +79,25 @@ def _transform_job_result(
 ]:
     if sim_type == "automatic":
         if memory:
-            transformed_counts = _counts_to_registers(result.get_memory(), True, clas_regs_lengths)
+            transformed_counts = _counts_to_registers(
+                result.get_memory(), True, output_registers.clas_regs_lengths
+            )
         else:
             transformed_counts = _counts_to_registers(
-                result.get_counts(), False, clas_regs_lengths
+                result.get_counts(), False, output_registers.clas_regs_lengths
             )
-        for i, reg in enumerate(output_bit_register_dict):
+        for i, reg in enumerate(output_registers.registers.bit_register_dict):
             reversed_list = []
             for shot in transformed_counts[i]:
                 reversed_list.append(shot[::-1])
-            output_bit_register_dict[reg] = reversed_list
+            output_registers.registers.bit_register_dict[reg] = reversed_list
     elif sim_type == "statevector":
         vector = list(np.asarray(result.data(0)["statevector"]).flatten())
-        for reg in output_complex_register_dict:
-            output_complex_register_dict[reg].append(vector)
+        for reg in output_registers.registers.complex_register_dict:
+            output_registers.registers.complex_register_dict[reg].append(vector)
     elif sim_type == "density_matrix":
         vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
-        for reg in output_complex_register_dict:
-            output_complex_register_dict[reg].append(vector)
+        for reg in output_registers.registers.complex_register_dict:
+            output_registers.registers.complex_register_dict[reg].append(vector)
 
-    return (
-        output_bit_register_dict,
-        _output_float_register_dict,
-        output_complex_register_dict,
-    )
+    return astuple(output_registers.registers)
