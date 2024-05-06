@@ -4,7 +4,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 ### 0.5.0
 
-* Modified 
+* Simplified the registers representation via dataclasses
 
 ### 0.4.2
 
