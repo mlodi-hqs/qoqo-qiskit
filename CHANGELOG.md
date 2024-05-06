@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.5.0
+
+* Modified 
+
 ### 0.4.2
 
 * Fixed `RotateXY` qiskit equivalence
