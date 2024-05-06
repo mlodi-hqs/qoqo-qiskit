@@ -11,6 +11,7 @@
 # the License.
 """Test queued_results.py file."""
 
+from dataclasses import astuple
 import time
 import json
 import sys
@@ -22,6 +23,7 @@ from qoqo import Circuit
 from qoqo import operations as ops
 from qoqo.measurements import ClassicalRegister  # type:ignore
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
+from qoqo_qiskit.models import RegistersWithLengths
 
 
 def _mocked_run(
@@ -56,19 +58,10 @@ def _mocked_run(
     (
         job,
         sim_type,
-        clas_regs_lengths,
-        output_bit_register_dict,
-        output_float_register_dict,
-        output_complex_register_dict,
+        output_registers
     ) = backend._run_circuit(circuit)
 
-    register_info = (
-        clas_regs_lengths,
-        output_bit_register_dict,
-        output_float_register_dict,
-        output_complex_register_dict,
-    )
-    return (job, sim_type, register_info, circuit)
+    return (job, sim_type, output_registers.to_flat_tuple(), circuit)
 
 
 def test_constructors() -> None:

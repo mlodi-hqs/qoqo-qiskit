@@ -24,7 +24,7 @@ from qoqo.measurements import ClassicalRegister  # type:ignore
 from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
 
-from ..models import RegistersWithLengths
+from ..models import RegistersWithLengths, Registers
 from .post_processing import _transform_job_result
 
 
@@ -225,14 +225,12 @@ class QoqoQiskitBackend:
         result = job.result()
 
         # Result transformation
-        transformed = _transform_job_result(
+        return _transform_job_result(
             self.memory,
             sim_type,
             result,
             output_registers,
         )
-
-        return astuple(transformed)
 
     def run_circuit_queued(
         self,
@@ -255,25 +253,10 @@ class QoqoQiskitBackend:
         (
             job,
             sim_type,
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
+            output_registers,
         ) = self._run_circuit(circuit)
 
-        register_info: Tuple[
-            Dict[str, int],
-            Dict[str, List[List[bool]]],
-            Dict[str, List[List[float]]],
-            Dict[str, List[List[complex]]],
-        ] = (
-            clas_regs_lengths,
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        )
-
-        return QueuedCircuitRun(job, self.memory, sim_type, register_info)
+        return QueuedCircuitRun(job, self.memory, sim_type, output_registers.to_flat_tuple())
 
     def run_measurement_registers(
         self,
@@ -294,9 +277,7 @@ class QoqoQiskitBackend:
                   Dict[str, List[List[complex]]]]
         """
         constant_circuit = measurement.constant_circuit()
-        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
-        output_float_register_dict: Dict[str, List[List[float]]] = {}
-        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
+        output_registers = Registers()
 
         for circuit in measurement.circuits():
             if constant_circuit is None:
@@ -311,26 +292,22 @@ class QoqoQiskitBackend:
             ) = self.run_circuit(run_circuit)
 
             for key, value_bools in tmp_bit_register_dict.items():
-                if key in output_bit_register_dict:
-                    output_bit_register_dict[key].extend(value_bools)
+                if key in output_registers.bit_register_dict:
+                    output_registers.bit_register_dict[key].extend(value_bools)
                 else:
-                    output_bit_register_dict[key] = value_bools
+                    output_registers.bit_register_dict[key] = value_bools
             for key, value_floats in tmp_float_register_dict.items():
-                if key in output_float_register_dict:
-                    output_float_register_dict[key].extend(value_floats)
+                if key in output_registers.float_register_dict:
+                    output_registers.float_register_dict[key].extend(value_floats)
                 else:
-                    output_float_register_dict[key] = value_floats
+                    output_registers.float_register_dict[key] = value_floats
             for key, value_complexes in tmp_complex_register_dict.items():
-                if key in output_complex_register_dict:
-                    output_complex_register_dict[key].extend(value_complexes)
+                if key in output_registers.complex_register_dict:
+                    output_registers.complex_register_dict[key].extend(value_complexes)
                 else:
-                    output_complex_register_dict[key] = value_complexes
+                    output_registers.complex_register_dict[key] = value_complexes
 
-        return (
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        )
+        return astuple(output_registers)
 
     def run_measurement(
         self,

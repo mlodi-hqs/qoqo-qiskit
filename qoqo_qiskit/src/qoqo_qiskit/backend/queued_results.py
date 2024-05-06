@@ -20,6 +20,7 @@ from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
 from qoqo import measurements
 
+from ..models import Registers, RegistersWithLengths
 from .post_processing import _transform_job_result
 from .utils import is_valid_uuid4
 
@@ -140,14 +141,16 @@ class QueuedCircuitRun:
             status = self._job.status()
             if status == JobStatus.DONE:
                 result = self._job.result()
+                modeled = RegistersWithLengths(
+                    Registers(
+                        bit_register_dict=self._registers_info[1],
+                        float_register_dict=self._registers_info[2],
+                        complex_register_dict=self._registers_info[3],
+                    ),
+                    clas_regs_lengths=self._registers_info[0],
+                )
                 self._qoqo_result = _transform_job_result(
-                    self._memory,
-                    self._sim_type,
-                    result,
-                    self._registers_info[0],
-                    self._registers_info[1],
-                    self._registers_info[2],
-                    self._registers_info[3],
+                    self._memory, self._sim_type, result, modeled
                 )
                 return self._qoqo_result
             elif status == JobStatus.ERROR:
