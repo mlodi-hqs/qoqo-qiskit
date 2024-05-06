@@ -11,9 +11,8 @@
 # the License.
 """Qoqo-qiskit dataclasses."""
 
-from typing import Dict, List
-from dataclasses import dataclass, field
-# useful: from dataclass import astuple
+from typing import Dict, List, Tuple
+from dataclasses import dataclass, field, astuple
 
 
 @dataclass
@@ -43,3 +42,15 @@ class RegistersWithLengths:
 
     registers: Registers = field(default_factory=Registers)
     clas_regs_lengths: Dict[str, int] = field(default_factory=dict)
+
+    def to_flat_tuple(
+        self,
+    ) -> Tuple[
+        Dict[str, int],
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        """Flattens the internal data into a single tuple."""
+        internal_regs = astuple(self.registers)
+        return (self.clas_regs_lengths, *internal_regs)
