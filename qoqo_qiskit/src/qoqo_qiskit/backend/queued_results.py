@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
@@ -149,8 +149,13 @@ class QueuedCircuitRun:
                     ),
                     clas_regs_lengths=self._registers_info[0],
                 )
-                self._qoqo_result = _transform_job_result(
-                    self._memory, self._sim_type, result, modeled
+                self._qoqo_result = cast(
+                    Tuple[
+                        Dict[str, List[List[bool]]],
+                        Dict[str, List[List[float]]],
+                        Dict[str, List[List[complex]]],
+                    ],
+                    _transform_job_result(self._memory, self._sim_type, result, modeled),
                 )
                 return self._qoqo_result
             elif status == JobStatus.ERROR:

@@ -88,8 +88,8 @@ class QoqoQiskitBackend:
 
         compiled_circuits_list: List[Circuit] = []
         output_registers_list: List[RegistersWithLengths] = []
-        sim_type_list: str = None
-        shots_list: int = None
+        sim_type_list: Optional[str] = None
+        shots_list: Optional[int] = None
         for circuit in circuit_list:
             output_registers = self._set_up_registers(circuit)
 
@@ -118,9 +118,9 @@ class QoqoQiskitBackend:
             compiled_circuits_list.append(compiled_circuit)
             output_registers_list.append(output_registers)
 
-        job = self._job_execution(compiled_circuits_list, shots_list)
+        job = self._job_execution(compiled_circuits_list, cast(int, shots_list))
 
-        return (job, sim_type_list, output_registers_list)
+        return (job, cast(str, sim_type_list), output_registers_list)
 
     def _set_up_registers(
         self,
@@ -267,11 +267,18 @@ class QoqoQiskitBackend:
         result = job.result()
 
         # Result transformation
-        return _transform_job_result(
-            self.memory,
-            sim_type,
-            result,
-            output_registers,
+        return cast(
+            Tuple[
+                Dict[str, List[List[bool]]],
+                Dict[str, List[List[float]]],
+                Dict[str, List[List[complex]]],
+            ],
+            _transform_job_result(
+                self.memory,
+                sim_type,
+                result,
+                output_registers,
+            ),
         )
 
     def run_circuit_list(
@@ -310,11 +317,20 @@ class QoqoQiskitBackend:
         result = job.result()
 
         # Result transformation
-        return _transform_job_result(
-            self.memory,
-            sim_type,
-            result,
-            output_registers_list,
+        return cast(
+            List[
+                Tuple[
+                    Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]],
+                ]
+            ],
+            _transform_job_result(
+                self.memory,
+                sim_type,
+                result,
+                output_registers_list,
+            ),
         )
 
     def run_circuit_queued(
