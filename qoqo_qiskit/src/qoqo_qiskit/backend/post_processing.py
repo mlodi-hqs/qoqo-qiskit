@@ -70,11 +70,50 @@ def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
     return splitted
 
 
-def _transform_job_result_single(sim_type: str, output_register: RegistersWithLengths):
-    pass
+def _transform_job_result_single(
+    memory: bool, sim_type: str, result: Result, output_registers: RegistersWithLengths
+) -> None:
+    if sim_type == "automatic":
+        transformed_counts = _counts_to_registers(
+            result.get_memory() if memory else result.get_counts(),
+            memory,
+            output_registers.clas_regs_lengths,
+        )
+        for i, reg in enumerate(output_registers.registers.bit_register_dict):
+            output_registers.registers.bit_register_dict[reg] = [
+                shot[::-1] for shot in transformed_counts[i]
+            ]
+    elif sim_type == "statevector":
+        vector = list(np.asarray(result.data(0)["statevector"]).flatten())
+        for reg in output_registers.registers.complex_register_dict:
+            output_registers.registers.complex_register_dict[reg].append(vector)
+    elif sim_type == "density_matrix":
+        vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
+        for reg in output_registers.registers.complex_register_dict:
+            output_registers.registers.complex_register_dict[reg].append(vector)
 
-def _transform_job_result_list(sim_type: str, output_registers: List[RegistersWithLengths]):
-    pass
+
+def _transform_job_result_list(
+    memory: bool, sim_type: str, result: Result, output_registers: List[RegistersWithLengths]
+) -> None:
+    if sim_type == "automatic":
+        res_list = result.get_memory() if memory else result.get_counts()
+        for res, regs in zip(res_list, output_registers):
+            transformed_counts = _counts_to_registers(res, memory, regs.clas_regs_lengths)
+            for i, reg in enumerate(regs.registers.bit_register_dict):
+                regs.registers.bit_register_dict[reg] = [
+                    shot[::-1] for shot in transformed_counts[i]
+                ]
+    elif sim_type == "statevector":
+        for i, regs in enumerate(output_registers):
+            vector = list(np.asarray(result.data(i)["statevector"]).flatten())
+            for reg in regs.registers.complex_register_dict:
+                regs.registers.complex_register_dict[reg].append(vector)
+    elif sim_type == "density_matrix":
+        for i, regs in enumerate(output_registers):
+            vector = list(np.asarray(result.data(i)["density_matrix"]).flatten())
+            for reg in regs.registers.complex_register_dict:
+                regs.registers.complex_register_dict[reg].append(vector)
 
 
 def _transform_job_result(
@@ -96,35 +135,9 @@ def _transform_job_result(
         ]
     ],
 ]:
-    is_list = isinstance(output_registers, list)
-    if sim_type == "automatic":
-        if is_list:
-            res_list = result.get_memory() if memory else result.get_counts()
-            for res, regs in zip(res_list, output_registers):
-                transformed_counts = _counts_to_registers(res, memory, regs.clas_regs_lengths)
-                for i, reg in enumerate(regs.registers.bit_register_dict):
-                    regs.registers.bit_register_dict[reg] = [
-                        shot[::-1] for shot in transformed_counts[i]
-                    ]
-        else:
-            transformed_counts = _counts_to_registers(
-                result.get_memory() if memory else result.get_counts(),
-                memory,
-                output_registers.clas_regs_lengths,
-            )
-            for i, reg in enumerate(output_registers.registers.bit_register_dict):
-                output_registers.registers.bit_register_dict[reg] = [
-                    shot[::-1] for shot in transformed_counts[i]
-                ]
-    elif sim_type == "statevector":
-        vector = list(np.asarray(result.data(0)["statevector"]).flatten())
-        for reg in output_registers.registers.complex_register_dict:
-            output_registers.registers.complex_register_dict[reg].append(vector)
-    elif sim_type == "density_matrix":
-        vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
-        for reg in output_registers.registers.complex_register_dict:
-            output_registers.registers.complex_register_dict[reg].append(vector)
-
-    if is_list:
+    if isinstance(output_registers, list):
+        _transform_job_result_list(memory, sim_type, result, output_registers)
         return [astuple(regs.registers) for regs in output_registers]
-    return astuple(output_registers.registers)
+    else:
+        _transform_job_result_single(memory, sim_type, result, output_registers)
+        return astuple(output_registers.registers)
