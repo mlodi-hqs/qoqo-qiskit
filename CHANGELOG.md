@@ -5,6 +5,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 ### 0.5.0
 
 * Simplified the registers representation via dataclasses
+* Added `run_circuit_list()` and `run_circuit_list_queued()` allowing to have a single job reference a list of running circuits
 
 ### 0.4.2
 
