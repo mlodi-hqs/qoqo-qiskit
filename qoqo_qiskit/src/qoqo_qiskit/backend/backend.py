@@ -298,10 +298,12 @@ class QoqoQiskitBackend:
         Returns:
             List[Tuple[Dict[str, List[List[bool]]],\
                   Dict[str, List[List[float]]],\
-                  Dict[str, List[List[complex]]]]]: bit, float and complex registers dictionaries.
+                  Dict[str, List[List[complex]]]]]: list of bit, float and complex registers\
+                    dictionaries.
 
         Raises:
-            ValueError: Incorrect Measurement or Pragma operations or .
+            ValueError: Incorrect Measurement or Pragma operations or incompatible run options\
+                between different circuits.
         """
         (job, sim_type, output_registers_list) = self._run_circuit_list(circuits)
 
