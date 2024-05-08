@@ -11,7 +11,8 @@
 # the License.
 """Test backend.py file."""
 
-import sys, time
+import sys
+import time
 from typing import Any, List
 
 import pytest
@@ -25,7 +26,6 @@ from qoqo.measurements import (  # type:ignore
 )
 from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
 from qoqo_qiskit.backend.post_processing import _split
-
 from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 
 
@@ -113,6 +113,7 @@ def test_run_circuit_errors(operations: List[Any]) -> None:
     except Exception:
         assert AssertionError("Correct Circuit failed on '.run_circuit()' call.")
 
+
 @pytest.mark.parametrize(
     "operations",
     [
@@ -136,7 +137,7 @@ def test_run_circuit_list_errors(operations: List[Any]) -> None:
     for op in operations:
         involved_qubits.update(op.involved_qubits())
         circuit += op
-    
+
     with pytest.raises(TypeError) as exc:
         _ = backend.run_circuit_list("error")
     assert "The input is not a valid list of Qoqo Circuit instances." in str(exc.value)
@@ -147,17 +148,19 @@ def test_run_circuit_list_errors(operations: List[Any]) -> None:
 
     circuit_0 = Circuit()
     circuit_0 += circuit
-    circuit_0 += ops.DefinitionComplex("ri", 2**len(involved_qubits), True)
+    circuit_0 += ops.DefinitionComplex("ri", 2 ** len(involved_qubits), True)
     circuit_0 += ops.PragmaGetStateVector("ri", None)
 
     circuit_1 = Circuit()
     circuit_1 += circuit
-    circuit_1 += ops.DefinitionComplex("ri", 4**len(involved_qubits), True)
+    circuit_1 += ops.DefinitionComplex("ri", 4 ** len(involved_qubits), True)
     circuit_1 += ops.PragmaGetDensityMatrix("ri", None)
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit_list([circuit_0, circuit_1])
-    assert "The input is a list of Qoqo Circuits with different simulation types." in str(exc.value)
+    assert "The input is a list of Qoqo Circuits with different simulation types." in str(
+        exc.value
+    )
 
     circuit_2 = Circuit()
     circuit_2 += circuit
@@ -236,6 +239,7 @@ def test_run_circuit_results(operations: List[Any]) -> None:
     assert result[2]["ri"]
     assert len(result[2]["ri"][0]) == (2 ** len(involved_qubits)) ** 2
 
+
 @pytest.mark.parametrize(
     "operations",
     [
@@ -265,7 +269,7 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     circuit_0 += ops.DefinitionBit("ri", len(involved_qubits), True)
     for i in involved_qubits:
         circuit_0 += ops.MeasureQubit(i, "ri", i)
-    
+
     circuit_1 = Circuit()
     circuit_1 += circuit
     circuit_1 += ops.DefinitionBit("ro", len(involved_qubits), True)
@@ -287,6 +291,60 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     assert len(second_circ_res[0]["ro"]) == 200
     assert not second_circ_res[1]
     assert not second_circ_res[2]
+
+    circuit_2 = Circuit()
+    circuit_2 += circuit
+    circuit_2 += ops.DefinitionComplex("ri", 2 ** len(involved_qubits), True)
+    circuit_2 += ops.PragmaGetStateVector("ri", None)
+
+    circuit_3 = Circuit()
+    circuit_3 += circuit
+    circuit_3 += ops.Hadamard(0)
+    circuit_3 += ops.DefinitionComplex("ro", 2 ** len(involved_qubits), True)
+    circuit_3 += ops.PragmaGetStateVector("ro", None)
+
+    result = backend.run_circuit_list([circuit_2, circuit_3])
+    first_circ_res = result[0]
+    second_circ_res = result[1]
+
+    assert not first_circ_res[0]
+    assert not first_circ_res[1]
+    assert first_circ_res[2]
+    assert first_circ_res[2]["ri"]
+    assert len(first_circ_res[2]["ri"][0]) == 2 ** len(involved_qubits)
+
+    assert not second_circ_res[0]
+    assert not second_circ_res[1]
+    assert second_circ_res[2]
+    assert second_circ_res[2]["ro"]
+    assert len(second_circ_res[2]["ro"][0]) == 2 ** len(involved_qubits)
+
+    circuit_4 = Circuit()
+    circuit_4 += circuit
+    circuit_4 += ops.DefinitionComplex("ri", 4 ** len(involved_qubits), True)
+    circuit_4 += ops.PragmaGetDensityMatrix("ri", None)
+
+    circuit_5 = Circuit()
+    circuit_5 += circuit
+    circuit_5 += ops.Hadamard(0)
+    circuit_5 += ops.DefinitionComplex("ro", 4 ** len(involved_qubits), True)
+    circuit_5 += ops.PragmaGetDensityMatrix("ro", None)
+
+    result = backend.run_circuit_list([circuit_4, circuit_5])
+    first_circ_res = result[0]
+    second_circ_res = result[1]
+
+    assert not first_circ_res[0]
+    assert not first_circ_res[1]
+    assert first_circ_res[2]
+    assert first_circ_res[2]["ri"]
+    assert len(first_circ_res[2]["ri"][0]) == 4 ** len(involved_qubits)
+
+    assert not second_circ_res[0]
+    assert not second_circ_res[1]
+    assert second_circ_res[2]
+    assert second_circ_res[2]["ro"]
+    assert len(second_circ_res[2]["ro"][0]) == 4 ** len(involved_qubits)
 
 
 @pytest.mark.parametrize(
@@ -498,6 +556,7 @@ def test_split() -> None:
 
     assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
 
+
 def test_overwrite() -> None:
     """Tests overwriting registers."""
     backend = QoqoQiskitBackend()
@@ -515,7 +574,6 @@ def test_overwrite() -> None:
     circuit_2 += ops.MeasureQubit(0, "same", 0)
     circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
 
-
     measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
 
     try:
@@ -532,10 +590,11 @@ def test_overwrite() -> None:
     assert not output[1]
     assert not output[2]
 
+
 def test_run_program() -> None:
     """Test QoqoQiskitBackend.run_program method."""
     backend = QoqoQiskitBackend()
-    
+
     init_circuit = Circuit()
     init_circuit += ops.RotateX(0, "angle_0")
     init_circuit += ops.RotateY(0, "angle_1")
@@ -550,10 +609,21 @@ def test_run_program() -> None:
     x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
 
     measurement_input = PauliZProductInput(1, False)
-    z_basis_index = measurement_input.add_pauliz_product("ro_z", [0,])
-    x_basis_index = measurement_input.add_pauliz_product("ro_x", [0,])
+    z_basis_index = measurement_input.add_pauliz_product(
+        "ro_z",
+        [
+            0,
+        ],
+    )
+    x_basis_index = measurement_input.add_pauliz_product(
+        "ro_x",
+        [
+            0,
+        ],
+    )
     measurement_input.add_linear_exp_val(
-        "<H>", {x_basis_index: 0.1, z_basis_index: 0.2},
+        "<H>",
+        {x_basis_index: 0.1, z_basis_index: 0.2},
     )
 
     measurement = PauliZProduct(
@@ -567,12 +637,14 @@ def test_run_program() -> None:
         input_parameter_names=["angle_0", "angle_1"],
     )
 
-    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+    res = backend.run_program(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
+    )
 
     assert len(res) == 3
     for el in res:
-        assert float(el['<H>'])
-    
+        assert float(el["<H>"])
+
     init_circuit += ops.DefinitionBit("ro", 1, True)
     init_circuit += ops.PragmaRepeatedMeasurement("ro", 1000, None)
 
@@ -580,7 +652,9 @@ def test_run_program() -> None:
 
     program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
 
-    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+    res = backend.run_program(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
+    )
 
     assert len(res) == 3
     assert res[0][0]
@@ -629,6 +703,7 @@ def test_run_measurement_queued(memory: bool) -> None:
 
     assert qpr._measurement == measurement
     assert len(qpr._queued_circuits) == 2
+
 
 def test_run_program_queued() -> None:
     """Test QoqoQiskitBackend.run_program_queued method."""
@@ -679,7 +754,10 @@ def test_run_program_queued() -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_program_queued(program=program, params_values=[])
-    assert "Wrong parameters value: no parameters values provided but input QuantumProgram has 2 input parameter names." in str(exc.value)
+    assert (
+        "Wrong parameters value: no parameters values provided but input QuantumProgram has 2 input parameter names."
+        in str(exc.value)
+    )
 
     queued_jobs = backend.run_program_queued(
         program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
@@ -695,6 +773,7 @@ def test_run_program_queued() -> None:
         with pytest.raises(ValueError) as exc:
             _ = QueuedProgramRun.from_json(serialised)
         assert "Retrieval is not possible." in str(exc.value)
+
 
 # For pytest
 if __name__ == "__main__":
