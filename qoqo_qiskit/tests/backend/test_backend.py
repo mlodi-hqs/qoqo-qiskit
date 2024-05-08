@@ -113,6 +113,66 @@ def test_run_circuit_errors(operations: List[Any]) -> None:
     except Exception:
         assert AssertionError("Correct Circuit failed on '.run_circuit()' call.")
 
+@pytest.mark.parametrize(
+    "operations",
+    [
+        [ops.PauliX(1), ops.PauliX(0), ops.PauliZ(2), ops.PauliX(3), ops.PauliY(4)],
+        [
+            ops.Hadamard(0),
+            ops.CNOT(0, 1),
+            ops.CNOT(1, 2),
+            ops.CNOT(2, 3),
+            ops.CNOT(3, 4),
+        ],
+        [ops.RotateX(0, 0.23), ops.RotateY(1, 0.12), ops.RotateZ(2, 0.34)],
+    ],
+)
+def test_run_circuit_list_errors(operations: List[Any]) -> None:
+    """Test QoqoQiskitBackend.run_circuit_list method errors."""
+    backend = QoqoQiskitBackend()
+
+    circuit = Circuit()
+    involved_qubits = set()
+    for op in operations:
+        involved_qubits.update(op.involved_qubits())
+        circuit += op
+    
+    with pytest.raises(TypeError) as exc:
+        _ = backend.run_circuit_list("error")
+    assert "The input is not a valid list of Qoqo Circuit instances." in str(exc.value)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit_list([])
+    assert "The input is an empty list of Qoqo Circuit instances." in str(exc.value)
+
+    circuit_0 = Circuit()
+    circuit_0 += circuit
+    circuit_0 += ops.DefinitionComplex("ri", 2**len(involved_qubits), True)
+    circuit_0 += ops.PragmaGetStateVector("ri", None)
+
+    circuit_1 = Circuit()
+    circuit_1 += circuit
+    circuit_1 += ops.DefinitionComplex("ri", 4**len(involved_qubits), True)
+    circuit_1 += ops.PragmaGetDensityMatrix("ri", None)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit_list([circuit_0, circuit_1])
+    assert "The input is a list of Qoqo Circuits with different simulation types." in str(exc.value)
+
+    circuit_2 = Circuit()
+    circuit_2 += circuit
+    circuit_2 += ops.DefinitionBit("ri", len(involved_qubits), True)
+    circuit_2 += ops.PragmaRepeatedMeasurement("ri", 150)
+
+    circuit_3 = Circuit()
+    circuit_3 += circuit
+    circuit_3 += ops.DefinitionBit("ri", len(involved_qubits), True)
+    circuit_3 += ops.PragmaRepeatedMeasurement("ri", 200)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit_list([circuit_2, circuit_3])
+    assert "The input is a list of Qoqo Circuits with different number of shots." in str(exc.value)
+
 
 @pytest.mark.parametrize(
     "operations",
@@ -175,6 +235,58 @@ def test_run_circuit_results(operations: List[Any]) -> None:
     assert result[2]
     assert result[2]["ri"]
     assert len(result[2]["ri"][0]) == (2 ** len(involved_qubits)) ** 2
+
+@pytest.mark.parametrize(
+    "operations",
+    [
+        [ops.PauliX(1), ops.PauliX(0), ops.PauliZ(2), ops.PauliX(3), ops.PauliY(4)],
+        [
+            ops.Hadamard(0),
+            ops.CNOT(0, 1),
+            ops.CNOT(1, 2),
+            ops.CNOT(2, 3),
+            ops.CNOT(3, 4),
+        ],
+        [ops.RotateX(0, 0.23), ops.RotateY(1, 0.12), ops.RotateZ(2, 0.34)],
+    ],
+)
+def test_run_circuit_list_results(operations: List[Any]) -> None:
+    """Test QoqoQiskitBackend.run_circuit_list method results."""
+    backend = QoqoQiskitBackend()
+
+    circuit = Circuit()
+    involved_qubits = set()
+    for op in operations:
+        involved_qubits.update(op.involved_qubits())
+        circuit += op
+
+    circuit_0 = Circuit()
+    circuit_0 += circuit
+    circuit_0 += ops.DefinitionBit("ri", len(involved_qubits), True)
+    for i in involved_qubits:
+        circuit_0 += ops.MeasureQubit(i, "ri", i)
+    
+    circuit_1 = Circuit()
+    circuit_1 += circuit
+    circuit_1 += ops.DefinitionBit("ro", len(involved_qubits), True)
+    for i in involved_qubits:
+        circuit_1 += ops.MeasureQubit(i, "ro", i)
+
+    result = backend.run_circuit_list([circuit_0, circuit_1])
+    first_circ_res = result[0]
+    second_circ_res = result[1]
+
+    assert first_circ_res[0]
+    assert first_circ_res[0]["ri"]
+    assert len(first_circ_res[0]["ri"]) == 200
+    assert not first_circ_res[1]
+    assert not first_circ_res[2]
+
+    assert second_circ_res[0]
+    assert second_circ_res[0]["ro"]
+    assert len(second_circ_res[0]["ro"]) == 200
+    assert not second_circ_res[1]
+    assert not second_circ_res[2]
 
 
 @pytest.mark.parametrize(
