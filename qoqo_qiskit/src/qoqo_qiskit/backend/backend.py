@@ -343,6 +343,32 @@ class QoqoQiskitBackend:
 
         return QueuedCircuitRun(job, self.memory, sim_type, output_registers.to_flat_tuple())
 
+    def run_circuit_list_queued(self, circuits: List[Circuit]) -> List[QueuedCircuitRun]:
+        """Run a list of Circuit instances on a Qiskit backend and return a list of queued Runs.
+
+        The default number of shots for the simulation is 200.
+        Any kind of Measurement, Statevector or DensityMatrix instruction only works as intended if
+        they are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuits (List[Circuit]): the list of Circuit instances to run.
+
+        Returns:
+            List[QueuedCircuitRun]
+        """
+        (
+            job,
+            sim_type,
+            output_registers,
+        ) = self._run_circuit_list(circuits)
+
+        return [
+            QueuedCircuitRun(job, self.memory, sim_type, reg.to_flat_tuple())
+            for reg in output_registers
+        ]
+
     def run_measurement_registers(
         self,
         measurement: Any,
