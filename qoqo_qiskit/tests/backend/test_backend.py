@@ -682,6 +682,35 @@ def test_run_circuit_queued(memory: bool) -> None:
 
 
 @pytest.mark.parametrize("memory", [True, False])
+def test_run_circuit_list_queued(memory: bool) -> None:
+    """Test QoqoQiskitBackend.run_circuit_list_queued method."""
+    backend = QoqoQiskitBackend(memory=memory)
+
+    circuit_0 = Circuit()
+    circuit_0 += ops.Hadamard(0)
+    circuit_0 += ops.Hadamard(1)
+    circuit_0 += ops.DefinitionBit("ro", 2, True)
+    circuit_0 += ops.PragmaRepeatedMeasurement("ro", 50)
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.Hadamard(0)
+    circuit_1 += ops.Hadamard(1)
+    circuit_1 += ops.PauliX(1)
+    circuit_1 += ops.DefinitionBit("ri", 2, True)
+    circuit_1 += ops.PragmaRepeatedMeasurement("ri", 50)
+
+    qcrs = backend.run_circuit_list_queued([circuit_0, circuit_1])
+
+    assert qcrs[0]._job == qcrs[1]._job
+    assert qcrs[0]._memory == qcrs[1]._memory == memory
+    assert qcrs[0]._sim_type == qcrs[1]._sim_type == "automatic"
+    assert "ro" in qcrs[0]._registers_info[0]
+    assert "ro" in qcrs[0]._registers_info[1]
+    assert "ri" in qcrs[1]._registers_info[0]
+    assert "ri" in qcrs[1]._registers_info[1]
+
+
+@pytest.mark.parametrize("memory", [True, False])
 def test_run_measurement_queued(memory: bool) -> None:
     """Test QoqoQiskitBackend.run_measurement_queued method."""
     backend = QoqoQiskitBackend(memory=memory)
