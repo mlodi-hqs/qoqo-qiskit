@@ -12,7 +12,7 @@
 """Results post-processing utilities."""
 
 from dataclasses import astuple
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 from qiskit.result import Result
@@ -70,27 +70,52 @@ def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
     return splitted
 
 
+def _transform_job_result_single(sim_type: str, output_register: RegistersWithLengths):
+    pass
+
+def _transform_job_result_list(sim_type: str, output_registers: List[RegistersWithLengths]):
+    pass
+
+
 def _transform_job_result(
-    memory: bool, sim_type: str, result: Result, output_registers: RegistersWithLengths
-) -> Tuple[
-    Dict[str, List[List[bool]]],
-    Dict[str, List[List[float]]],
-    Dict[str, List[List[complex]]],
+    memory: bool,
+    sim_type: str,
+    result: Result,
+    output_registers: Union[RegistersWithLengths, List[RegistersWithLengths]],
+) -> Union[
+    Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ],
+    List[
+        Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ]
+    ],
 ]:
+    is_list = isinstance(output_registers, list)
     if sim_type == "automatic":
-        if memory:
-            transformed_counts = _counts_to_registers(
-                result.get_memory(), True, output_registers.clas_regs_lengths
-            )
+        if is_list:
+            res_list = result.get_memory() if memory else result.get_counts()
+            for res, regs in zip(res_list, output_registers):
+                transformed_counts = _counts_to_registers(res, memory, regs.clas_regs_lengths)
+                for i, reg in enumerate(regs.registers.bit_register_dict):
+                    regs.registers.bit_register_dict[reg] = [
+                        shot[::-1] for shot in transformed_counts[i]
+                    ]
         else:
             transformed_counts = _counts_to_registers(
-                result.get_counts(), False, output_registers.clas_regs_lengths
+                result.get_memory() if memory else result.get_counts(),
+                memory,
+                output_registers.clas_regs_lengths,
             )
-        for i, reg in enumerate(output_registers.registers.bit_register_dict):
-            reversed_list = []
-            for shot in transformed_counts[i]:
-                reversed_list.append(shot[::-1])
-            output_registers.registers.bit_register_dict[reg] = reversed_list
+            for i, reg in enumerate(output_registers.registers.bit_register_dict):
+                output_registers.registers.bit_register_dict[reg] = [
+                    shot[::-1] for shot in transformed_counts[i]
+                ]
     elif sim_type == "statevector":
         vector = list(np.asarray(result.data(0)["statevector"]).flatten())
         for reg in output_registers.registers.complex_register_dict:
@@ -100,4 +125,6 @@ def _transform_job_result(
         for reg in output_registers.registers.complex_register_dict:
             output_registers.registers.complex_register_dict[reg].append(vector)
 
+    if is_list:
+        return [astuple(regs.registers) for regs in output_registers]
     return astuple(output_registers.registers)
