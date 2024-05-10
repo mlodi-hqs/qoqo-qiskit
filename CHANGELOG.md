@@ -6,6 +6,10 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 * Added `transpiler_helper` submodule
 
+### 0.4.2
+
+* Fixed `RotateXY` qiskit equivalence
+
 ### 0.4.1
 
 * Fixed overwriting registers bug
