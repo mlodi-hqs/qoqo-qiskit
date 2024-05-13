@@ -12,7 +12,7 @@
 """Test file for interface.py."""
 
 from qoqo import Circuit, CircuitDag, QuantumProgram
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qoqo.measurements import (  # type:ignore
     PauliZProduct,
     PauliZProductInput,
@@ -40,7 +40,7 @@ def test_basic_circuit_basic_gates() -> None:
     circuit_res += ops.SqrtPauliX(0)
 
     transpiled_circuit = transpile_with_qiskit(circuit, [{"basis_gates": ["sx", "rz", "cz"]}])
-
+    print(transpiled_circuit)
     assert transpiled_circuit == circuit_res
 
 
