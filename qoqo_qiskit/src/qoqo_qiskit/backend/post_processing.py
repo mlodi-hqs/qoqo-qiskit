@@ -12,7 +12,7 @@
 """Results post-processing utilities."""
 
 from dataclasses import astuple
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from qiskit.result import Result
@@ -71,11 +71,17 @@ def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
 
 
 def _transform_job_result_single(
-    memory: bool, sim_type: str, result: Result, output_registers: RegistersWithLengths
+    memory: bool,
+    sim_type: str,
+    result: Result,
+    output_registers: RegistersWithLengths,
+    res_index: Optional[int] = 0,
 ) -> None:
+    # res_index is the index of the chosen result to extract in case
+    #  the single Result contains multiple ExperimentalResult instances
     if sim_type == "automatic":
         transformed_counts = _counts_to_registers(
-            result.get_memory() if memory else result.get_counts(),
+            result.get_memory(res_index) if memory else result.get_counts(res_index),
             memory,
             output_registers.clas_regs_lengths,
         )
@@ -84,11 +90,11 @@ def _transform_job_result_single(
                 shot[::-1] for shot in transformed_counts[i]
             ]
     elif sim_type == "statevector":
-        vector = list(np.asarray(result.data(0)["statevector"]).flatten())
+        vector = list(np.asarray(result.data(res_index)["statevector"]).flatten())
         for reg in output_registers.registers.complex_register_dict:
             output_registers.registers.complex_register_dict[reg].append(vector)
     elif sim_type == "density_matrix":
-        vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
+        vector = list(np.asarray(result.data(res_index)["density_matrix"]).flatten())
         for reg in output_registers.registers.complex_register_dict:
             output_registers.registers.complex_register_dict[reg].append(vector)
 
@@ -121,6 +127,7 @@ def _transform_job_result(
     sim_type: str,
     result: Result,
     output_registers: Union[RegistersWithLengths, List[RegistersWithLengths]],
+    res_index: Optional[int] = 0,
 ) -> Tuple[
     Dict[str, List[List[bool]]],
     Dict[str, List[List[float]]],
@@ -147,5 +154,5 @@ def _transform_job_result(
                     final_output.registers.complex_register_dict[key] = value_complexes
         return astuple(final_output.registers)
     else:
-        _transform_job_result_single(memory, sim_type, result, output_registers)
+        _transform_job_result_single(memory, sim_type, result, output_registers, res_index)
         return astuple(output_registers.registers)

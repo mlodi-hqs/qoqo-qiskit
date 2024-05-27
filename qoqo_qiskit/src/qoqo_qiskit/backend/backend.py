@@ -362,8 +362,8 @@ class QoqoQiskitBackend:
         ) = self._run_circuit_list(circuits)
 
         return [
-            QueuedCircuitRun(job, self.memory, sim_type, reg.to_flat_tuple())
-            for reg in output_registers
+            QueuedCircuitRun(job, self.memory, sim_type, reg.to_flat_tuple(), res_index)
+            for res_index, reg in enumerate(output_registers)
         ]
 
     def run_measurement_registers(

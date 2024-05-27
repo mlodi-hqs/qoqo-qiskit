@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
@@ -39,6 +39,7 @@ class QueuedCircuitRun:
             Dict[str, List[List[float]]],
             Dict[str, List[List[complex]]],
         ],
+        res_index: Optional[int] = 0,
     ) -> None:
         """Initialise the QueuedCircuitRun class.
 
@@ -49,6 +50,9 @@ class QueuedCircuitRun:
             sim_type (str): The simulation type. This can be "automatic", "statevector"
                 or "density_matrix".
             registers_info (Tuple[Any]): The initially setup registers.
+            res_index (Optional[int]): The index of the ExperimentalResult in Result.results.
+                Defaults to 0. It can be relevant in case the circuit has been run as part of
+                a list.
         """
         self._job: Job = job
         self._memory: bool = memory
@@ -66,6 +70,7 @@ class QueuedCircuitRun:
                 Dict[str, List[List[complex]]],
             ]
         ] = None
+        self._res_index: Optional[int] = res_index
 
     def to_json(self) -> str:
         """Convert self to a JSON string.
@@ -79,6 +84,7 @@ class QueuedCircuitRun:
             "sim_type": self._sim_type,
             "registers_info": self._registers_info,
             "qoqo_result": self._qoqo_result,
+            "res_index": self._res_index,
         }
 
         return json.dumps(json_dict)
@@ -113,6 +119,8 @@ class QueuedCircuitRun:
         )
         if json_dict["qoqo_result"] is not None:
             instance._qoqo_result = json_dict["qoqo_result"]
+        if json_dict["res_index"] is not None:
+            instance._res_index = json_dict["res_index"]
 
         return instance
 
@@ -149,13 +157,8 @@ class QueuedCircuitRun:
                     ),
                     clas_regs_lengths=self._registers_info[0],
                 )
-                self._qoqo_result = cast(
-                    Tuple[
-                        Dict[str, List[List[bool]]],
-                        Dict[str, List[List[float]]],
-                        Dict[str, List[List[complex]]],
-                    ],
-                    _transform_job_result(self._memory, self._sim_type, result, modeled),
+                self._qoqo_result = _transform_job_result(
+                    self._memory, self._sim_type, result, modeled, self._res_index
                 )
                 return self._qoqo_result
             elif status == JobStatus.ERROR:
