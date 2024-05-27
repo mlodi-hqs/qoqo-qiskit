@@ -11,7 +11,7 @@ maintainers = [
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "qoqo>=1.9",
+    "qoqo>=1.9,<1.12",
     "qoqo_qasm>=0.9.6",         # minimum version for PragmaSleep support
     "qiskit<0.46",              # no 1.0 yet
     "qiskit_aer>=0.13.2",       # minimum version for Python 3.12 support
