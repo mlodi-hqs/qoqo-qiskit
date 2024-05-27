@@ -121,23 +121,31 @@ def _transform_job_result(
     sim_type: str,
     result: Result,
     output_registers: Union[RegistersWithLengths, List[RegistersWithLengths]],
-) -> Union[
-    Tuple[
-        Dict[str, List[List[bool]]],
-        Dict[str, List[List[float]]],
-        Dict[str, List[List[complex]]],
-    ],
-    List[
-        Tuple[
-            Dict[str, List[List[bool]]],
-            Dict[str, List[List[float]]],
-            Dict[str, List[List[complex]]],
-        ]
-    ],
+) -> Tuple[
+    Dict[str, List[List[bool]]],
+    Dict[str, List[List[float]]],
+    Dict[str, List[List[complex]]],
 ]:
     if isinstance(output_registers, list):
         _transform_job_result_list(memory, sim_type, result, output_registers)
-        return [astuple(regs.registers) for regs in output_registers]
+        final_output = RegistersWithLengths()
+        for regs in output_registers:
+            for key, value_bools in regs.registers.bit_register_dict.items():
+                if key in final_output.registers.bit_register_dict:
+                    final_output.registers.bit_register_dict[key].extend(value_bools)
+                else:
+                    final_output.registers.bit_register_dict[key] = value_bools
+            for key, value_floats in regs.registers.float_register_dict.items():
+                if key in final_output.registers.float_register_dict:
+                    final_output.registers.float_register_dict[key].extend(value_floats)
+                else:
+                    final_output.registers.float_register_dict[key] = value_floats
+            for key, value_complexes in regs.registers.complex_register_dict.items():
+                if key in final_output.registers.complex_register_dict:
+                    final_output.registers.complex_register_dict[key].extend(value_complexes)
+                else:
+                    final_output.registers.complex_register_dict[key] = value_complexes
+        return astuple(final_output.registers)
     else:
         _transform_job_result_single(memory, sim_type, result, output_registers)
         return astuple(output_registers.registers)

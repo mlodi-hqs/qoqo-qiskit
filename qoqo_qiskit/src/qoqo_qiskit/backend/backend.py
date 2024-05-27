@@ -267,29 +267,20 @@ class QoqoQiskitBackend:
         result = job.result()
 
         # Result transformation
-        return cast(
-            Tuple[
-                Dict[str, List[List[bool]]],
-                Dict[str, List[List[float]]],
-                Dict[str, List[List[complex]]],
-            ],
-            _transform_job_result(
-                self.memory,
-                sim_type,
-                result,
-                output_registers,
-            ),
+        return _transform_job_result(
+            self.memory,
+            sim_type,
+            result,
+            output_registers,
         )
 
     def run_circuit_list(
         self,
         circuits: List[Circuit],
-    ) -> List[
-        Tuple[
-            Dict[str, List[List[bool]]],
-            Dict[str, List[List[float]]],
-            Dict[str, List[List[complex]]],
-        ]
+    ) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
     ]:
         """Run a list of Circuit instances on a Qiskit backend.
 
@@ -303,10 +294,9 @@ class QoqoQiskitBackend:
             circuits (List[Circuit]): the list of Circuit instances to run.
 
         Returns:
-            List[Tuple[Dict[str, List[List[bool]]],\
+            Tuple[Dict[str, List[List[bool]]],\
                   Dict[str, List[List[float]]],\
-                  Dict[str, List[List[complex]]]]]: list of bit, float and complex registers\
-                    dictionaries.
+                  Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.
 
         Raises:
             ValueError: Incorrect Measurement or Pragma operations or incompatible run options\
@@ -317,20 +307,11 @@ class QoqoQiskitBackend:
         result = job.result()
 
         # Result transformation
-        return cast(
-            List[
-                Tuple[
-                    Dict[str, List[List[bool]]],
-                    Dict[str, List[List[float]]],
-                    Dict[str, List[List[complex]]],
-                ]
-            ],
-            _transform_job_result(
-                self.memory,
-                sim_type,
-                result,
-                output_registers_list,
-            ),
+        return _transform_job_result(
+            self.memory,
+            sim_type,
+            result,
+            output_registers_list,
         )
 
     def run_circuit_queued(
