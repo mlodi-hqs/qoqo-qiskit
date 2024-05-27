@@ -102,6 +102,7 @@ def test_from_to_json(sim_type: str) -> None:
     assert serialized_json_qcr["memory"]
     assert serialized_json_qcr["registers_info"] == list(run[2])
     assert serialized_json_qcr["qoqo_result"] is None
+    assert serialized_json_qcr["res_index"] == 0
 
     assert serialized_json_qpr["measurement_type"] == "ClassicalRegister"
     assert serialized_json_qpr["measurement"] == measurement.to_json()

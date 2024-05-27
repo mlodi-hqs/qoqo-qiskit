@@ -711,6 +711,14 @@ def test_run_circuit_list_queued(memory: bool) -> None:
     assert "ri" in qcrs[1]._registers_info[0]
     assert "ri" in qcrs[1]._registers_info[1]
 
+    time.sleep(1)
+
+    poll1 = qcrs[0].poll_result()
+    poll2 = qcrs[1].poll_result()
+
+    assert len(poll1[0]["ro"]) == 50
+    assert len(poll2[0]["ri"]) == 50
+
 
 @pytest.mark.parametrize("memory", [True, False])
 def test_run_measurement_queued(memory: bool) -> None:
