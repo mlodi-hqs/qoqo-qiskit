@@ -277,20 +277,14 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
         circuit_1 += ops.MeasureQubit(i, "ro", i)
 
     result = backend.run_circuit_list([circuit_0, circuit_1])
-    first_circ_res = result[0]
-    second_circ_res = result[1]
 
-    assert first_circ_res[0]
-    assert first_circ_res[0]["ri"]
-    assert len(first_circ_res[0]["ri"]) == 200
-    assert not first_circ_res[1]
-    assert not first_circ_res[2]
-
-    assert second_circ_res[0]
-    assert second_circ_res[0]["ro"]
-    assert len(second_circ_res[0]["ro"]) == 200
-    assert not second_circ_res[1]
-    assert not second_circ_res[2]
+    assert result[0]
+    assert result[0]["ri"]
+    assert result[0]["ro"]
+    assert len(result[0]["ri"]) == 200
+    assert len(result[0]["ro"]) == 200
+    assert not result[1]
+    assert not result[2]
 
     circuit_2 = Circuit()
     circuit_2 += circuit
@@ -304,20 +298,14 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     circuit_3 += ops.PragmaGetStateVector("ro", None)
 
     result = backend.run_circuit_list([circuit_2, circuit_3])
-    first_circ_res = result[0]
-    second_circ_res = result[1]
 
-    assert not first_circ_res[0]
-    assert not first_circ_res[1]
-    assert first_circ_res[2]
-    assert first_circ_res[2]["ri"]
-    assert len(first_circ_res[2]["ri"][0]) == 2 ** len(involved_qubits)
-
-    assert not second_circ_res[0]
-    assert not second_circ_res[1]
-    assert second_circ_res[2]
-    assert second_circ_res[2]["ro"]
-    assert len(second_circ_res[2]["ro"][0]) == 2 ** len(involved_qubits)
+    assert not result[0]
+    assert not result[1]
+    assert result[2]
+    assert result[2]["ri"]
+    assert result[2]["ro"]
+    assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
+    assert len(result[2]["ro"][0]) == 2 ** len(involved_qubits)
 
     circuit_4 = Circuit()
     circuit_4 += circuit
@@ -331,20 +319,34 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     circuit_5 += ops.PragmaGetDensityMatrix("ro", None)
 
     result = backend.run_circuit_list([circuit_4, circuit_5])
-    first_circ_res = result[0]
-    second_circ_res = result[1]
 
-    assert not first_circ_res[0]
-    assert not first_circ_res[1]
-    assert first_circ_res[2]
-    assert first_circ_res[2]["ri"]
-    assert len(first_circ_res[2]["ri"][0]) == 4 ** len(involved_qubits)
+    assert not result[0]
+    assert not result[1]
+    assert result[2]
+    assert result[2]["ri"]
+    assert result[2]["ro"]
+    assert len(result[2]["ri"][0]) == 4 ** len(involved_qubits)
+    assert len(result[2]["ro"][0]) == 4 ** len(involved_qubits)
 
-    assert not second_circ_res[0]
-    assert not second_circ_res[1]
-    assert second_circ_res[2]
-    assert second_circ_res[2]["ro"]
-    assert len(second_circ_res[2]["ro"][0]) == 4 ** len(involved_qubits)
+    circuit_6 = Circuit()
+    circuit_6 += circuit
+    circuit_6 += ops.DefinitionBit("ro", len(involved_qubits), True)
+    for i in involved_qubits:
+        circuit_6 += ops.MeasureQubit(i, "ro", i)
+
+    circuit_7 = Circuit()
+    circuit_7 += circuit
+    circuit_7 += ops.DefinitionBit("ro", len(involved_qubits), True)
+    for i in involved_qubits:
+        circuit_7 += ops.MeasureQubit(i, "ro", i)
+
+    result = backend.run_circuit_list([circuit_6, circuit_7])
+
+    assert result[0]
+    assert result[0]["ro"]
+    assert len(result[0]["ro"]) == 400
+    assert not result[1]
+    assert not result[2]
 
 
 @pytest.mark.parametrize(
