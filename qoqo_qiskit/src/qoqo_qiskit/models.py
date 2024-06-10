@@ -37,6 +37,9 @@ class RegistersWithLengths:
     The registers are used to store classical information during the execution of a
     roqoqo circuit and to provide a unified output interface for the different backends.
 
+    In addition, a dictionary containing the lengths of any DefinitionBit register (indexed
+    by its name) is also provided.
+
     Defined by three dictionaries, representing bit, float and complex registers.
     """
 
