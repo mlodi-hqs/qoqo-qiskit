@@ -727,7 +727,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-bytemuck 1.15.0
+bytemuck 1.16.0
 https://github.com/Lokathor/bytemuck
 by Lokathor <zefria@gmail.com>
 A crate for mucking around with piles of bytes.
@@ -1285,7 +1285,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-either 1.11.0
+either 1.12.0
 https://github.com/rayon-rs/either
 by bluss
 The enum `Either` with variants `Left` and `Right` is a general purpose sum type with two cases.
@@ -3857,7 +3857,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-libc 0.2.154
+libc 0.2.155
 https://github.com/rust-lang/libc
 by The Rust Project Developers
 Raw FFI bindings to platform libraries like libc.
@@ -5292,7 +5292,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-num-complex 0.4.5
+num-complex 0.4.6
 https://github.com/rust-num/num-complex
 by The Rust Project Developers
 Complex numbers implementation for Rust
@@ -5774,7 +5774,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-num-rational 0.4.1
+num-rational 0.4.2
 https://github.com/rust-num/num-rational
 by The Rust Project Developers
 Rational numbers implementation for Rust
@@ -6531,7 +6531,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-parking_lot 0.12.2
+parking_lot 0.12.3
 https://github.com/Amanieu/parking_lot
 by Amanieu d'Antras <amanieu@gmail.com>
 More compact and efficient implementations of the standard synchronization primitives.
@@ -7013,7 +7013,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-paste 1.0.14
+paste 1.0.15
 https://github.com/dtolnay/paste
 by David Tolnay <dtolnay@gmail.com>
 Macros for all your token pasting needs
@@ -7227,7 +7227,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-petgraph 0.6.4
+petgraph 0.6.5
 https://github.com/petgraph/petgraph
 by bluss, mitchmindtree
 Graph data structure library. Provides graph types and graph algorithms.
@@ -7925,7 +7925,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-proc-macro2 1.0.81
+proc-macro2 1.0.85
 https://github.com/dtolnay/proc-macro2
 by David Tolnay <dtolnay@gmail.com>, Alex Crichton <alex@alexcrichton.com>
 A substitute implementation of the compiler's `proc_macro` API to decouple token-based libraries from the procedural macro use case.
@@ -9284,7 +9284,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-qoqo 1.11.0
+qoqo 1.11.1
 https://github.com/HQSquantumsimulations/qoqo
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Quantum computing circuit toolkit. Python interface of roqoqo
@@ -9496,7 +9496,7 @@ LICENSE:
 
 
 ====================================================
-qoqo-macros 1.11.0
+qoqo-macros 1.11.1
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for the qoqo crate
 License: Apache-2.0
@@ -9707,7 +9707,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_calculator 1.2.1
+qoqo_calculator 1.1.6
 https://github.com/HQSquantumsimulations/qoqo_calculator
 by HQS Quantum Simulations <info@quantumsimulations.de>
 qoqo-calculator is the calculator backend of the qoqo quantum computing toolkit by HQS Quantum Simulations
@@ -9919,7 +9919,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_calculator_pyo3 1.1.5
+qoqo_calculator_pyo3 1.1.6
 https://github.com/HQSquantumsimulations/qoqo_calculator_pyo3
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Python interface to qoqo calculator, the calculator backend of the qoqo quantum computing toolkit by HQS Quantum Simulations
@@ -11753,7 +11753,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-roqoqo 1.11.0
+roqoqo 1.11.1
 https://github.com/HQSquantumsimulations/qoqo
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Rust Quantum Computing Toolkit by HQS
@@ -11965,7 +11965,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo-derive 1.11.0
+roqoqo-derive 1.11.1
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for the roqoqo crate
 License: Apache-2.0
@@ -12627,7 +12627,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-ryu 1.0.17
+ryu 1.0.18
 https://github.com/dtolnay/ryu
 by David Tolnay <dtolnay@gmail.com>
 Fast floating point to string conversion
@@ -12941,7 +12941,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ====================================================
-schemars 0.8.18
+schemars 0.8.21
 https://graham.cool/schemars/
 by Graham Esau <gesau@hotmail.co.uk>
 Generate JSON Schemas from Rust code
@@ -12973,7 +12973,7 @@ SOFTWARE.
 
 
 ====================================================
-schemars_derive 0.8.18
+schemars_derive 0.8.21
 https://graham.cool/schemars/
 by Graham Esau <gesau@hotmail.co.uk>
 Macros for #[derive(JsonSchema)], for use with schemars
@@ -13251,7 +13251,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-serde 1.0.200
+serde 1.0.203
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A generic serialization/deserialization framework
@@ -13465,7 +13465,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-serde_derive 1.0.200
+serde_derive 1.0.203
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 Macros 1.1 implementation of #[derive(Serialize, Deserialize)]
@@ -13679,7 +13679,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-serde_derive_internals 0.29.0
+serde_derive_internals 0.29.1
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 AST representation used by Serde derive macros. Unstable.
@@ -13893,7 +13893,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-serde_json 1.0.116
+serde_json 1.0.117
 https://github.com/serde-rs/json
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A JSON serialization file format
@@ -14560,7 +14560,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-struqture 1.6.1
+struqture 1.6.2
 by HQS Quantum Simulations <info@quantumsimulations.de>
 HQS tool for representing operators, Hamiltonians and open systems.
 License: Apache-2.0
@@ -14771,13 +14771,13 @@ LICENSE:
 
 
 ====================================================
-struqture-py 1.6.1
+struqture-py 1.6.2
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Python interface of struqture, the HQS tool for representing operators, Hamiltonians and open systems.
 License: Apache-2.0
 
 ====================================================
-struqture-py-macros 1.6.1
+struqture-py-macros 1.6.2
 by HQS Quantum Simulations <info@quantumsimulations.de>
 Macros for struqture-py crate.
 License: Apache-2.0
@@ -15227,7 +15227,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-syn 2.0.60
+syn 2.0.66
 https://github.com/dtolnay/syn
 by David Tolnay <dtolnay@gmail.com>
 Parser for Rust source code
@@ -15768,7 +15768,7 @@ SOFTWARE.
 
 
 ====================================================
-thiserror 1.0.59
+thiserror 1.0.61
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 derive(Error)
@@ -15982,7 +15982,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-thiserror-impl 1.0.59
+thiserror-impl 1.0.61
 https://github.com/dtolnay/thiserror
 by David Tolnay <dtolnay@gmail.com>
 Implementation detail of the `thiserror` crate
@@ -17879,7 +17879,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-wide 0.7.17
+wide 0.7.24
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.
