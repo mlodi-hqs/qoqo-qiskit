@@ -11,6 +11,7 @@
 # the License.
 """Test queued_results.py file."""
 
+from dataclasses import astuple
 import time
 import json
 import sys
@@ -22,6 +23,7 @@ from qoqo import Circuit
 from qoqo import operations as ops
 from qoqo.measurements import ClassicalRegister  # type:ignore
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
+from qoqo_qiskit.models import RegistersWithLengths
 
 
 def _mocked_run(
@@ -53,22 +55,9 @@ def _mocked_run(
 
     backend = QoqoQiskitBackend(memory=memory)
 
-    (
-        job,
-        sim_type,
-        clas_regs_lengths,
-        output_bit_register_dict,
-        output_float_register_dict,
-        output_complex_register_dict,
-    ) = backend._run_circuit(circuit)
+    (job, sim_type, output_registers) = backend._run_circuit(circuit)
 
-    register_info = (
-        clas_regs_lengths,
-        output_bit_register_dict,
-        output_float_register_dict,
-        output_complex_register_dict,
-    )
-    return (job, sim_type, register_info, circuit)
+    return (job, sim_type, output_registers.to_flat_tuple(), circuit)
 
 
 def test_constructors() -> None:
@@ -113,6 +102,7 @@ def test_from_to_json(sim_type: str) -> None:
     assert serialized_json_qcr["memory"]
     assert serialized_json_qcr["registers_info"] == list(run[2])
     assert serialized_json_qcr["qoqo_result"] is None
+    assert serialized_json_qcr["res_index"] == 0
 
     assert serialized_json_qpr["measurement_type"] == "ClassicalRegister"
     assert serialized_json_qpr["measurement"] == measurement.to_json()
