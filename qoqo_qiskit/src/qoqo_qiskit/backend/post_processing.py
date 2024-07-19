@@ -11,11 +11,14 @@
 # the License.
 """Results post-processing utilities."""
 
-from typing import Any, Dict, List, Tuple
+from dataclasses import astuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from qiskit.result import Result
 from qoqo import Circuit
+
+from ..models import RegistersWithLengths
 
 
 def _counts_to_registers(
@@ -67,42 +70,89 @@ def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
     return splitted
 
 
+def _transform_job_result_single(
+    memory: bool,
+    sim_type: str,
+    result: Result,
+    output_registers: RegistersWithLengths,
+    res_index: Optional[int] = 0,
+) -> None:
+    # res_index is the index of the chosen result to extract in case
+    #  the single Result contains multiple ExperimentalResult instances
+    if sim_type == "automatic":
+        transformed_counts = _counts_to_registers(
+            result.get_memory(res_index) if memory else result.get_counts(res_index),
+            memory,
+            output_registers.clas_regs_lengths,
+        )
+        for i, reg in enumerate(output_registers.registers.bit_register_dict):
+            output_registers.registers.bit_register_dict[reg] = [
+                shot[::-1] for shot in transformed_counts[i]
+            ]
+    elif sim_type == "statevector":
+        vector = list(np.asarray(result.data(res_index)["statevector"]).flatten())
+        for reg in output_registers.registers.complex_register_dict:
+            output_registers.registers.complex_register_dict[reg].append(vector)
+    elif sim_type == "density_matrix":
+        vector = list(np.asarray(result.data(res_index)["density_matrix"]).flatten())
+        for reg in output_registers.registers.complex_register_dict:
+            output_registers.registers.complex_register_dict[reg].append(vector)
+
+
+def _transform_job_result_list(
+    memory: bool, sim_type: str, result: Result, output_registers: List[RegistersWithLengths]
+) -> None:
+    if sim_type == "automatic":
+        res_list = result.get_memory() if memory else result.get_counts()
+        for res, regs in zip(res_list, output_registers):
+            transformed_counts = _counts_to_registers(res, memory, regs.clas_regs_lengths)
+            for i, reg in enumerate(regs.registers.bit_register_dict):
+                regs.registers.bit_register_dict[reg] = [
+                    shot[::-1] for shot in transformed_counts[i]
+                ]
+    elif sim_type == "statevector":
+        for i, regs in enumerate(output_registers):
+            vector = list(np.asarray(result.data(i)["statevector"]).flatten())
+            for reg in regs.registers.complex_register_dict:
+                regs.registers.complex_register_dict[reg].append(vector)
+    elif sim_type == "density_matrix":
+        for i, regs in enumerate(output_registers):
+            vector = list(np.asarray(result.data(i)["density_matrix"]).flatten())
+            for reg in regs.registers.complex_register_dict:
+                regs.registers.complex_register_dict[reg].append(vector)
+
+
 def _transform_job_result(
     memory: bool,
     sim_type: str,
     result: Result,
-    clas_regs_lengths: Dict[str, int],
-    output_bit_register_dict: Dict[str, List[List[bool]]],
-    _output_float_register_dict: Dict[str, List[List[float]]],
-    output_complex_register_dict: Dict[str, List[List[complex]]],
+    output_registers: Union[RegistersWithLengths, List[RegistersWithLengths]],
+    res_index: Optional[int] = 0,
 ) -> Tuple[
     Dict[str, List[List[bool]]],
     Dict[str, List[List[float]]],
     Dict[str, List[List[complex]]],
 ]:
-    if sim_type == "automatic":
-        if memory:
-            transformed_counts = _counts_to_registers(result.get_memory(), True, clas_regs_lengths)
-        else:
-            transformed_counts = _counts_to_registers(
-                result.get_counts(), False, clas_regs_lengths
-            )
-        for i, reg in enumerate(output_bit_register_dict):
-            reversed_list = []
-            for shot in transformed_counts[i]:
-                reversed_list.append(shot[::-1])
-            output_bit_register_dict[reg] = reversed_list
-    elif sim_type == "statevector":
-        vector = list(np.asarray(result.data(0)["statevector"]).flatten())
-        for reg in output_complex_register_dict:
-            output_complex_register_dict[reg].append(vector)
-    elif sim_type == "density_matrix":
-        vector = list(np.asarray(result.data(0)["density_matrix"]).flatten())
-        for reg in output_complex_register_dict:
-            output_complex_register_dict[reg].append(vector)
-
-    return (
-        output_bit_register_dict,
-        _output_float_register_dict,
-        output_complex_register_dict,
-    )
+    if isinstance(output_registers, list):
+        _transform_job_result_list(memory, sim_type, result, output_registers)
+        final_output = RegistersWithLengths()
+        for regs in output_registers:
+            for key, value_bools in regs.registers.bit_register_dict.items():
+                if key in final_output.registers.bit_register_dict:
+                    final_output.registers.bit_register_dict[key].extend(value_bools)
+                else:
+                    final_output.registers.bit_register_dict[key] = value_bools
+            for key, value_floats in regs.registers.float_register_dict.items():
+                if key in final_output.registers.float_register_dict:
+                    final_output.registers.float_register_dict[key].extend(value_floats)
+                else:
+                    final_output.registers.float_register_dict[key] = value_floats
+            for key, value_complexes in regs.registers.complex_register_dict.items():
+                if key in final_output.registers.complex_register_dict:
+                    final_output.registers.complex_register_dict[key].extend(value_complexes)
+                else:
+                    final_output.registers.complex_register_dict[key] = value_complexes
+        return astuple(final_output.registers)
+    else:
+        _transform_job_result_single(memory, sim_type, result, output_registers, res_index)
+        return astuple(output_registers.registers)

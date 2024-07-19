@@ -16,6 +16,8 @@ Translates qoqo operations and circuits to qiskit equivalents.
 .. autosummary::
     :toctree: generated/
 
+    Registers
+    RegistersWithLengths
     to_qiskit_circuit
     QoqoQiskitBackend
     QueuedCircuitRun
@@ -23,8 +25,15 @@ Translates qoqo operations and circuits to qiskit equivalents.
 
 """
 
-
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
+from .models import Registers, RegistersWithLengths
 
-__all__ = ("to_qiskit_circuit", "QoqoQiskitBackend", "QueuedCircuitRun", "QueuedProgramRun")
+__all__ = (
+    "to_qiskit_circuit",
+    "QoqoQiskitBackend",
+    "QueuedCircuitRun",
+    "QueuedProgramRun",
+    "Registers",
+    "RegistersWithLengths",
+)

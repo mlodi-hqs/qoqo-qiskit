@@ -2,8 +2,8 @@
 name = "qoqo_qiskit_devices"
 version = "0.5.0"
 dependencies = [
-  'qoqo_calculator_pyo3>=1.1',
-  'qoqo>=1.9',
+  'qoqo_calculator_pyo3>=1.1,<1.2',
+  'qoqo>=1.9,<1.12',
   'qiskit<0.46',
   'qiskit-ibm-provider',
   'struqture_py',
