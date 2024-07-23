@@ -20,7 +20,7 @@ from qoqo.measurements import (  # type:ignore
     Cheated,
 )
 from qiskit import QuantumCircuit, transpile
-from qiskit.qasm2 import dumps
+from qiskit.qasm2 import dumps  # type: ignore
 from typing import Dict, Union, List
 
 
@@ -59,13 +59,17 @@ def transpile_with_qiskit(
             scheduling_method=transpiler_args.get("scheduling_method"),
             instruction_durations=transpiler_args.get("instruction_durations"),
             dt=transpiler_args.get("dt"),
-            approximation_degree=transpiler_args.get("approximation_degree") or 1.0,
+            approximation_degree=transpiler_args.get("approximation_degree")
+            or 1.0,
             timing_constraints=transpiler_args.get("timing_constraints"),
             seed_transpiler=transpiler_args.get("seed_transpiler"),
             optimization_level=transpiler_args.get("optimization_level"),
             callback=transpiler_args.get("callback"),
             output_name=transpiler_args.get("output_name"),
-            unitary_synthesis_method=transpiler_args.get("unitary_synthesis_method") or "default",
+            unitary_synthesis_method=transpiler_args.get(
+                "unitary_synthesis_method"
+            )
+            or "default",
             target=transpiler_args.get("target"),
             hls_config=transpiler_args.get("hls_config"),
             init_method=transpiler_args.get("init_method"),
@@ -80,7 +84,11 @@ def transpile_with_qiskit(
         qasm_str_to_circuit(dumps(transpiled_qiskit_circuit))
         for transpiled_qiskit_circuit in qiskit_circuits
     ]
-    return transpiled_qoqo_circuits if circuits_is_list else transpiled_qoqo_circuits[0]
+    return (
+        transpiled_qoqo_circuits
+        if circuits_is_list
+        else transpiled_qoqo_circuits[0]
+    )
 
 
 def transpile_program_with_qiskit(
@@ -104,45 +112,33 @@ def transpile_program_with_qiskit(
     )
     transpiled_circuits = transpile_with_qiskit(circuits, transpilers)
 
-    def recreate_measurement(
-        quantum_program: QuantumProgram, transpiled_circuits: List[Circuit]
-    ) -> Union[PauliZProduct, ClassicalRegister, CheatedPauliZProduct, Cheated]:
-        """Recreate a measurement QuantumProgram using the transpiled circuits.
-
-        Args:
-            quantum_program (QuantumProgram): quantumProgram to transpile.
-            transpiled_circuits (List[Circuit]): transpiled circuits.
-
-        Returns:
-            Union[PauliZProduct, ClassicalRegister, CheatedPauliZProduct, Cheated]: measurement
-
-        Raises:
-            TypeError: if the measurement type is not supported.
-        """
-        if isinstance(quantum_program.measurement(), PauliZProduct):
-            return PauliZProduct(
-                constant_circuit=None,
-                circuits=transpiled_circuits,
-                input=quantum_program.measurement().input(),
-            )
-        elif isinstance(quantum_program.measurement(), CheatedPauliZProduct):
-            return CheatedPauliZProduct(
-                constant_circuit=None,
-                circuits=transpiled_circuits,
-                input=quantum_program.measurement().input(),
-            )
-        elif isinstance(quantum_program.measurement(), Cheated):
-            return Cheated(
-                constant_circuit=None,
-                circuits=transpiled_circuits,
-                input=quantum_program.measurement().input(),
-            )
-        elif isinstance(quantum_program.measurement(), ClassicalRegister):
-            return ClassicalRegister(constant_circuit=None, circuits=transpiled_circuits)
-        else:
-            raise TypeError("Unknown measurement type")
+    measurements = None
+    if isinstance(quantum_program.measurement(), PauliZProduct):
+        measurements = PauliZProduct(
+            constant_circuit=None,
+            circuits=transpiled_circuits,
+            input=quantum_program.measurement().input(),
+        )
+    elif isinstance(quantum_program.measurement(), CheatedPauliZProduct):
+        measurements = CheatedPauliZProduct(
+            constant_circuit=None,
+            circuits=transpiled_circuits,
+            input=quantum_program.measurement().input(),
+        )
+    elif isinstance(quantum_program.measurement(), Cheated):
+        measurements = Cheated(
+            constant_circuit=None,
+            circuits=transpiled_circuits,
+            input=quantum_program.measurement().input(),
+        )
+    elif isinstance(quantum_program.measurement(), ClassicalRegister):
+        measurements = ClassicalRegister(
+            constant_circuit=None, circuits=transpiled_circuits
+        )
+    else:
+        raise TypeError("Unknown measurement type")
 
     return QuantumProgram(
-        measurement=recreate_measurement(quantum_program, transpiled_circuits),
+        measurement=measurements,
         input_parameter_names=quantum_program.input_parameter_names(),
     )

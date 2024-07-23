@@ -67,6 +67,7 @@ source = ["src", "**/site-packages"]
 line-length = 99        # same as black
 target-version = "py39"
 show-fixes = true
+output-format = "full"
 # activate the following checks
 select = [
     "A",   # builtins
