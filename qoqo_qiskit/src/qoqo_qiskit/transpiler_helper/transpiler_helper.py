@@ -59,17 +59,13 @@ def transpile_with_qiskit(
             scheduling_method=transpiler_args.get("scheduling_method"),
             instruction_durations=transpiler_args.get("instruction_durations"),
             dt=transpiler_args.get("dt"),
-            approximation_degree=transpiler_args.get("approximation_degree")
-            or 1.0,
+            approximation_degree=transpiler_args.get("approximation_degree") or 1.0,
             timing_constraints=transpiler_args.get("timing_constraints"),
             seed_transpiler=transpiler_args.get("seed_transpiler"),
             optimization_level=transpiler_args.get("optimization_level"),
             callback=transpiler_args.get("callback"),
             output_name=transpiler_args.get("output_name"),
-            unitary_synthesis_method=transpiler_args.get(
-                "unitary_synthesis_method"
-            )
-            or "default",
+            unitary_synthesis_method=transpiler_args.get("unitary_synthesis_method") or "default",
             target=transpiler_args.get("target"),
             hls_config=transpiler_args.get("hls_config"),
             init_method=transpiler_args.get("init_method"),
@@ -84,11 +80,7 @@ def transpile_with_qiskit(
         qasm_str_to_circuit(dumps(transpiled_qiskit_circuit))
         for transpiled_qiskit_circuit in qiskit_circuits
     ]
-    return (
-        transpiled_qoqo_circuits
-        if circuits_is_list
-        else transpiled_qoqo_circuits[0]
-    )
+    return transpiled_qoqo_circuits if circuits_is_list else transpiled_qoqo_circuits[0]
 
 
 def transpile_program_with_qiskit(
@@ -132,9 +124,7 @@ def transpile_program_with_qiskit(
             input=quantum_program.measurement().input(),
         )
     elif isinstance(quantum_program.measurement(), ClassicalRegister):
-        measurements = ClassicalRegister(
-            constant_circuit=None, circuits=transpiled_circuits
-        )
+        measurements = ClassicalRegister(constant_circuit=None, circuits=transpiled_circuits)
     else:
         raise TypeError("Unknown measurement type")
 
