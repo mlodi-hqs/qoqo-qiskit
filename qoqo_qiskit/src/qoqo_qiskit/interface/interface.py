@@ -56,9 +56,16 @@ def to_qiskit_circuit(
         if "PragmaSetStateVector" in op.tags():
             initial_statevector = op.statevector()
         elif "PragmaRepeatedMeasurement" in op.tags():
-            if "PragmaRepeatedMeasurement" not in circuit_info["MeasurementInfo"]:
-                circuit_info["MeasurementInfo"]["PragmaRepeatedMeasurement"] = []
-            circuit_info["MeasurementInfo"]["PragmaRepeatedMeasurement"].append(
+            if (
+                "PragmaRepeatedMeasurement"
+                not in circuit_info["MeasurementInfo"]
+            ):
+                circuit_info["MeasurementInfo"][
+                    "PragmaRepeatedMeasurement"
+                ] = []
+            circuit_info["MeasurementInfo"][
+                "PragmaRepeatedMeasurement"
+            ].append(
                 (op.readout(), op.number_measurements(), op.qubit_mapping())
             )
             filtered_circuit += op
@@ -70,11 +77,16 @@ def to_qiskit_circuit(
             )
             filtered_circuit += op
         elif "PragmaSetNumberOfMeasurements" in op.tags():
-            if "PragmaSetNumberOfMeasurements" not in circuit_info["SimulationInfo"]:
-                circuit_info["SimulationInfo"]["PragmaSetNumberOfMeasurements"] = []
-            circuit_info["SimulationInfo"]["PragmaSetNumberOfMeasurements"].append(
-                (op.readout(), op.number_measurements())
-            )
+            if (
+                "PragmaSetNumberOfMeasurements"
+                not in circuit_info["SimulationInfo"]
+            ):
+                circuit_info["SimulationInfo"][
+                    "PragmaSetNumberOfMeasurements"
+                ] = []
+            circuit_info["SimulationInfo"][
+                "PragmaSetNumberOfMeasurements"
+            ].append((op.readout(), op.number_measurements()))
         elif "PragmaGetStateVector" in op.tags():
             circuit_info["SimulationInfo"]["PragmaGetStateVector"] = True
         elif "PragmaGetDensityMatrix" in op.tags():
@@ -84,7 +96,9 @@ def to_qiskit_circuit(
                 for _ in range(int(op.repetitions().float())):
                     filtered_circuit += op.circuit()
             else:
-                raise ValueError("A symbolic PragmaLoop operation is not supported.")
+                raise ValueError(
+                    "A symbolic PragmaLoop operation is not supported."
+                )
         elif "PragmaSleep" in op.tags() or "RotateXY" in op.tags():
             to_fix = True
             filtered_circuit += op
@@ -93,6 +107,7 @@ def to_qiskit_circuit(
 
     # qoqo_qasm call
     qasm_backend = QasmBackend(qubit_register_name=qubit_register_name)
+    print(circuit.__class__.__name__)
     input_qasm_str = qasm_backend.circuit_to_qasm_str(filtered_circuit)
 
     # QASM -> Qiskit transformation
