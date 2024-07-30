@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.7.0
+
+* Updated to pyo3 0.21
+
 ### 0.6.0
 
 * Added `transpiler_helper` submodule
