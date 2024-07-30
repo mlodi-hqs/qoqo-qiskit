@@ -1,6 +1,6 @@
 [package]
 name = "qoqo_qiskit_devices"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -28,7 +28,7 @@ qoqo = { version = "~1.14", default-features = false }
 roqoqo = "~1.14"
 qoqo-macros = "~1.14"
 
-roqoqo_qiskit_devices = { path = "../roqoqo_qiskit_devices", version = "0.6" }
+roqoqo_qiskit_devices = { path = "../roqoqo_qiskit_devices", version = "0.7" }
 
 [dev-dependencies]
 test-case = "3.0"
