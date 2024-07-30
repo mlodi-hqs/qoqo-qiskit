@@ -93,7 +93,6 @@ def to_qiskit_circuit(
 
     # qoqo_qasm call
     qasm_backend = QasmBackend(qubit_register_name=qubit_register_name)
-    print(circuit.__class__.__name__)
     input_qasm_str = qasm_backend.circuit_to_qasm_str(filtered_circuit)
 
     # QASM -> Qiskit transformation
