@@ -58,9 +58,7 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(
-        self, circuit: Circuit
-    ) -> Tuple[
+    def _run_circuit(self, circuit: Circuit) -> Tuple[
         Job,
         str,
         RegistersWithLengths,
@@ -231,10 +229,7 @@ class QoqoQiskitBackend:
         input_to_send: Union[Circuit, List[Circuit]],
         shots: int,
     ) -> Job:
-        # if self.compilation:
-        #     job = execute(input_to_send, self.qiskit_backend, shots=shots, memory=self.memory)
-        # else:
-        job = self.qiskit_backend.run(input_to_send, shots=shots)
+        job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)
         return job
 
     def run_circuit(
@@ -443,9 +438,7 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def run_program(
-        self, program: QuantumProgram, params_values: List[List[float]]
-    ) -> Optional[
+    def run_program(self, program: QuantumProgram, params_values: List[List[float]]) -> Optional[
         List[
             Union[
                 Tuple[

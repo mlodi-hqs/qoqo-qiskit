@@ -12,9 +12,9 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "qoqo>=1.15,<1.16",
-    "qoqo_qasm>=0.12.1,<0.13",        # minimum version for Pyo3 0.21 support
+    "qoqo_qasm>=0.12.1,<0.13",  # minimum version for Pyo3 0.21 support
     "qiskit>=1.0",
-    "qiskit_aer>=0.15",               # minimum version for Python 3.12 support
+    "qiskit_aer>=0.15",         # minimum version for Python 3.12 support
     "qiskit_ibm_runtime>=0.15",
     "numpy",
 ]
