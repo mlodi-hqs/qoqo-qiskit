@@ -14,7 +14,7 @@
 from dataclasses import astuple
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
-from qiskit import QuantumCircuit, execute
+from qiskit import QuantumCircuit
 from qiskit.providers import Backend
 from qiskit.providers.job import Job
 from qiskit_aer import AerSimulator
@@ -58,7 +58,9 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(self, circuit: Circuit) -> Tuple[
+    def _run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[
         Job,
         str,
         RegistersWithLengths,
@@ -229,10 +231,10 @@ class QoqoQiskitBackend:
         input_to_send: Union[Circuit, List[Circuit]],
         shots: int,
     ) -> Job:
-        if self.compilation:
-            job = execute(input_to_send, self.qiskit_backend, shots=shots, memory=self.memory)
-        else:
-            job = self.qiskit_backend.run(input_to_send, shots=shots)
+        # if self.compilation:
+        #     job = execute(input_to_send, self.qiskit_backend, shots=shots, memory=self.memory)
+        # else:
+        job = self.qiskit_backend.run(input_to_send, shots=shots)
         return job
 
     def run_circuit(
@@ -441,7 +443,9 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def run_program(self, program: QuantumProgram, params_values: List[List[float]]) -> Optional[
+    def run_program(
+        self, program: QuantumProgram, params_values: List[List[float]]
+    ) -> Optional[
         List[
             Union[
                 Tuple[
