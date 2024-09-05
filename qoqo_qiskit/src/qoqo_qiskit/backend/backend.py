@@ -231,10 +231,7 @@ class QoqoQiskitBackend:
         input_to_send: Union[Circuit, List[Circuit]],
         shots: int,
     ) -> Job:
-        # if self.compilation:
-        #     job = execute(input_to_send, self.qiskit_backend, shots=shots, memory=self.memory)
-        # else:
-        job = self.qiskit_backend.run(input_to_send, shots=shots)
+        job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)
         return job
 
     def run_circuit(

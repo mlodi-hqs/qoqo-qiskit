@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.8.0
+
+* Updated to qiskit 1.2
+
 ### 0.7.0
 
 * Updated to pyo3 0.21

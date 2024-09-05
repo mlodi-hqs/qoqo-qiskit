@@ -29,6 +29,9 @@ def transpile_with_qiskit(
 ) -> Circuit:
     """Use qiskit transpilers to transpile a qoqo circuit.
 
+    For more details about the arguments, see:
+    https://docs.quantum.ibm.com/api/qiskit/compiler#transpile
+
     Args:
         circuits (Union[Circuit, List[Circuit]]): qoqo circuit(s) to transpile.
         transpilers (List[Dict[str, str]]): transpilers to use.
@@ -66,6 +69,7 @@ def transpile_with_qiskit(
             callback=transpiler_args.get("callback"),
             output_name=transpiler_args.get("output_name"),
             unitary_synthesis_method=transpiler_args.get("unitary_synthesis_method") or "default",
+            unitary_synthesis_plugin_config=transpiler_args.get("unitary_synthesis_plugin_config"),
             target=transpiler_args.get("target"),
             hls_config=transpiler_args.get("hls_config"),
             init_method=transpiler_args.get("init_method"),
@@ -74,6 +78,7 @@ def transpile_with_qiskit(
                 "ignore_backend_supplied_default_methods"
             )
             or False,
+            num_processes=transpiler_args.get("num_processes"),
         )
 
     transpiled_qoqo_circuits = [
@@ -87,6 +92,9 @@ def transpile_program_with_qiskit(
     quantum_program: QuantumProgram, transpilers: List[Dict[str, str]]
 ) -> QuantumProgram:
     """Use qiskit transpilers to transpile a QuantumProgram.
+
+    For more details about the arguments, see:
+    https://docs.quantum.ibm.com/api/qiskit/compiler#transpile
 
     Args:
         quantum_program (QuantumProgram): QuantumProgram to transpile.

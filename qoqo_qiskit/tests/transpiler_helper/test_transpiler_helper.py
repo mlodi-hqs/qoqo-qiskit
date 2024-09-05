@@ -22,7 +22,7 @@ from qoqo.measurements import (  # type:ignore
     Cheated,
     CheatedInput,
 )
-from qiskit.providers.fake_provider import FakeManilaV2
+from qiskit_ibm_runtime.fake_provider import FakeManilaV2
 from qoqo_qiskit.transpiler_helper.transpiler_helper import (
     transpile_with_qiskit,
     transpile_program_with_qiskit,
