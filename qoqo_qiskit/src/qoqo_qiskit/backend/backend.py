@@ -65,7 +65,7 @@ class QoqoQiskitBackend:
         str,
         RegistersWithLengths,
     ]:
-        if not isinstance(circuit, Circuit):
+        if not circuit.__class__.__name__ == 'Circuit':
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
         output_registers = self._set_up_registers(circuit)
