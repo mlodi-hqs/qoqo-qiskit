@@ -60,12 +60,8 @@ class QoqoQiskitBackend:
     # Internal _run_circuit method
     def _run_circuit(
         self, circuit: Circuit
-    ) -> Tuple[
-        Job,
-        str,
-        RegistersWithLengths,
-    ]:
-        if not circuit.__class__.__name__ == 'Circuit':
+    ) -> Tuple[Job, str, RegistersWithLengths,]:
+        if not circuit.__class__.__name__ == "Circuit":
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
         output_registers = self._set_up_registers(circuit)
