@@ -10,3 +10,8 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Helper to use qiskit transpiler for qoqo circuits."""
+
+from qoqo_qiskit.transpiler_helper.transpiler_helper import (
+    transpile_with_qiskit,
+    transpile_program_with_qiskit,
+)

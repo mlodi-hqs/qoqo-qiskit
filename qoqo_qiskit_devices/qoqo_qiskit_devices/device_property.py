@@ -16,7 +16,7 @@ import types
 import warnings
 from typing import Tuple
 
-from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_runtime import QiskitRuntimeService
 from qoqo import noise_models
 from struqture_py import spins
 
@@ -49,7 +49,7 @@ def set_qiskit_device_information(
 ) -> types.ModuleType:
     """Sets a qoqo_qiskit_devices.ibm_devices instance noise info.
 
-    Obtains the device info from qiskit's IBMProvider and performs the following updates:
+    Obtains the device info from qiskit's QiskitRuntimeService and performs the following updates:
         - sets single qubit gate times
         - sets two qubit gate times
 
@@ -64,7 +64,7 @@ def set_qiskit_device_information(
     if get_mocked_information:
         properties = MockedProperties()
     else:
-        properties = IBMProvider().get_backend(name).properties()
+        properties = QiskitRuntimeService().backend(name).properties()
 
     for qubit in range(device.number_qubits()):
         for gate in device.single_qubit_gate_names():
@@ -124,7 +124,7 @@ def get_decoherence_on_gate_model(
     if get_mocked_information:
         properties = MockedProperties()
     else:
-        properties = IBMProvider().get_backend(device.name()).properties()
+        properties = QiskitRuntimeService().backend(device.name()).properties()
     warn = False
     operators = ["+", "-", "Z"]
     rate_factors = [0.5, 0.5, 0.25]
@@ -225,7 +225,7 @@ def get_noise_models(
     if get_mocked_information:
         properties = MockedProperties()
     else:
-        properties = IBMProvider().get_backend(device.name()).properties()
+        properties = QiskitRuntimeService().backend(device.name()).properties()
     warn = False
     operators = ["+", "-", "Z"]
     rate_factors = [0.5, 0.5, 0.25]

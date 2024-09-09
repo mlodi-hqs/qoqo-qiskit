@@ -100,7 +100,10 @@ def _transform_job_result_single(
 
 
 def _transform_job_result_list(
-    memory: bool, sim_type: str, result: Result, output_registers: List[RegistersWithLengths]
+    memory: bool,
+    sim_type: str,
+    result: Result,
+    output_registers: List[RegistersWithLengths],
 ) -> None:
     if sim_type == "automatic":
         res_list = result.get_memory() if memory else result.get_counts()

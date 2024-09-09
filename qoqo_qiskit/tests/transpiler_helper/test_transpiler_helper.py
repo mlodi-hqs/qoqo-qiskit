@@ -22,7 +22,7 @@ from qoqo.measurements import (  # type:ignore
     Cheated,
     CheatedInput,
 )
-from qiskit.providers.fake_provider import FakeManilaV2
+from qiskit_ibm_runtime.fake_provider import FakeManilaV2
 from qoqo_qiskit.transpiler_helper.transpiler_helper import (
     transpile_with_qiskit,
     transpile_program_with_qiskit,
@@ -39,7 +39,9 @@ def test_basic_circuit_basic_gates() -> None:
     circuit_res += ops.SqrtPauliX(0)
     circuit_res += ops.SqrtPauliX(0)
 
-    transpiled_circuit = transpile_with_qiskit(circuit, [{"basis_gates": ["sx", "rz", "cz"]}])
+    transpiled_circuit = transpile_with_qiskit(
+        circuit, [{"basis_gates": ["sx", "rz", "cz"]}]
+    )
     assert transpiled_circuit == circuit_res
 
 
@@ -57,7 +59,9 @@ def test_medium_circuit_basic_gates() -> None:
     circuit_res += ops.SqrtPauliX(1)
     circuit_res += ops.RotateZ(1, 1.5707963267948966)
 
-    transpiled_circuit = transpile_with_qiskit(circuit, [{"basis_gates": ["sx", "rz", "cz"]}])
+    transpiled_circuit = transpile_with_qiskit(
+        circuit, [{"basis_gates": ["sx", "rz", "cz"]}]
+    )
 
     assert transpiled_circuit == circuit_res
 
@@ -163,14 +167,19 @@ def test_multiple_circuits_backend() -> None:
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
 
     backend = FakeManilaV2()
-    transpiled_circuits = transpile_with_qiskit([circuit_1, circuit_2], [{"backend": backend}])
+    transpiled_circuits = transpile_with_qiskit(
+        [circuit_1, circuit_2], [{"backend": backend}]
+    )
 
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
     transpiled_circuit_dag = transpiled_circuit_dag.from_circuit(transpiled_circuits[1])
     circuit_res_dag = circuit_res_dag.from_circuit(circuit_res_2)
 
-    assert transpiled_circuits[0] == circuit_res_1 and transpiled_circuit_dag == circuit_res_dag
+    assert (
+        transpiled_circuits[0] == circuit_res_1
+        and transpiled_circuit_dag == circuit_res_dag
+    )
 
 
 def assert_quantum_program_equal(
@@ -185,9 +194,15 @@ def assert_quantum_program_equal(
     Raises:
         AssertionError: if the quantum programs are not equal
     """
-    assert quantum_program_1.input_parameter_names() == quantum_program2.input_parameter_names()
+    assert (
+        quantum_program_1.input_parameter_names()
+        == quantum_program2.input_parameter_names()
+    )
     if not isinstance(quantum_program_1.measurement(), ClassicalRegister):
-        assert quantum_program_1.measurement().input() == quantum_program2.measurement().input()
+        assert (
+            quantum_program_1.measurement().input()
+            == quantum_program2.measurement().input()
+        )
     assert (
         quantum_program_1.measurement().constant_circuit()
         == quantum_program2.measurement().constant_circuit()
@@ -225,12 +240,18 @@ def test_basic_program_basic_gates() -> None:
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
 
-    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+    measurement = ClassicalRegister(
+        constant_circuit=None, circuits=[circuit_1, circuit_2]
+    )
     measurement_res = ClassicalRegister(
         constant_circuit=None, circuits=[circuit_res_1, circuit_res_2]
     )
-    quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
-    quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
+    quantum_program = QuantumProgram(
+        measurement=measurement, input_parameter_names=["x"]
+    )
+    quantum_program_res = QuantumProgram(
+        measurement=measurement_res, input_parameter_names=["x"]
+    )
 
     transpiled_program = transpile_program_with_qiskit(
         quantum_program, [{"basis_gates": ["sx", "rz", "cz"]}]
@@ -280,8 +301,12 @@ def test_program_with_constant_circuit_basic_gates() -> None:
         circuits=[circuit_res_1, circuit_res_2],
         input=measurement_input,
     )
-    quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
-    quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
+    quantum_program = QuantumProgram(
+        measurement=measurement, input_parameter_names=["x"]
+    )
+    quantum_program_res = QuantumProgram(
+        measurement=measurement_res, input_parameter_names=["x"]
+    )
 
     transpiled_program = transpile_program_with_qiskit(
         quantum_program, [{"basis_gates": ["sx", "rz", "cz"]}]
@@ -335,11 +360,17 @@ def test_quantum_program_backend() -> None:
         circuits=[circuit_res_1, circuit_res_2, circuit_res_3],
         input=measurement_input,
     )
-    quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
-    quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
+    quantum_program = QuantumProgram(
+        measurement=measurement, input_parameter_names=["x"]
+    )
+    quantum_program_res = QuantumProgram(
+        measurement=measurement_res, input_parameter_names=["x"]
+    )
 
     backend = FakeManilaV2()
-    transpiled_program = transpile_program_with_qiskit(quantum_program, [{"backend": backend}])
+    transpiled_program = transpile_program_with_qiskit(
+        quantum_program, [{"backend": backend}]
+    )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)
 
@@ -402,10 +433,16 @@ def test_quantum_program_with_constant_circuit_backend() -> None:
         circuits=[circuit_res_1, circuit_res_2, circuit_res_3],
         input=measurement_input,
     )
-    quantum_program = QuantumProgram(measurement=measurement, input_parameter_names=["x"])
-    quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
+    quantum_program = QuantumProgram(
+        measurement=measurement, input_parameter_names=["x"]
+    )
+    quantum_program_res = QuantumProgram(
+        measurement=measurement_res, input_parameter_names=["x"]
+    )
 
     backend = FakeManilaV2()
-    transpiled_program = transpile_program_with_qiskit(quantum_program, [{"backend": backend}])
+    transpiled_program = transpile_program_with_qiskit(
+        quantum_program, [{"backend": backend}]
+    )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)

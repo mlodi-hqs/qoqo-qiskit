@@ -14,7 +14,7 @@
 from dataclasses import astuple
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
-from qiskit import QuantumCircuit, execute
+from qiskit import QuantumCircuit
 from qiskit.providers import Backend
 from qiskit.providers.job import Job
 from qiskit_aer import AerSimulator
@@ -63,7 +63,7 @@ class QoqoQiskitBackend:
         str,
         RegistersWithLengths,
     ]:
-        if not isinstance(circuit, Circuit):
+        if not circuit.__class__.__name__ == "Circuit":
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
         output_registers = self._set_up_registers(circuit)
@@ -229,10 +229,7 @@ class QoqoQiskitBackend:
         input_to_send: Union[Circuit, List[Circuit]],
         shots: int,
     ) -> Job:
-        if self.compilation:
-            job = execute(input_to_send, self.qiskit_backend, shots=shots, memory=self.memory)
-        else:
-            job = self.qiskit_backend.run(input_to_send, shots=shots)
+        job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)
         return job
 
     def run_circuit(

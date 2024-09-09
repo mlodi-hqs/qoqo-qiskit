@@ -158,8 +158,9 @@ def test_run_circuit_list_errors(operations: List[Any]) -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit_list([circuit_0, circuit_1])
-    assert "The input is a list of Qoqo Circuits with different simulation types." in str(
-        exc.value
+    assert (
+        "The input is a list of Qoqo Circuits with different simulation types."
+        in str(exc.value)
     )
 
     circuit_2 = Circuit()
@@ -174,7 +175,10 @@ def test_run_circuit_list_errors(operations: List[Any]) -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit_list([circuit_2, circuit_3])
-    assert "The input is a list of Qoqo Circuits with different number of shots." in str(exc.value)
+    assert (
+        "The input is a list of Qoqo Circuits with different number of shots."
+        in str(exc.value)
+    )
 
 
 @pytest.mark.parametrize(
@@ -416,9 +420,13 @@ def test_measurement(operations: List[Any]) -> None:
     circuit += ops.DefinitionBit("ri", len(involved_qubits), True)
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    pzpinput = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
+    pzpinput = PauliZProductInput(
+        number_qubits=len(involved_qubits), use_flipped_measurement=True
+    )
 
-    measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=pzpinput)
+    measurement = PauliZProduct(
+        constant_circuit=None, circuits=[circuit], input=pzpinput
+    )
 
     try:
         _ = backend.run_measurement(measurement=measurement)
@@ -576,7 +584,9 @@ def test_overwrite() -> None:
     circuit_2 += ops.MeasureQubit(0, "same", 0)
     circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
 
-    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+    measurement = ClassicalRegister(
+        constant_circuit=None, circuits=[circuit_1, circuit_2]
+    )
 
     try:
         output = backend.run_measurement_registers(measurement=measurement)
@@ -650,9 +660,13 @@ def test_run_program() -> None:
     init_circuit += ops.DefinitionBit("ro", 1, True)
     init_circuit += ops.PragmaRepeatedMeasurement("ro", 1000, None)
 
-    measurement = ClassicalRegister(constant_circuit=None, circuits=[init_circuit, init_circuit])
+    measurement = ClassicalRegister(
+        constant_circuit=None, circuits=[init_circuit, init_circuit]
+    )
 
-    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+    program = QuantumProgram(
+        measurement=measurement, input_parameter_names=["angle_0", "angle_1"]
+    )
 
     res = backend.run_program(
         program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
@@ -736,7 +750,9 @@ def test_run_measurement_queued(memory: bool) -> None:
     circuit_1 += ops.DefinitionBit("ri", 2, True)
     circuit_1 += ops.PragmaRepeatedMeasurement("ri", 50)
 
-    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_0, circuit_1])
+    measurement = ClassicalRegister(
+        constant_circuit=None, circuits=[circuit_0, circuit_1]
+    )
 
     qpr: QueuedProgramRun = backend.run_measurement_queued(measurement=measurement)
 
@@ -785,11 +801,16 @@ def test_run_program_queued() -> None:
         input=measurement_input,
     )
 
-    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+    program = QuantumProgram(
+        measurement=measurement, input_parameter_names=["angle_0", "angle_1"]
+    )
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_program_queued(program=program, params_values=[[0.4]])
-    assert "Wrong number of parameters 2 parameters expected 1 parameters given." in str(exc.value)
+    assert (
+        "Wrong number of parameters 2 parameters expected 1 parameters given."
+        in str(exc.value)
+    )
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_program_queued(program=program, params_values=[])
