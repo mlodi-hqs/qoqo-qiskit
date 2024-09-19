@@ -139,9 +139,7 @@ def test_poll_result() -> None:
         registers_info=run_1[2],
     )
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[run_0[3], run_1[3]]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[run_0[3], run_1[3]])
     qpr = QueuedProgramRun(
         measurement=measurement,
         queued_circuits=[qcr_0, qcr_1],
@@ -176,9 +174,7 @@ def test_overwrite() -> None:
         registers_info=run_1[2],
     )
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[run_0[3], run_1[3]]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[run_0[3], run_1[3]])
     qpr = QueuedProgramRun(
         measurement=measurement,
         queued_circuits=[qcr_0, qcr_1],
