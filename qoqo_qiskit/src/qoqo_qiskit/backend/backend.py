@@ -438,7 +438,9 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def run_program(self, program: QuantumProgram, params_values: List[List[float]]) -> Optional[
+    def run_program(
+        self, program: QuantumProgram, params_values: Union[List[float], List[List[float]]]
+    ) -> Optional[
         List[
             Union[
                 Tuple[
@@ -462,8 +464,8 @@ class QoqoQiskitBackend:
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
-            params_values (List[List[float]]): the parameters values to pass to the quantum
-                program.
+            params_values (Union[List[float], List[List[float]]]): the parameters values to pass
+                to the quantum program.
 
         Returns:
             Optional[
@@ -485,13 +487,19 @@ class QoqoQiskitBackend:
         if isinstance(program.measurement(), ClassicalRegister):
             if not params_values:
                 returned_results.append(program.run_registers(self, []))
-            for params in params_values:
-                returned_results.append(program.run_registers(self, params))
+            if isinstance(params_values[0], list):
+                for params in params_values:
+                    returned_results.append(program.run_registers(self, params))
+            else:
+                return program.run_registers(self, params_values)
         else:
             if not params_values:
                 returned_results.append(program.run(self, []))
-            for params in params_values:
-                returned_results.append(program.run(self, params))
+            if isinstance(params_values[0], list):
+                for params in params_values:
+                    returned_results.append(program.run(self, params))
+            else:
+                return program.run(self, params_values)
 
         return returned_results
 
@@ -522,7 +530,7 @@ class QoqoQiskitBackend:
         return QueuedProgramRun(measurement, queued_circuits)
 
     def run_program_queued(
-        self, program: QuantumProgram, params_values: List[List[float]]
+        self, program: QuantumProgram, params_values: Union[List[float], List[List[float]]]
     ) -> List[QueuedProgramRun]:
         """Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.
 
@@ -532,8 +540,8 @@ class QoqoQiskitBackend:
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
-            params_values (List[List[float]]): the parameters values to pass to the quantum
-                program.
+            params_values (Union[List[float], List[List[float]]]): the parameters values to pass
+                to the quantum program.
 
         Raises:
             ValueError: incorrect length of params_values compared to program's input
@@ -553,13 +561,23 @@ class QoqoQiskitBackend:
                     " input parameter names."
                 )
             queued_runs.append(self.run_measurement_queued(program.measurement()))
-        for params in params_values:
-            if len(params) != len(input_parameter_names):
+        if isinstance(params_values[0], list):
+            for params in params_values:
+                if len(params) != len(input_parameter_names):
+                    raise ValueError(
+                        f"Wrong number of parameters {len(input_parameter_names)} parameters"
+                        f" expected {len(params)} parameters given."
+                    )
+                substituted_parameters = dict(zip(input_parameter_names, params))
+                measurement = program.measurement().substitute_parameters(substituted_parameters)
+                queued_runs.append(self.run_measurement_queued(measurement))
+        else:
+            if len(params_values) != len(input_parameter_names):
                 raise ValueError(
                     f"Wrong number of parameters {len(input_parameter_names)} parameters"
-                    f" expected {len(params)} parameters given."
+                    f" expected {len(params_values)} parameters given."
                 )
-            substituted_parameters = dict(zip(input_parameter_names, params))
+            substituted_parameters = dict(zip(input_parameter_names, params_values))
             measurement = program.measurement().substitute_parameters(substituted_parameters)
             queued_runs.append(self.run_measurement_queued(measurement))
 
