@@ -18,7 +18,7 @@ from typing import Any, List
 import pytest
 from qiskit_aer import AerSimulator
 from qoqo import Circuit, QuantumProgram
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qoqo.measurements import (  # type:ignore
     ClassicalRegister,
     PauliZProduct,

@@ -20,10 +20,9 @@ from typing import Dict, List, Tuple
 import pytest
 from qiskit.providers import Job
 from qoqo import Circuit
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qoqo.measurements import ClassicalRegister  # type:ignore
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
-from qoqo_qiskit.models import RegistersWithLengths
 
 
 def _mocked_run(
