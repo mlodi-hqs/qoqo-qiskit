@@ -794,7 +794,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-bytemuck 1.17.1
+bytemuck 1.18.0
 https://github.com/Lokathor/bytemuck
 by Lokathor <zefria@gmail.com>
 A crate for mucking around with piles of bytes.
@@ -10338,7 +10338,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_qiskit_devices 0.8.0
+qoqo_qiskit_devices 0.8.1
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for qoqo python quantum computing toolkit
@@ -11927,7 +11927,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-redox_syscall 0.5.3
+redox_syscall 0.5.4
 https://gitlab.redox-os.org/redox-os/syscall
 by Jeremy Soller <jackpot51@gmail.com>
 A Rust library to access raw Redox system calls
@@ -13108,7 +13108,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_qiskit_devices 0.8.0
+roqoqo_qiskit_devices 0.8.1
 https://github.com/HQSquantumsimulations/qoqo_qiskit
 by HQS Quantum Simulations <info@quantumsimulations.de>
 IBM's Qiskit devices interface for roqoqo rust quantum computing toolkit
@@ -14183,7 +14183,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-serde 1.0.209
+serde 1.0.210
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A generic serialization/deserialization framework
@@ -14397,7 +14397,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-serde_derive 1.0.209
+serde_derive 1.0.210
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 Macros 1.1 implementation of #[derive(Serialize, Deserialize)]
@@ -17631,7 +17631,7 @@ LICENSE:
 MIT OR Apache-2.0
 
 ====================================================
-unicode-ident 1.0.12
+unicode-ident 1.0.13
 https://github.com/dtolnay/unicode-ident
 by David Tolnay <dtolnay@gmail.com>
 Determine whether characters have the XID_Start or XID_Continue properties according to Unicode Standard Annex #31
