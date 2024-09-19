@@ -34,6 +34,8 @@ def _mocked_run(
     str,
     Tuple[
         Dict[str, int],
+        Dict[str, int],
+        Dict[str, int],
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],

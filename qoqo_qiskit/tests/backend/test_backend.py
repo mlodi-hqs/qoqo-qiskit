@@ -550,13 +550,13 @@ def test_memory() -> None:
 
 def test_split() -> None:
     """Test post_processing._split method."""
-    clas_regs = {}
-    clas_regs["ro"] = 1
-    clas_regs["ri"] = 2
+    bit_regs = {}
+    bit_regs["ro"] = 1
+    bit_regs["ri"] = 2
     shot_result_ws = "01 1"
     shot_result_no_ws = "011"
 
-    assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
+    assert _split(shot_result_ws, bit_regs) == _split(shot_result_no_ws, bit_regs)
 
 
 def test_overwrite() -> None:
@@ -687,7 +687,7 @@ def test_run_circuit_queued(memory: bool) -> None:
     assert qcr._memory == memory
     assert qcr._sim_type == "automatic"
     assert "ro" in qcr._registers_info[0]
-    assert "ro" in qcr._registers_info[1]
+    assert "ro" in qcr._registers_info[3]
 
 
 @pytest.mark.parametrize("memory", [True, False])
@@ -714,9 +714,9 @@ def test_run_circuit_list_queued(memory: bool) -> None:
     assert qcrs[0]._memory == qcrs[1]._memory == memory
     assert qcrs[0]._sim_type == qcrs[1]._sim_type == "automatic"
     assert "ro" in qcrs[0]._registers_info[0]
-    assert "ro" in qcrs[0]._registers_info[1]
+    assert "ro" in qcrs[0]._registers_info[3]
     assert "ri" in qcrs[1]._registers_info[0]
-    assert "ri" in qcrs[1]._registers_info[1]
+    assert "ri" in qcrs[1]._registers_info[3]
 
     time.sleep(1)
 

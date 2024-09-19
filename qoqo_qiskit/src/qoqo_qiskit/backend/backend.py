@@ -58,11 +58,7 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(self, circuit: Circuit) -> Tuple[
-        Job,
-        str,
-        RegistersWithLengths,
-    ]:
+    def _run_circuit(self, circuit: Circuit) -> Tuple[Job, str, RegistersWithLengths, Circuit]:
         if not circuit.__class__.__name__ == "Circuit":
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
@@ -129,15 +125,17 @@ class QoqoQiskitBackend:
         output_registers = RegistersWithLengths()
 
         for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            output_registers.clas_regs_lengths[bit_def.name()] = bit_def.length()
+            output_registers.bit_regs_lengths[bit_def.name()] = bit_def.length()
             if bit_def.is_output():
                 output_registers.registers.bit_register_dict[bit_def.name()] = []
         for float_def in circuit.filter_by_tag("DefinitionFloat"):
+            output_registers.float_regs_lengths[float_def.name()] = float_def.length()
             if float_def.is_output():
                 output_registers.registers.float_register_dict[float_def.name()] = cast(
                     List[List[float]], []
                 )
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
+            output_registers.complex_regs_lengths[complex_def.name()] = complex_def.length()
             if complex_def.is_output():
                 output_registers.registers.complex_register_dict[complex_def.name()] = cast(
                     List[List[complex]], []

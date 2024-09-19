@@ -22,16 +22,16 @@ from ..models import RegistersWithLengths
 
 
 def _counts_to_registers(
-    counts: Any, mem: bool, clas_regs_lengths: Dict[str, int]
+    counts: Any, mem: bool, bit_regs_lengths: Dict[str, int]
 ) -> List[List[List[bool]]]:
     bit_map: List[List[List[bool]]] = []
     reg_num = 0
-    for key in clas_regs_lengths:
-        reg_num += clas_regs_lengths[key]
+    for key in bit_regs_lengths:
+        reg_num += bit_regs_lengths[key]
     for _ in range(reg_num):
         bit_map.append([])
     for key in counts:
-        splitted = _split(key, clas_regs_lengths)
+        splitted = _split(key, bit_regs_lengths)
         for i, measurement in enumerate(splitted):
             transf_measurement = _bit_to_bool(measurement)
             if mem:
@@ -56,17 +56,17 @@ def _bit_to_bool(element: str) -> List[bool]:
     return ret
 
 
-def _split(element: str, clas_regs_lengths: Dict[str, int]) -> List[str]:
+def _split(element: str, bit_regs_lengths: Dict[str, int]) -> List[str]:
     splitted: list[str] = []
     if " " in element:
         splitted = element.split()
         splitted.reverse()
     else:
         element = element[::-1]
-        for key in clas_regs_lengths:
-            splitted.append(element[: clas_regs_lengths[key] :])
+        for key in bit_regs_lengths:
+            splitted.append(element[: bit_regs_lengths[key] :])
             splitted[-1] = splitted[-1][::-1]
-            element = element[clas_regs_lengths[key] :]
+            element = element[bit_regs_lengths[key] :]
     return splitted
 
 
@@ -83,7 +83,7 @@ def _transform_job_result_single(
         transformed_counts = _counts_to_registers(
             result.get_memory(res_index) if memory else result.get_counts(res_index),
             memory,
-            output_registers.clas_regs_lengths,
+            output_registers.bit_regs_lengths,
         )
         for i, reg in enumerate(output_registers.registers.bit_register_dict):
             output_registers.registers.bit_register_dict[reg] = [
@@ -108,7 +108,7 @@ def _transform_job_result_list(
     if sim_type == "automatic":
         res_list = result.get_memory() if memory else result.get_counts()
         for res, regs in zip(res_list, output_registers):
-            transformed_counts = _counts_to_registers(res, memory, regs.clas_regs_lengths)
+            transformed_counts = _counts_to_registers(res, memory, regs.bit_regs_lengths)
             for i, reg in enumerate(regs.registers.bit_register_dict):
                 regs.registers.bit_register_dict[reg] = [
                     shot[::-1] for shot in transformed_counts[i]

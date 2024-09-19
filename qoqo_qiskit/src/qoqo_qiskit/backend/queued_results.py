@@ -18,7 +18,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
-from qoqo import measurements
+from qoqo import measurements  # type:ignore
 
 from ..models import Registers, RegistersWithLengths
 from .post_processing import _transform_job_result
@@ -34,6 +34,8 @@ class QueuedCircuitRun:
         memory: bool,
         sim_type: str,
         registers_info: Tuple[
+            Dict[str, int],
+            Dict[str, int],
             Dict[str, int],
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
@@ -58,6 +60,8 @@ class QueuedCircuitRun:
         self._memory: bool = memory
         self._sim_type: str = sim_type
         self._registers_info: Tuple[
+            Dict[str, int],
+            Dict[str, int],
             Dict[str, int],
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
@@ -151,11 +155,13 @@ class QueuedCircuitRun:
                 result = self._job.result()
                 modeled = RegistersWithLengths(
                     Registers(
-                        bit_register_dict=self._registers_info[1],
-                        float_register_dict=self._registers_info[2],
-                        complex_register_dict=self._registers_info[3],
+                        bit_register_dict=self._registers_info[3],
+                        float_register_dict=self._registers_info[4],
+                        complex_register_dict=self._registers_info[5],
                     ),
-                    clas_regs_lengths=self._registers_info[0],
+                    bit_regs_lengths=self._registers_info[0],
+                    float_regs_lengths=self._registers_info[1],
+                    complex_regs_lengths=self._registers_info[2],
                 )
                 self._qoqo_result = _transform_job_result(
                     self._memory, self._sim_type, result, modeled, self._res_index
