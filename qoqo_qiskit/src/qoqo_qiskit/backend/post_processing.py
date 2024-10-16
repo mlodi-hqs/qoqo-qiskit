@@ -92,9 +92,7 @@ def _transform_job_result_single(
             ]
         if input_bit_circuit:
             for input_bit_op in input_bit_circuit:
-                for bit_result in output_register.registers.bit_register_dict[
-                    input_bit_op.name()
-                ]:
+                for bit_result in output_register.registers.bit_register_dict[input_bit_op.name()]:
                     bit_result[input_bit_op.index()] = input_bit_op.value()
     elif sim_type == "statevector":
         vector = list(np.asarray(result.data(res_index)["statevector"]).flatten())
@@ -123,9 +121,7 @@ def _transform_job_result_list(
                 ]
             if input_bit_circuit:
                 for input_bit_op in input_bit_circuit:
-                    for bit_result in regs.registers.bit_register_dict[
-                        input_bit_op.name()
-                    ]:
+                    for bit_result in regs.registers.bit_register_dict[input_bit_op.name()]:
                         bit_result[input_bit_op.index()] = input_bit_op.value()
     elif sim_type == "statevector":
         for i, regs in enumerate(output_registers):
