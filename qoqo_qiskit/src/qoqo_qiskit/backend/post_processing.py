@@ -147,7 +147,7 @@ def _transform_job_result(
     Dict[str, List[List[float]]],
     Dict[str, List[List[complex]]],
 ]:
-    if isinstance(output_registers, list):
+    if isinstance(output_registers, list) and isinstance(input_bit_circuits, list):
         _transform_job_result_list(memory, sim_type, result, output_registers, input_bit_circuits)
         final_output = RegistersWithLengths()
         for regs in output_registers:
@@ -167,7 +167,9 @@ def _transform_job_result(
                 else:
                     final_output.registers.complex_register_dict[key] = value_complexes
         return astuple(final_output.registers)
-    else:
+    elif isinstance(output_registers, RegistersWithLengths) and (
+        isinstance(input_bit_circuits, Circuit) or input_bit_circuits is None
+    ):
         _transform_job_result_single(
             memory,
             sim_type,
@@ -177,3 +179,5 @@ def _transform_job_result(
             res_index,
         )
         return astuple(output_registers.registers)
+    else:
+        raise ValueError("Invalid input for output_registers and/or input_bit_circuits.")

@@ -575,7 +575,8 @@ class QoqoQiskitBackend:
                     " input parameter names."
                 )
             queued_runs.append(self.run_measurement_queued(program.measurement()))
-        if isinstance(params_values[0], list):
+        elif isinstance(params_values[0], list):
+            params_values = cast(List[List[float]], params_values)
             for params in params_values:
                 if len(params) != len(input_parameter_names):
                     raise ValueError(
