@@ -164,7 +164,7 @@ class QueuedCircuitRun:
                     complex_regs_lengths=self._registers_info[2],
                 )
                 self._qoqo_result = _transform_job_result(
-                    self._memory, self._sim_type, result, modeled, self._res_index
+                    self._memory, self._sim_type, result, modeled, None, self._res_index
                 )
                 return self._qoqo_result
             elif status == JobStatus.ERROR:
