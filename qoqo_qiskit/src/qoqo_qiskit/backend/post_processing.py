@@ -74,7 +74,8 @@ def _transform_job_result_single(
     memory: bool,
     sim_type: str,
     result: Result,
-    output_registers: RegistersWithLengths,
+    output_register: RegistersWithLengths,
+    input_bit_circuit: Optional[Circuit],
     res_index: Optional[int] = 0,
 ) -> None:
     # res_index is the index of the chosen result to extract in case
@@ -83,20 +84,26 @@ def _transform_job_result_single(
         transformed_counts = _counts_to_registers(
             result.get_memory(res_index) if memory else result.get_counts(res_index),
             memory,
-            output_registers.bit_regs_lengths,
+            output_register.bit_regs_lengths,
         )
-        for i, reg in enumerate(output_registers.registers.bit_register_dict):
-            output_registers.registers.bit_register_dict[reg] = [
+        for i, reg in enumerate(output_register.registers.bit_register_dict):
+            output_register.registers.bit_register_dict[reg] = [
                 shot[::-1] for shot in transformed_counts[i]
             ]
+        if input_bit_circuit:
+            for input_bit_op in input_bit_circuit:
+                for bit_result in output_register.registers.bit_register_dict[
+                    input_bit_op.name()
+                ]:
+                    bit_result[input_bit_op.index()] = input_bit_op.value()
     elif sim_type == "statevector":
         vector = list(np.asarray(result.data(res_index)["statevector"]).flatten())
-        for reg in output_registers.registers.complex_register_dict:
-            output_registers.registers.complex_register_dict[reg].append(vector)
+        for reg in output_register.registers.complex_register_dict:
+            output_register.registers.complex_register_dict[reg].append(vector)
     elif sim_type == "density_matrix":
         vector = list(np.asarray(result.data(res_index)["density_matrix"]).flatten())
-        for reg in output_registers.registers.complex_register_dict:
-            output_registers.registers.complex_register_dict[reg].append(vector)
+        for reg in output_register.registers.complex_register_dict:
+            output_register.registers.complex_register_dict[reg].append(vector)
 
 
 def _transform_job_result_list(
@@ -104,15 +111,22 @@ def _transform_job_result_list(
     sim_type: str,
     result: Result,
     output_registers: List[RegistersWithLengths],
+    input_bit_circuits: List[Optional[Circuit]],
 ) -> None:
     if sim_type == "automatic":
         res_list = result.get_memory() if memory else result.get_counts()
-        for res, regs in zip(res_list, output_registers):
+        for res, regs, input_bit_circuit in zip(res_list, output_registers, input_bit_circuits):
             transformed_counts = _counts_to_registers(res, memory, regs.bit_regs_lengths)
             for i, reg in enumerate(regs.registers.bit_register_dict):
                 regs.registers.bit_register_dict[reg] = [
                     shot[::-1] for shot in transformed_counts[i]
                 ]
+            if input_bit_circuit:
+                for input_bit_op in input_bit_circuit:
+                    for bit_result in regs.registers.bit_register_dict[
+                        input_bit_op.name()
+                    ]:
+                        bit_result[input_bit_op.index()] = input_bit_op.value()
     elif sim_type == "statevector":
         for i, regs in enumerate(output_registers):
             vector = list(np.asarray(result.data(i)["statevector"]).flatten())
@@ -130,6 +144,7 @@ def _transform_job_result(
     sim_type: str,
     result: Result,
     output_registers: Union[RegistersWithLengths, List[RegistersWithLengths]],
+    input_bit_circuits: Union[Optional[Circuit], List[Optional[Circuit]]],
     res_index: Optional[int] = 0,
 ) -> Tuple[
     Dict[str, List[List[bool]]],
@@ -137,7 +152,7 @@ def _transform_job_result(
     Dict[str, List[List[complex]]],
 ]:
     if isinstance(output_registers, list):
-        _transform_job_result_list(memory, sim_type, result, output_registers)
+        _transform_job_result_list(memory, sim_type, result, output_registers, input_bit_circuits)
         final_output = RegistersWithLengths()
         for regs in output_registers:
             for key, value_bools in regs.registers.bit_register_dict.items():
@@ -157,5 +172,12 @@ def _transform_job_result(
                     final_output.registers.complex_register_dict[key] = value_complexes
         return astuple(final_output.registers)
     else:
-        _transform_job_result_single(memory, sim_type, result, output_registers, res_index)
+        _transform_job_result_single(
+            memory,
+            sim_type,
+            result,
+            output_registers,
+            input_bit_circuits,
+            res_index,
+        )
         return astuple(output_registers.registers)
