@@ -58,13 +58,15 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(self, circuit: Circuit) -> Tuple[Job, str, RegistersWithLengths, Circuit]:
+    def _run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[Job, str, RegistersWithLengths, Optional[Circuit]]:
         if not circuit.__class__.__name__ == "Circuit":
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
         output_registers = self._set_up_registers(circuit)
 
-        (compiled_circuit, run_options) = self._compile_circuit(circuit)
+        (compiled_circuit, run_options, input_bit_circuit) = self._compile_circuit(circuit)
 
         self._handle_errors(run_options)
 
@@ -72,24 +74,25 @@ class QoqoQiskitBackend:
 
         job = self._job_execution(compiled_circuit, shots)
 
-        return (job, sim_type, output_registers)
+        return (job, sim_type, output_registers, input_bit_circuit)
 
     def _run_circuit_list(
         self, circuit_list: List[Circuit]
-    ) -> Tuple[Job, str, List[RegistersWithLengths]]:
+    ) -> Tuple[Job, str, List[RegistersWithLengths], List[Optional[Circuit]]]:
         if not isinstance(circuit_list, List):
             raise TypeError("The input is not a valid list of Qoqo Circuit instances.")
         if len(circuit_list) == 0:
             raise ValueError("The input is an empty list of Qoqo Circuit instances.")
 
         compiled_circuits_list: List[Circuit] = []
+        input_bit_circuits_list: List[Optional[Circuit]] = []
         output_registers_list: List[RegistersWithLengths] = []
         sim_type_list: Optional[str] = None
         shots_list: Optional[int] = None
         for circuit in circuit_list:
             output_registers = self._set_up_registers(circuit)
 
-            (compiled_circuit, run_options) = self._compile_circuit(circuit)
+            (compiled_circuit, run_options, input_bit_circuit) = self._compile_circuit(circuit)
 
             self._handle_errors(run_options)
 
@@ -112,11 +115,12 @@ class QoqoQiskitBackend:
                     )
 
             compiled_circuits_list.append(compiled_circuit)
+            input_bit_circuits_list.append(input_bit_circuit)
             output_registers_list.append(output_registers)
 
         job = self._job_execution(compiled_circuits_list, cast(int, shots_list))
 
-        return (job, cast(str, sim_type_list), output_registers_list)
+        return (job, cast(str, sim_type_list), output_registers_list, input_bit_circuits_list)
 
     def _set_up_registers(
         self,
@@ -145,7 +149,18 @@ class QoqoQiskitBackend:
     def _compile_circuit(
         self,
         circuit: Circuit,
-    ) -> Tuple[QuantumCircuit, Dict[str, Any]]:
+    ) -> Tuple[QuantumCircuit, Dict[str, Any], Optional[Circuit]]:
+        input_bit_circuit = Circuit()
+        tmp_circuit = Circuit()
+        for c in circuit:
+            if c.hqslang() == "InputBit":
+                input_bit_circuit += c
+            else:
+                tmp_circuit += c
+        if len(input_bit_circuit) == 0:
+            input_bit_circuit = None
+        circuit = tmp_circuit
+
         try:
             defs = circuit.definitions()
             doubles = [defs[0]]
@@ -166,7 +181,7 @@ class QoqoQiskitBackend:
         compiled_circuit: QuantumCircuit = res[0]
         run_options: Dict[str, Any] = res[1]
 
-        return compiled_circuit, run_options
+        return compiled_circuit, run_options, input_bit_circuit
 
     def _handle_errors(
         self,
@@ -257,7 +272,7 @@ class QoqoQiskitBackend:
         Raises:
             ValueError: Incorrect Measurement or Pragma operations.
         """
-        (job, sim_type, output_registers) = self._run_circuit(circuit)
+        (job, sim_type, output_registers, input_bit_circuit) = self._run_circuit(circuit)
 
         result = job.result()
 
@@ -267,6 +282,7 @@ class QoqoQiskitBackend:
             sim_type,
             result,
             output_registers,
+            input_bit_circuit,
         )
 
     def run_circuit_list(
@@ -297,7 +313,9 @@ class QoqoQiskitBackend:
             ValueError: Incorrect Measurement or Pragma operations or incompatible run options\
                 between different circuits.
         """
-        (job, sim_type, output_registers_list) = self._run_circuit_list(circuits)
+        (job, sim_type, output_registers_list, input_bit_circuits_list) = self._run_circuit_list(
+            circuits
+        )
 
         result = job.result()
 
@@ -307,6 +325,7 @@ class QoqoQiskitBackend:
             sim_type,
             result,
             output_registers_list,
+            input_bit_circuits_list,
         )
 
     def run_circuit_queued(
@@ -327,11 +346,7 @@ class QoqoQiskitBackend:
         Returns:
             QueuedCircuitRun
         """
-        (
-            job,
-            sim_type,
-            output_registers,
-        ) = self._run_circuit(circuit)
+        (job, sim_type, output_registers, _input_bit_circuit) = self._run_circuit(circuit)
 
         return QueuedCircuitRun(job, self.memory, sim_type, output_registers.to_flat_tuple())
 
@@ -354,6 +369,7 @@ class QoqoQiskitBackend:
             job,
             sim_type,
             output_registers,
+            _input_bit_circuits_list,
         ) = self._run_circuit_list(circuits)
 
         return [
