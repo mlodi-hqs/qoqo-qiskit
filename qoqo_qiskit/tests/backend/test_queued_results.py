@@ -56,7 +56,7 @@ def _mocked_run(
 
     backend = QoqoQiskitBackend(memory=memory)
 
-    (job, sim_type, output_registers) = backend._run_circuit(circuit)
+    (job, sim_type, output_registers, _input_bit_circuit) = backend._run_circuit(circuit)
 
     return (job, sim_type, output_registers.to_flat_tuple(), circuit)
 
