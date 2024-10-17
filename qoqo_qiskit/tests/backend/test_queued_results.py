@@ -20,10 +20,9 @@ from typing import Dict, List, Tuple
 import pytest
 from qiskit.providers import Job
 from qoqo import Circuit
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qoqo.measurements import ClassicalRegister  # type:ignore
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
-from qoqo_qiskit.models import RegistersWithLengths
 
 
 def _mocked_run(
@@ -34,6 +33,8 @@ def _mocked_run(
     Job,
     str,
     Tuple[
+        Dict[str, int],
+        Dict[str, int],
         Dict[str, int],
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
@@ -55,7 +56,7 @@ def _mocked_run(
 
     backend = QoqoQiskitBackend(memory=memory)
 
-    (job, sim_type, output_registers) = backend._run_circuit(circuit)
+    (job, sim_type, output_registers, _input_bit_circuit) = backend._run_circuit(circuit)
 
     return (job, sim_type, output_registers.to_flat_tuple(), circuit)
 
@@ -139,9 +140,7 @@ def test_poll_result() -> None:
         registers_info=run_1[2],
     )
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[run_0[3], run_1[3]]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[run_0[3], run_1[3]])
     qpr = QueuedProgramRun(
         measurement=measurement,
         queued_circuits=[qcr_0, qcr_1],
@@ -176,9 +175,7 @@ def test_overwrite() -> None:
         registers_info=run_1[2],
     )
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[run_0[3], run_1[3]]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[run_0[3], run_1[3]])
     qpr = QueuedProgramRun(
         measurement=measurement,
         queued_circuits=[qcr_0, qcr_1],

@@ -58,17 +58,15 @@ class QoqoQiskitBackend:
         self.compilation = compilation
 
     # Internal _run_circuit method
-    def _run_circuit(self, circuit: Circuit) -> Tuple[
-        Job,
-        str,
-        RegistersWithLengths,
-    ]:
+    def _run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[Job, str, RegistersWithLengths, Optional[Circuit]]:
         if not circuit.__class__.__name__ == "Circuit":
             raise TypeError("The input is not a valid Qoqo Circuit instance.")
 
         output_registers = self._set_up_registers(circuit)
 
-        (compiled_circuit, run_options) = self._compile_circuit(circuit)
+        (compiled_circuit, run_options, input_bit_circuit) = self._compile_circuit(circuit)
 
         self._handle_errors(run_options)
 
@@ -76,24 +74,25 @@ class QoqoQiskitBackend:
 
         job = self._job_execution(compiled_circuit, shots)
 
-        return (job, sim_type, output_registers)
+        return (job, sim_type, output_registers, input_bit_circuit)
 
     def _run_circuit_list(
         self, circuit_list: List[Circuit]
-    ) -> Tuple[Job, str, List[RegistersWithLengths]]:
+    ) -> Tuple[Job, str, List[RegistersWithLengths], List[Optional[Circuit]]]:
         if not isinstance(circuit_list, List):
             raise TypeError("The input is not a valid list of Qoqo Circuit instances.")
         if len(circuit_list) == 0:
             raise ValueError("The input is an empty list of Qoqo Circuit instances.")
 
         compiled_circuits_list: List[Circuit] = []
+        input_bit_circuits_list: List[Optional[Circuit]] = []
         output_registers_list: List[RegistersWithLengths] = []
         sim_type_list: Optional[str] = None
         shots_list: Optional[int] = None
         for circuit in circuit_list:
             output_registers = self._set_up_registers(circuit)
 
-            (compiled_circuit, run_options) = self._compile_circuit(circuit)
+            (compiled_circuit, run_options, input_bit_circuit) = self._compile_circuit(circuit)
 
             self._handle_errors(run_options)
 
@@ -116,11 +115,12 @@ class QoqoQiskitBackend:
                     )
 
             compiled_circuits_list.append(compiled_circuit)
+            input_bit_circuits_list.append(input_bit_circuit)
             output_registers_list.append(output_registers)
 
         job = self._job_execution(compiled_circuits_list, cast(int, shots_list))
 
-        return (job, cast(str, sim_type_list), output_registers_list)
+        return (job, cast(str, sim_type_list), output_registers_list, input_bit_circuits_list)
 
     def _set_up_registers(
         self,
@@ -129,15 +129,17 @@ class QoqoQiskitBackend:
         output_registers = RegistersWithLengths()
 
         for bit_def in circuit.filter_by_tag("DefinitionBit"):
-            output_registers.clas_regs_lengths[bit_def.name()] = bit_def.length()
+            output_registers.bit_regs_lengths[bit_def.name()] = bit_def.length()
             if bit_def.is_output():
                 output_registers.registers.bit_register_dict[bit_def.name()] = []
         for float_def in circuit.filter_by_tag("DefinitionFloat"):
+            output_registers.float_regs_lengths[float_def.name()] = float_def.length()
             if float_def.is_output():
                 output_registers.registers.float_register_dict[float_def.name()] = cast(
                     List[List[float]], []
                 )
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
+            output_registers.complex_regs_lengths[complex_def.name()] = complex_def.length()
             if complex_def.is_output():
                 output_registers.registers.complex_register_dict[complex_def.name()] = cast(
                     List[List[complex]], []
@@ -147,7 +149,18 @@ class QoqoQiskitBackend:
     def _compile_circuit(
         self,
         circuit: Circuit,
-    ) -> Tuple[QuantumCircuit, Dict[str, Any]]:
+    ) -> Tuple[QuantumCircuit, Dict[str, Any], Optional[Circuit]]:
+        input_bit_circuit = Circuit()
+        tmp_circuit = Circuit()
+        for c in circuit:
+            if c.hqslang() == "InputBit":
+                input_bit_circuit += c
+            else:
+                tmp_circuit += c
+        if len(input_bit_circuit) == 0:
+            input_bit_circuit = None
+        circuit = tmp_circuit
+
         try:
             defs = circuit.definitions()
             doubles = [defs[0]]
@@ -168,7 +181,7 @@ class QoqoQiskitBackend:
         compiled_circuit: QuantumCircuit = res[0]
         run_options: Dict[str, Any] = res[1]
 
-        return compiled_circuit, run_options
+        return compiled_circuit, run_options, input_bit_circuit
 
     def _handle_errors(
         self,
@@ -259,7 +272,7 @@ class QoqoQiskitBackend:
         Raises:
             ValueError: Incorrect Measurement or Pragma operations.
         """
-        (job, sim_type, output_registers) = self._run_circuit(circuit)
+        (job, sim_type, output_registers, input_bit_circuit) = self._run_circuit(circuit)
 
         result = job.result()
 
@@ -269,6 +282,7 @@ class QoqoQiskitBackend:
             sim_type,
             result,
             output_registers,
+            input_bit_circuit,
         )
 
     def run_circuit_list(
@@ -299,7 +313,9 @@ class QoqoQiskitBackend:
             ValueError: Incorrect Measurement or Pragma operations or incompatible run options\
                 between different circuits.
         """
-        (job, sim_type, output_registers_list) = self._run_circuit_list(circuits)
+        (job, sim_type, output_registers_list, input_bit_circuits_list) = self._run_circuit_list(
+            circuits
+        )
 
         result = job.result()
 
@@ -309,6 +325,7 @@ class QoqoQiskitBackend:
             sim_type,
             result,
             output_registers_list,
+            input_bit_circuits_list,
         )
 
     def run_circuit_queued(
@@ -329,11 +346,7 @@ class QoqoQiskitBackend:
         Returns:
             QueuedCircuitRun
         """
-        (
-            job,
-            sim_type,
-            output_registers,
-        ) = self._run_circuit(circuit)
+        (job, sim_type, output_registers, _input_bit_circuit) = self._run_circuit(circuit)
 
         return QueuedCircuitRun(job, self.memory, sim_type, output_registers.to_flat_tuple())
 
@@ -356,6 +369,7 @@ class QoqoQiskitBackend:
             job,
             sim_type,
             output_registers,
+            _input_bit_circuits_list,
         ) = self._run_circuit_list(circuits)
 
         return [
@@ -438,7 +452,9 @@ class QoqoQiskitBackend:
             output_complex_register_dict,
         )
 
-    def run_program(self, program: QuantumProgram, params_values: List[List[float]]) -> Optional[
+    def run_program(
+        self, program: QuantumProgram, params_values: Union[List[float], List[List[float]]]
+    ) -> Optional[
         List[
             Union[
                 Tuple[
@@ -462,8 +478,8 @@ class QoqoQiskitBackend:
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
-            params_values (List[List[float]]): the parameters values to pass to the quantum
-                program.
+            params_values (Union[List[float], List[List[float]]]): the parameters values to pass
+                to the quantum program.
 
         Returns:
             Optional[
@@ -485,13 +501,19 @@ class QoqoQiskitBackend:
         if isinstance(program.measurement(), ClassicalRegister):
             if not params_values:
                 returned_results.append(program.run_registers(self, []))
-            for params in params_values:
-                returned_results.append(program.run_registers(self, params))
+            if isinstance(params_values[0], list):
+                for params in params_values:
+                    returned_results.append(program.run_registers(self, params))
+            else:
+                return program.run_registers(self, params_values)
         else:
             if not params_values:
                 returned_results.append(program.run(self, []))
-            for params in params_values:
-                returned_results.append(program.run(self, params))
+            if isinstance(params_values[0], list):
+                for params in params_values:
+                    returned_results.append(program.run(self, params))
+            else:
+                return program.run(self, params_values)
 
         return returned_results
 
@@ -522,7 +544,7 @@ class QoqoQiskitBackend:
         return QueuedProgramRun(measurement, queued_circuits)
 
     def run_program_queued(
-        self, program: QuantumProgram, params_values: List[List[float]]
+        self, program: QuantumProgram, params_values: Union[List[float], List[List[float]]]
     ) -> List[QueuedProgramRun]:
         """Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.
 
@@ -532,8 +554,8 @@ class QoqoQiskitBackend:
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
-            params_values (List[List[float]]): the parameters values to pass to the quantum
-                program.
+            params_values (Union[List[float], List[List[float]]]): the parameters values to pass
+                to the quantum program.
 
         Raises:
             ValueError: incorrect length of params_values compared to program's input
@@ -553,13 +575,24 @@ class QoqoQiskitBackend:
                     " input parameter names."
                 )
             queued_runs.append(self.run_measurement_queued(program.measurement()))
-        for params in params_values:
-            if len(params) != len(input_parameter_names):
+        elif isinstance(params_values[0], list):
+            params_values = cast(List[List[float]], params_values)
+            for params in params_values:
+                if len(params) != len(input_parameter_names):
+                    raise ValueError(
+                        f"Wrong number of parameters {len(input_parameter_names)} parameters"
+                        f" expected {len(params)} parameters given."
+                    )
+                substituted_parameters = dict(zip(input_parameter_names, params))
+                measurement = program.measurement().substitute_parameters(substituted_parameters)
+                queued_runs.append(self.run_measurement_queued(measurement))
+        else:
+            if len(params_values) != len(input_parameter_names):
                 raise ValueError(
                     f"Wrong number of parameters {len(input_parameter_names)} parameters"
-                    f" expected {len(params)} parameters given."
+                    f" expected {len(params_values)} parameters given."
                 )
-            substituted_parameters = dict(zip(input_parameter_names, params))
+            substituted_parameters = dict(zip(input_parameter_names, params_values))
             measurement = program.measurement().substitute_parameters(substituted_parameters)
             queued_runs.append(self.run_measurement_queued(measurement))
 

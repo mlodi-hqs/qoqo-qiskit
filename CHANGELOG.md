@@ -2,6 +2,11 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.8.1
+
+* Fixed `.run_program()` allowing it to run with a single list of parameters
+* Fixed support for `InputBit` operation by keeping track of it and correct the circuit result in post-process
+
 ### 0.8.0
 
 * Updated to qiskit 1.2

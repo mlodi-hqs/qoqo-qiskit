@@ -37,18 +37,22 @@ class RegistersWithLengths:
     The registers are used to store classical information during the execution of a
     roqoqo circuit and to provide a unified output interface for the different backends.
 
-    In addition, a dictionary containing the lengths of any DefinitionBit register (indexed
+    In addition, a dictionary containing the lengths of any register (indexed
     by its name) is also provided.
 
     Defined by three dictionaries, representing bit, float and complex registers.
     """
 
     registers: Registers = field(default_factory=Registers)
-    clas_regs_lengths: Dict[str, int] = field(default_factory=dict)
+    bit_regs_lengths: Dict[str, int] = field(default_factory=dict)
+    float_regs_lengths: Dict[str, int] = field(default_factory=dict)
+    complex_regs_lengths: Dict[str, int] = field(default_factory=dict)
 
     def to_flat_tuple(
         self,
     ) -> Tuple[
+        Dict[str, int],
+        Dict[str, int],
         Dict[str, int],
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
@@ -56,4 +60,9 @@ class RegistersWithLengths:
     ]:
         """Flattens the internal data into a single tuple."""
         internal_regs = astuple(self.registers)
-        return (self.clas_regs_lengths, *internal_regs)
+        return (
+            self.bit_regs_lengths,
+            self.float_regs_lengths,
+            self.complex_regs_lengths,
+            *internal_regs,
+        )

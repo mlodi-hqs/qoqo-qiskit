@@ -18,7 +18,7 @@ from typing import Any, List
 import pytest
 from qiskit_aer import AerSimulator
 from qoqo import Circuit, QuantumProgram
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qoqo.measurements import (  # type:ignore
     ClassicalRegister,
     PauliZProduct,
@@ -158,9 +158,8 @@ def test_run_circuit_list_errors(operations: List[Any]) -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit_list([circuit_0, circuit_1])
-    assert (
-        "The input is a list of Qoqo Circuits with different simulation types."
-        in str(exc.value)
+    assert "The input is a list of Qoqo Circuits with different simulation types." in str(
+        exc.value
     )
 
     circuit_2 = Circuit()
@@ -175,10 +174,7 @@ def test_run_circuit_list_errors(operations: List[Any]) -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_circuit_list([circuit_2, circuit_3])
-    assert (
-        "The input is a list of Qoqo Circuits with different number of shots."
-        in str(exc.value)
-    )
+    assert "The input is a list of Qoqo Circuits with different number of shots." in str(exc.value)
 
 
 @pytest.mark.parametrize(
@@ -420,13 +416,9 @@ def test_measurement(operations: List[Any]) -> None:
     circuit += ops.DefinitionBit("ri", len(involved_qubits), True)
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    pzpinput = PauliZProductInput(
-        number_qubits=len(involved_qubits), use_flipped_measurement=True
-    )
+    pzpinput = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
 
-    measurement = PauliZProduct(
-        constant_circuit=None, circuits=[circuit], input=pzpinput
-    )
+    measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=pzpinput)
 
     try:
         _ = backend.run_measurement(measurement=measurement)
@@ -558,13 +550,13 @@ def test_memory() -> None:
 
 def test_split() -> None:
     """Test post_processing._split method."""
-    clas_regs = {}
-    clas_regs["ro"] = 1
-    clas_regs["ri"] = 2
+    bit_regs = {}
+    bit_regs["ro"] = 1
+    bit_regs["ri"] = 2
     shot_result_ws = "01 1"
     shot_result_no_ws = "011"
 
-    assert _split(shot_result_ws, clas_regs) == _split(shot_result_no_ws, clas_regs)
+    assert _split(shot_result_ws, bit_regs) == _split(shot_result_no_ws, bit_regs)
 
 
 def test_overwrite() -> None:
@@ -584,9 +576,7 @@ def test_overwrite() -> None:
     circuit_2 += ops.MeasureQubit(0, "same", 0)
     circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[circuit_1, circuit_2]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
 
     try:
         output = backend.run_measurement_registers(measurement=measurement)
@@ -660,13 +650,9 @@ def test_run_program() -> None:
     init_circuit += ops.DefinitionBit("ro", 1, True)
     init_circuit += ops.PragmaRepeatedMeasurement("ro", 1000, None)
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[init_circuit, init_circuit]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[init_circuit, init_circuit])
 
-    program = QuantumProgram(
-        measurement=measurement, input_parameter_names=["angle_0", "angle_1"]
-    )
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
 
     res = backend.run_program(
         program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
@@ -676,6 +662,13 @@ def test_run_program() -> None:
     assert res[0][0]
     assert not res[0][1]
     assert not res[0][2]
+
+    res = backend.run_program(program=program, params_values=[0.875, 0.612])
+
+    assert len(res) == 3
+    assert res[0]
+    assert not res[1]
+    assert not res[2]
 
 
 @pytest.mark.parametrize("memory", [True, False])
@@ -694,7 +687,7 @@ def test_run_circuit_queued(memory: bool) -> None:
     assert qcr._memory == memory
     assert qcr._sim_type == "automatic"
     assert "ro" in qcr._registers_info[0]
-    assert "ro" in qcr._registers_info[1]
+    assert "ro" in qcr._registers_info[3]
 
 
 @pytest.mark.parametrize("memory", [True, False])
@@ -721,9 +714,9 @@ def test_run_circuit_list_queued(memory: bool) -> None:
     assert qcrs[0]._memory == qcrs[1]._memory == memory
     assert qcrs[0]._sim_type == qcrs[1]._sim_type == "automatic"
     assert "ro" in qcrs[0]._registers_info[0]
-    assert "ro" in qcrs[0]._registers_info[1]
+    assert "ro" in qcrs[0]._registers_info[3]
     assert "ri" in qcrs[1]._registers_info[0]
-    assert "ri" in qcrs[1]._registers_info[1]
+    assert "ri" in qcrs[1]._registers_info[3]
 
     time.sleep(1)
 
@@ -750,9 +743,7 @@ def test_run_measurement_queued(memory: bool) -> None:
     circuit_1 += ops.DefinitionBit("ri", 2, True)
     circuit_1 += ops.PragmaRepeatedMeasurement("ri", 50)
 
-    measurement = ClassicalRegister(
-        constant_circuit=None, circuits=[circuit_0, circuit_1]
-    )
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_0, circuit_1])
 
     qpr: QueuedProgramRun = backend.run_measurement_queued(measurement=measurement)
 
@@ -801,16 +792,11 @@ def test_run_program_queued() -> None:
         input=measurement_input,
     )
 
-    program = QuantumProgram(
-        measurement=measurement, input_parameter_names=["angle_0", "angle_1"]
-    )
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_program_queued(program=program, params_values=[[0.4]])
-    assert (
-        "Wrong number of parameters 2 parameters expected 1 parameters given."
-        in str(exc.value)
-    )
+    assert "Wrong number of parameters 2 parameters expected 1 parameters given." in str(exc.value)
 
     with pytest.raises(ValueError) as exc:
         _ = backend.run_program_queued(program=program, params_values=[])
@@ -824,6 +810,19 @@ def test_run_program_queued() -> None:
     )
 
     assert len(queued_jobs) == 3
+
+    for queued in queued_jobs:
+        while queued.poll_result() is None:
+            time.sleep(1)
+
+        serialised = queued.to_json()
+        with pytest.raises(ValueError) as exc:
+            _ = QueuedProgramRun.from_json(serialised)
+        assert "Retrieval is not possible." in str(exc.value)
+
+    queued_jobs = backend.run_program_queued(program=program, params_values=[0.785, 0.238])
+
+    assert len(queued_jobs) == 1
 
     for queued in queued_jobs:
         while queued.poll_result() is None:
