@@ -29,4 +29,5 @@ jobs:
       # Run tests also on macos runners
       macos: true
       py_interface_folder: "qoqo_qiskit_devices"
+      python_3_13: false
       has_python_tests: true
