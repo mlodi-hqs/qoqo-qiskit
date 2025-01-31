@@ -17,7 +17,7 @@ from typing import Union
 import pytest
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qoqo import Circuit
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
 
 
@@ -151,11 +151,15 @@ def test_pragma_loop(repetitions: Union[int, str]) -> None:
 
 def test_custom_gates_fix() -> None:
     """Test _custom_gates_fix method."""
+    int_circ = Circuit()
+    int_circ += ops.RotateXY(0, 0.1, 0.2)
+
     qoqo_circuit = Circuit()
     qoqo_circuit += ops.PragmaSleep([0, 3], 1.0)
     qoqo_circuit += ops.PauliX(2)
     qoqo_circuit += ops.PragmaSleep([4], 0.004)
     qoqo_circuit += ops.RotateXY(3, 0.1, 0.1)
+    qoqo_circuit += ops.PragmaLoop(2, int_circ)
 
     qr = QuantumRegister(5, "q")
     qiskit_circuit = QuantumCircuit(qr)
@@ -164,6 +168,8 @@ def test_custom_gates_fix() -> None:
     qiskit_circuit.x(qr[2])
     qiskit_circuit.delay(0.004, qr[4], unit="s")
     qiskit_circuit.r(0.1, 0.1, qr[3])
+    qiskit_circuit.r(0.1, 0.2, qr[0])
+    qiskit_circuit.r(0.1, 0.2, qr[0])
 
     out_circ, _ = to_qiskit_circuit(qoqo_circuit)
     assert out_circ == qiskit_circuit

@@ -26,7 +26,7 @@ def _counts_to_registers(
 ) -> List[List[List[bool]]]:
     bit_map: List[List[List[bool]]] = []
     reg_num = 0
-    for key in bit_regs_lengths:
+    for key, _value in bit_regs_lengths.items():
         reg_num += bit_regs_lengths[key]
     for _ in range(reg_num):
         bit_map.append([])

@@ -30,10 +30,10 @@ from qoqo_qiskit.interface import to_qiskit_circuit
 from .models import Registers, RegistersWithLengths
 
 __all__ = (
-    "to_qiskit_circuit",
     "QoqoQiskitBackend",
     "QueuedCircuitRun",
     "QueuedProgramRun",
     "Registers",
     "RegistersWithLengths",
+    "to_qiskit_circuit",
 )
