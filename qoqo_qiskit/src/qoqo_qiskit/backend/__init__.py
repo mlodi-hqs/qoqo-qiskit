@@ -16,4 +16,4 @@ from qoqo_qiskit.backend.backend import QoqoQiskitBackend
 from qoqo_qiskit.backend.queued_results import QueuedProgramRun, QueuedCircuitRun
 
 
-__all__ = ["QoqoQiskitBackend", "QueuedProgramRun", "QueuedCircuitRun"]
+__all__ = ["QoqoQiskitBackend", "QueuedCircuitRun", "QueuedProgramRun"]
