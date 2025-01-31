@@ -22,8 +22,8 @@ ndarray = "0.15"
 bincode = "1.3"
 numpy = "0.21"
 
-qoqo = { version = "~1.16", default-features = false }
-roqoqo = "~1.16"
+qoqo = { version = "~1.15", default-features = false }
+roqoqo = "~1.15"
 
 roqoqo_qiskit_devices = { path = "../roqoqo_qiskit_devices", version = "0.8" }
 

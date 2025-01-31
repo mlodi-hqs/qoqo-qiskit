@@ -21,7 +21,7 @@ doctest = false
 ndarray = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 
-roqoqo = { version = "~1.16", features = ["unstable_qoqo_devices"] }
+roqoqo = { version = "~1.15", features = ["unstable_qoqo_devices"] }
 
 [dev-dependencies]
 test-case = "3.0"
