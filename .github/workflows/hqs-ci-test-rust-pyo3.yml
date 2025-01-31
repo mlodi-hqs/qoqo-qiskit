@@ -13,20 +13,20 @@ jobs:
     uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_unittests_rust_pyo3.yml@main
     with:
       # Run tests also on windows runners
-      windows: false
+      windows: true
       # Run tests also on macos runners
       macos: true
       # Test code coverage of rust core is over 90 percent
       test_code_coverage: true
-      python_3_12: false
+      python_3_13: false
       rust_package_name: "roqoqo_qiskit_devices"
 
   build_tests:
     uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_tests_rust_pyo3.yml@main
     with: 
       # Run tests also on windows runners
-      windows: false
+      windows: true
       # Run tests also on macos runners
-      macos: false
+      macos: true
       py_interface_folder: "qoqo_qiskit_devices"
       has_python_tests: true
