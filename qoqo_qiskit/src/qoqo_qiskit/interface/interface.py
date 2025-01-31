@@ -83,6 +83,9 @@ def to_qiskit_circuit(
             if op.repetitions().is_float:
                 for _ in range(int(op.repetitions().float())):
                     filtered_circuit += op.circuit()
+                for in_op in filtered_circuit:
+                    if "PragmaSleep" in in_op.tags() or "RotateXY" in in_op.tags():
+                        to_fix = True
             else:
                 raise ValueError("A symbolic PragmaLoop operation is not supported.")
         elif "PragmaSleep" in op.tags() or "RotateXY" in op.tags():
