@@ -4,7 +4,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 ### 0.8.2
 
-* Fixed bug involving `PragmaLoop` amd `RotateXY`
+* Fixed bug involving the `_custom_gates_fix` method not being called correctly if `RotateXY` was inside a `PragmaLoop`
 
 ### 0.8.1
 
