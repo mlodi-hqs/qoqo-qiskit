@@ -1,9 +1,10 @@
 [package]
 name = "qoqo_qiskit_devices"
-version = "0.8.2"
+version = "0.9.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
+rust-version = "1.76"
 categories = ["science", "simulation"]
 readme = "README.md"
 repository = "https://github.com/HQSquantumsimulations/qoqo_qiskit"
@@ -25,7 +26,7 @@ numpy = "0.21"
 qoqo = { version = "~1.15", default-features = false }
 roqoqo = "~1.15"
 
-roqoqo_qiskit_devices = { path = "../roqoqo_qiskit_devices", version = "0.8" }
+roqoqo_qiskit_devices = { path = "../roqoqo_qiskit_devices", version = "0.9" }
 
 [dev-dependencies]
 test-case = "3.0"

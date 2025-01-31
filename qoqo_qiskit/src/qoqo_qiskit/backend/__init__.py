@@ -1,4 +1,4 @@
-# Copyright © 2023 HQS Quantum Simulations GmbH.
+# Copyright © 2023-2025 HQS Quantum Simulations GmbH.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -10,7 +10,6 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Qoqo-qiskit backend package for compatibility and simulation purposes."""
-
 
 from qoqo_qiskit.backend.backend import QoqoQiskitBackend
 from qoqo_qiskit.backend.queued_results import QueuedProgramRun, QueuedCircuitRun
