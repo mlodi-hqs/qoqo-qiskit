@@ -2,11 +2,16 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
-## 0.8.2
+## 0.9.0
 
-### Fixed in 0.8.2
+### Fixed in 0.9.0
 
 * Fixed bug involving the `_custom_gates_fix` method not being called correctly if `RotateXY` was inside a `PragmaLoop`
+
+### Changed in 0.9.0
+
+* Changed MSRV to 1.76
+* Upped minimum required Python version to 3.9
 
 ## 0.8.1
 
