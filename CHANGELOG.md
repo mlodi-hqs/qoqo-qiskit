@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+### 0.8.2
+
+* Fixed bug involving `PragmaLoop` amd `RotateXY`
+
 ### 0.8.1
 
 * Fixed `.run_program()` allowing it to run with a single list of parameters
