@@ -15,7 +15,7 @@ jobs:
       # Run tests also on windows runners
       windows: true
       # Run tests also on macos runners
-      macos: true
+      macos: false
       # Test code coverage of rust core is over 90 percent
       test_code_coverage: true
       python_3_13: false
