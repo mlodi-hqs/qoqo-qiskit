@@ -1,4 +1,4 @@
-# Copyright © 2023 HQS Quantum Simulations GmbH.
+# Copyright © 2023-2025 HQS Quantum Simulations GmbH.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -30,10 +30,10 @@ from qoqo_qiskit.interface import to_qiskit_circuit
 from .models import Registers, RegistersWithLengths
 
 __all__ = (
-    "to_qiskit_circuit",
     "QoqoQiskitBackend",
     "QueuedCircuitRun",
     "QueuedProgramRun",
     "Registers",
     "RegistersWithLengths",
+    "to_qiskit_circuit",
 )

@@ -1,4 +1,4 @@
-# Copyright © 2023 HQS Quantum Simulations GmbH.
+# Copyright © 2023-2025 HQS Quantum Simulations GmbH.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -35,6 +35,39 @@ def to_qiskit_circuit(
     Raises:
         ValueError: the circuit contains a symbolic PragmaLoop operation.
     """
+    filtered_circuit, circuit_info, initial_statevector, to_fix = _filter_circuit(circuit)
+
+    # qoqo_qasm call
+    qasm_backend = QasmBackend(qubit_register_name=qubit_register_name)
+    input_qasm_str = qasm_backend.circuit_to_qasm_str(filtered_circuit)
+
+    # QASM -> Qiskit transformation
+    return_circuit = QuantumCircuit()
+    from_qasm_circuit = QuantumCircuit.from_qasm_str(input_qasm_str)
+
+    # Fixing custom gates qiskit translation
+    if to_fix:
+        from_qasm_circuit = _custom_gates_fix(from_qasm_circuit)
+
+    # Handling PragmaSetStateVector
+    if len(initial_statevector) != 0:
+        qregs = []
+        for qreg in from_qasm_circuit.qregs:
+            qregs.append(QuantumRegister(qreg.size, qreg.name))
+        cregs = []
+        for creg in from_qasm_circuit.cregs:
+            cregs.append(ClassicalRegister(creg.size, creg.name))
+        regs = qregs + cregs
+        initial_circuit = QuantumCircuit(*regs)
+        initial_circuit.initialize(initial_statevector)
+        return_circuit = initial_circuit.compose(from_qasm_circuit)
+    else:
+        return_circuit = from_qasm_circuit
+
+    return (return_circuit, circuit_info)
+
+
+def _filter_circuit(circuit: Circuit) -> Circuit:
     # Populating dict output. Currently handling:
     #   - PragmaSetStateVector (continues further down)
     #   - PragmaGetStateVector
@@ -83,6 +116,9 @@ def to_qiskit_circuit(
             if op.repetitions().is_float:
                 for _ in range(int(op.repetitions().float())):
                     filtered_circuit += op.circuit()
+                for in_op in filtered_circuit:
+                    if "PragmaSleep" in in_op.tags() or "RotateXY" in in_op.tags():
+                        to_fix = True
             else:
                 raise ValueError("A symbolic PragmaLoop operation is not supported.")
         elif "PragmaSleep" in op.tags() or "RotateXY" in op.tags():
@@ -91,34 +127,7 @@ def to_qiskit_circuit(
         else:
             filtered_circuit += op
 
-    # qoqo_qasm call
-    qasm_backend = QasmBackend(qubit_register_name=qubit_register_name)
-    input_qasm_str = qasm_backend.circuit_to_qasm_str(filtered_circuit)
-
-    # QASM -> Qiskit transformation
-    return_circuit = QuantumCircuit()
-    from_qasm_circuit = QuantumCircuit.from_qasm_str(input_qasm_str)
-
-    # Fixing custom gates qiskit translation
-    if to_fix:
-        from_qasm_circuit = _custom_gates_fix(from_qasm_circuit)
-
-    # Handling PragmaSetStateVector
-    if len(initial_statevector) != 0:
-        qregs = []
-        for qreg in from_qasm_circuit.qregs:
-            qregs.append(QuantumRegister(qreg.size, qreg.name))
-        cregs = []
-        for creg in from_qasm_circuit.cregs:
-            cregs.append(ClassicalRegister(creg.size, creg.name))
-        regs = qregs + cregs
-        initial_circuit = QuantumCircuit(*regs)
-        initial_circuit.initialize(initial_statevector)
-        return_circuit = initial_circuit.compose(from_qasm_circuit)
-    else:
-        return_circuit = from_qasm_circuit
-
-    return (return_circuit, circuit_info)
+    return filtered_circuit, circuit_info, initial_statevector, to_fix
 
 
 def _custom_gates_fix(from_qasm_circuit: QuantumCircuit) -> QuantumCircuit:

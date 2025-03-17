@@ -1,4 +1,4 @@
-# Copyright © 2024 HQS Quantum Simulations GmbH.
+# Copyright © 2024-2025 HQS Quantum Simulations GmbH.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -26,7 +26,7 @@ def _counts_to_registers(
 ) -> List[List[List[bool]]]:
     bit_map: List[List[List[bool]]] = []
     reg_num = 0
-    for key in bit_regs_lengths:
+    for key, _value in bit_regs_lengths.items():
         reg_num += bit_regs_lengths[key]
     for _ in range(reg_num):
         bit_map.append([])
