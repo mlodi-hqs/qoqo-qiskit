@@ -118,9 +118,9 @@ class QoqoQiskitBackend:
             input_bit_circuits_list.append(input_bit_circuit)
             output_registers_list.append(output_registers)
 
-        job = self._job_execution(compiled_circuits_list, cast(int, shots_list))
+        job = self._job_execution(compiled_circuits_list, cast("int", shots_list))
 
-        return (job, cast(str, sim_type_list), output_registers_list, input_bit_circuits_list)
+        return (job, cast("str", sim_type_list), output_registers_list, input_bit_circuits_list)
 
     def _set_up_registers(
         self,
@@ -136,13 +136,13 @@ class QoqoQiskitBackend:
             output_registers.float_regs_lengths[float_def.name()] = float_def.length()
             if float_def.is_output():
                 output_registers.registers.float_register_dict[float_def.name()] = cast(
-                    List[List[float]], []
+                    "List[List[float]]", []
                 )
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
             output_registers.complex_regs_lengths[complex_def.name()] = complex_def.length()
             if complex_def.is_output():
                 output_registers.registers.complex_register_dict[complex_def.name()] = cast(
-                    List[List[complex]], []
+                    "List[List[complex]]", []
                 )
         return output_registers
 
@@ -576,7 +576,7 @@ class QoqoQiskitBackend:
                 )
             queued_runs.append(self.run_measurement_queued(program.measurement()))
         elif isinstance(params_values[0], list):
-            params_values = cast(List[List[float]], params_values)
+            params_values = cast("List[List[float]]", params_values)
             for params in params_values:
                 if len(params) != len(input_parameter_names):
                     raise ValueError(
