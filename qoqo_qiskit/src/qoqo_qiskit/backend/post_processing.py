@@ -21,6 +21,20 @@ from qoqo import Circuit
 from ..models import RegistersWithLengths
 
 
+def _split(element: str, bit_regs_lengths: Dict[str, int]) -> List[str]:
+    splitted: list[str] = []
+    if " " in element:
+        splitted = element.split()
+        splitted.reverse()
+    else:
+        element = element[::-1]
+        for key in bit_regs_lengths:
+            splitted.append(element[: bit_regs_lengths[key] :])
+            splitted[-1] = splitted[-1][::-1]
+            element = element[bit_regs_lengths[key] :]
+    return splitted
+
+
 def _transform_job_result_single(
     memory: bool,
     sim_type: str,
