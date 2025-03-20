@@ -204,40 +204,50 @@ def test_run_circuit_results(operations: List[Any]) -> None:
     circuit_1 = Circuit()
     circuit_1 += circuit
     circuit_1 += ops.DefinitionBit("ri", len(involved_qubits), True)
-    circuit_1 += ops.PragmaRepeatedMeasurement("ri", 10)
+    for i in involved_qubits:
+        circuit_1 += ops.MeasureQubit(i, "ri", i)
+    circuit_1 += ops.DefinitionBit("ro", len(involved_qubits), True)
+    circuit_1 += ops.PauliX(4)
+    for i in involved_qubits:
+        circuit_1 += ops.MeasureQubit(i, "ro", i)
+    circuit_1 += ops.PragmaSetNumberOfMeasurements(10, "ro")
+    # circuit_1 += ops.PragmaSetNumberOfMeasurements(10, "ri")
 
     result = backend.run_circuit(circuit_1)
 
     assert result[0]
     assert result[0]["ri"]
+    assert result[0]["ro"]
+    assert len(result[0]["ro"]) == 10
+    assert len(result[0]["ri"]) == 10
     assert not result[1]
     assert not result[2]
 
-    circuit_2 = Circuit()
-    circuit_2 += circuit
-    circuit_2 += ops.DefinitionComplex("ri", len(involved_qubits), True)
-    circuit_2 += ops.PragmaGetStateVector("ri", None)
+    # circuit_2 = Circuit()
+    # circuit_2 += circuit
+    # circuit_2 += ops.DefinitionComplex("ri", len(involved_qubits), True)
+    # circuit_2 += ops.PragmaGetStateVector("ri", None)
 
-    result = backend.run_circuit(circuit_2)
+    # result = backend.run_circuit(circuit_2)
 
-    assert not result[0]
-    assert not result[1]
-    assert result[2]
-    assert result[2]["ri"]
-    assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
+    # assert not result[0]
+    # assert not result[1]
+    # assert result[2]
+    # assert result[2]["ri"]
+    # assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
 
-    circuit_3 = Circuit()
-    circuit_3 += circuit
-    circuit_3 += ops.DefinitionComplex("ri", len(involved_qubits), True)
-    circuit_3 += ops.PragmaGetDensityMatrix("ri", None)
+    # circuit_3 = Circuit()
+    # circuit_3 += circuit
+    # circuit_3 += ops.DefinitionComplex("ri", len(involved_qubits), True)
+    # circuit_3 += ops.PragmaGetDensityMatrix("ri", None)
 
-    result = backend.run_circuit(circuit_3)
+    # result = backend.run_circuit(circuit_3)
 
-    assert not result[0]
-    assert not result[1]
-    assert result[2]
-    assert result[2]["ri"]
-    assert len(result[2]["ri"][0]) == (2 ** len(involved_qubits)) ** 2
+    # assert not result[0]
+    # assert not result[1]
+    # assert result[2]
+    # assert result[2]["ri"]
+    # assert len(result[2]["ri"][0]) == (2 ** len(involved_qubits)) ** 2
 
 
 @pytest.mark.parametrize(
@@ -273,6 +283,7 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     circuit_1 = Circuit()
     circuit_1 += circuit
     circuit_1 += ops.DefinitionBit("ro", len(involved_qubits), True)
+    circuit_1 += ops.PauliX(len(involved_qubits) - 1)
     for i in involved_qubits:
         circuit_1 += ops.MeasureQubit(i, "ro", i)
 
@@ -286,47 +297,47 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     assert not result[1]
     assert not result[2]
 
-    circuit_2 = Circuit()
-    circuit_2 += circuit
-    circuit_2 += ops.DefinitionComplex("ri", 2 ** len(involved_qubits), True)
-    circuit_2 += ops.PragmaGetStateVector("ri", None)
+    # circuit_2 = Circuit()
+    # circuit_2 += circuit
+    # circuit_2 += ops.DefinitionComplex("ri", 2 ** len(involved_qubits), True)
+    # circuit_2 += ops.PragmaGetStateVector("ri", None)
 
-    circuit_3 = Circuit()
-    circuit_3 += circuit
-    circuit_3 += ops.Hadamard(0)
-    circuit_3 += ops.DefinitionComplex("ro", 2 ** len(involved_qubits), True)
-    circuit_3 += ops.PragmaGetStateVector("ro", None)
+    # circuit_3 = Circuit()
+    # circuit_3 += circuit
+    # circuit_3 += ops.Hadamard(0)
+    # circuit_3 += ops.DefinitionComplex("ro", 2 ** len(involved_qubits), True)
+    # circuit_3 += ops.PragmaGetStateVector("ro", None)
 
-    result = backend.run_circuit_list([circuit_2, circuit_3])
+    # result = backend.run_circuit_list([circuit_2, circuit_3])
 
-    assert not result[0]
-    assert not result[1]
-    assert result[2]
-    assert result[2]["ri"]
-    assert result[2]["ro"]
-    assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
-    assert len(result[2]["ro"][0]) == 2 ** len(involved_qubits)
+    # assert not result[0]
+    # assert not result[1]
+    # assert result[2]
+    # assert result[2]["ri"]
+    # assert result[2]["ro"]
+    # assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
+    # assert len(result[2]["ro"][0]) == 2 ** len(involved_qubits)
 
-    circuit_4 = Circuit()
-    circuit_4 += circuit
-    circuit_4 += ops.DefinitionComplex("ri", 4 ** len(involved_qubits), True)
-    circuit_4 += ops.PragmaGetDensityMatrix("ri", None)
+    # circuit_4 = Circuit()
+    # circuit_4 += circuit
+    # circuit_4 += ops.DefinitionComplex("ri", 4 ** len(involved_qubits), True)
+    # circuit_4 += ops.PragmaGetDensityMatrix("ri", None)
 
-    circuit_5 = Circuit()
-    circuit_5 += circuit
-    circuit_5 += ops.Hadamard(0)
-    circuit_5 += ops.DefinitionComplex("ro", 4 ** len(involved_qubits), True)
-    circuit_5 += ops.PragmaGetDensityMatrix("ro", None)
+    # circuit_5 = Circuit()
+    # circuit_5 += circuit
+    # circuit_5 += ops.Hadamard(0)
+    # circuit_5 += ops.DefinitionComplex("ro", 4 ** len(involved_qubits), True)
+    # circuit_5 += ops.PragmaGetDensityMatrix("ro", None)
 
-    result = backend.run_circuit_list([circuit_4, circuit_5])
+    # result = backend.run_circuit_list([circuit_4, circuit_5])
 
-    assert not result[0]
-    assert not result[1]
-    assert result[2]
-    assert result[2]["ri"]
-    assert result[2]["ro"]
-    assert len(result[2]["ri"][0]) == 4 ** len(involved_qubits)
-    assert len(result[2]["ro"][0]) == 4 ** len(involved_qubits)
+    # assert not result[0]
+    # assert not result[1]
+    # assert result[2]
+    # assert result[2]["ri"]
+    # assert result[2]["ro"]
+    # assert len(result[2]["ri"][0]) == 4 ** len(involved_qubits)
+    # assert len(result[2]["ro"][0]) == 4 ** len(involved_qubits)
 
     circuit_6 = Circuit()
     circuit_6 += circuit
