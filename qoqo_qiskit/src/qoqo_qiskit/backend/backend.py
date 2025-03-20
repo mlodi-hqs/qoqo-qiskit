@@ -17,6 +17,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 from qiskit import QuantumCircuit
 from qiskit.providers import Backend
 from qiskit.providers.job import Job
+from qiskit_ibm_runtime import Sampler
+from qiskit.primitives import StatevectorSampler
 from qiskit_aer import AerSimulator
 from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import ClassicalRegister  # type:ignore
@@ -44,6 +46,7 @@ class QoqoQiskitBackend:
             memory (bool): Whether the output will return the actual single shots instead
                            of an equivalent sequence taken from a result summary.
             compilation (bool): Whether the qiskit `compiler` should be used instead of `run`.
+                (DEPRECATED)
 
         Raises:
             TypeError: the input is not a valid Qiskit Backend instance.
@@ -72,7 +75,8 @@ class QoqoQiskitBackend:
 
         (shots, sim_type) = self._handle_simulation_options(run_options, compiled_circuit)
 
-        job = self._job_execution(compiled_circuit, shots)
+        # job = self._job_execution(compiled_circuit, shots)
+        job = self._job_execution([compiled_circuit], shots, sim_type)
 
         return (job, sim_type, output_registers, input_bit_circuit)
 
@@ -118,7 +122,7 @@ class QoqoQiskitBackend:
             input_bit_circuits_list.append(input_bit_circuit)
             output_registers_list.append(output_registers)
 
-        job = self._job_execution(compiled_circuits_list, cast("int", shots_list))
+        job = self._job_execution(compiled_circuits_list, cast("int", shots_list), sim_type_list)
 
         return (job, cast("str", sim_type_list), output_registers_list, input_bit_circuits_list)
 
@@ -239,10 +243,16 @@ class QoqoQiskitBackend:
 
     def _job_execution(
         self,
-        input_to_send: Union[Circuit, List[Circuit]],
+        input_to_send: List[Circuit],
         shots: int,
+        sim_type: Optional[str]
     ) -> Job:
-        job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)
+        # job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)
+        if sim_type == "statevector":
+            sampler = StatevectorSampler()
+        else:
+            sampler = Sampler(self.qiskit_backend)
+        job = sampler.run(input_to_send, shots=shots)
         return job
 
     def run_circuit(
