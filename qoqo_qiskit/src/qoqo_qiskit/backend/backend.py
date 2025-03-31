@@ -244,7 +244,8 @@ class QoqoQiskitBackend:
     def _job_execution(
         self, input_to_send: List[Circuit], shots: int, sim_type: Optional[str]
     ) -> Job:
-        # job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)  # noqa: ERA001
+        # job =
+        # self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory) # noqa: ERA001
         if sim_type == "statevector":
             sampler = StatevectorSampler()
         else:
