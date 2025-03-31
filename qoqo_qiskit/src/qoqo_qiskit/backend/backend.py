@@ -18,7 +18,6 @@ from qiskit import QuantumCircuit
 from qiskit.providers import Backend
 from qiskit.providers.job import Job
 from qiskit_ibm_runtime import Sampler
-from qiskit.primitives import StatevectorSampler
 from qiskit_aer import AerSimulator
 from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import ClassicalRegister  # type:ignore
@@ -242,14 +241,11 @@ class QoqoQiskitBackend:
         return shots, sim_type
 
     def _job_execution(
-        self, input_to_send: List[Circuit], shots: int, sim_type: Optional[str]
+        self, input_to_send: List[Circuit], shots: int, _sim_type: Optional[str]
     ) -> Job:
         # job =
         # self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory) # noqa: ERA001
-        if sim_type == "statevector":
-            sampler = StatevectorSampler()
-        else:
-            sampler = Sampler(self.qiskit_backend)
+        sampler = Sampler(self.qiskit_backend)
         job = sampler.run(input_to_send, shots=shots)
         return job
 

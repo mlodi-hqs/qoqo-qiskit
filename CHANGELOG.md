@@ -7,6 +7,7 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 ### Changed in 0.10.0
 
 * Migrated `backend.run()` method to using qiskit's `Sampler`
+* Temporarily removed support for statevector simulation (no support for `PragmaGetStateVector` and `PragmaGetDensityMatrix`)
 
 ## 0.9.0
 
