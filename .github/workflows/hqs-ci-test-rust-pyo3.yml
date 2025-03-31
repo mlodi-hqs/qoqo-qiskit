@@ -18,7 +18,6 @@ jobs:
       macos: false
       # Test code coverage of rust core is over 90 percent
       test_code_coverage: true
-      python_3_13: false
       rust_package_name: "roqoqo_qiskit_devices"
 
   build_tests:
@@ -29,5 +28,4 @@ jobs:
       # Run tests also on macos runners
       macos: false
       py_interface_folder: "qoqo_qiskit_devices"
-      python_3_13: false
       has_python_tests: true
