@@ -75,7 +75,6 @@ class QoqoQiskitBackend:
 
         (shots, sim_type) = self._handle_simulation_options(run_options, compiled_circuit)
 
-        # job = self._job_execution(compiled_circuit, shots)
         job = self._job_execution([compiled_circuit], shots, sim_type)
 
         return (job, sim_type, output_registers, input_bit_circuit)
@@ -224,10 +223,11 @@ class QoqoQiskitBackend:
         custom_shots = 0
         sim_type = "automatic"
         if run_options["SimulationInfo"]["PragmaGetStateVector"]:
-            compiled_circuit.save_statevector()
+            # compiled_circuit.save_statevector() # noqa: ERA001
+            compiled_circuit.measure_all()
             sim_type = "statevector"
         elif run_options["SimulationInfo"]["PragmaGetDensityMatrix"]:
-            compiled_circuit.save_density_matrix()
+            # compiled_circuit.save_density_matrix() # noqa: ERA001
             sim_type = "density_matrix"
         if "PragmaRepeatedMeasurement" in run_options["MeasurementInfo"]:
             for el in run_options["MeasurementInfo"]["PragmaRepeatedMeasurement"]:
@@ -242,12 +242,9 @@ class QoqoQiskitBackend:
         return shots, sim_type
 
     def _job_execution(
-        self,
-        input_to_send: List[Circuit],
-        shots: int,
-        sim_type: Optional[str]
+        self, input_to_send: List[Circuit], shots: int, sim_type: Optional[str]
     ) -> Job:
-        # job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)
+        # job = self.qiskit_backend.run(input_to_send, shots=shots, memory=self.memory)  # noqa: ERA001
         if sim_type == "statevector":
             sampler = StatevectorSampler()
         else:
