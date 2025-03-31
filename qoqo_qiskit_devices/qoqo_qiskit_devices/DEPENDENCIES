@@ -6942,7 +6942,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ====================================================
-once_cell 1.21.1
+once_cell 1.21.3
 https://github.com/matklad/once_cell
 by Aleksey Kladov <aleksey.kladov@gmail.com>
 Single assignment cells and lazy values.
@@ -21588,7 +21588,7 @@ license-mit:
 
 
 ====================================================
-zerocopy 0.8.23
+zerocopy 0.8.24
 https://github.com/google/zerocopy
 by Joshua Liebow-Feeser <joshlf@google.com>, Jack Wrenn <jswrenn@amazon.com>
 Zerocopy makes zero-cost memory manipulation effortless. We write "unsafe" so you don't have to.
@@ -21859,7 +21859,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-zerocopy-derive 0.8.23
+zerocopy-derive 0.8.24
 https://github.com/google/zerocopy
 by Joshua Liebow-Feeser <joshlf@google.com>, Jack Wrenn <jswrenn@amazon.com>
 Custom derive for traits from the zerocopy crate
