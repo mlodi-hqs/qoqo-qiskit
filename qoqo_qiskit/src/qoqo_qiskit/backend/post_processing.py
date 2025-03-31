@@ -12,9 +12,8 @@
 """Results post-processing utilities."""
 
 from dataclasses import astuple
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
-import numpy as np
 from qiskit.result import Result
 from qoqo import Circuit
 
@@ -36,7 +35,7 @@ def _split(element: str, bit_regs_lengths: Dict[str, int]) -> List[str]:
 
 
 def _transform_job_result_single(
-    memory: bool,
+    _memory: bool,
     sim_type: str,
     result: Result,
     output_register: RegistersWithLengths,
@@ -57,14 +56,6 @@ def _transform_job_result_single(
             for input_bit_op in input_bit_circuit:
                 for bit_result in output_register.registers.bit_register_dict[input_bit_op.name()]:
                     bit_result[input_bit_op.index()] = input_bit_op.value()
-    # elif sim_type == "statevector":
-    #     vector = list(np.asarray(result.data(res_index)["statevector"]).flatten())
-    #     for reg in output_register.registers.complex_register_dict:
-    #         output_register.registers.complex_register_dict[reg].append(vector)
-    # elif sim_type == "density_matrix":
-    #     vector = list(np.asarray(result.data(res_index)["density_matrix"]).flatten())
-    #     for reg in output_register.registers.complex_register_dict:
-    #         output_register.registers.complex_register_dict[reg].append(vector)
 
 
 def _transform_job_result_list(
@@ -81,16 +72,6 @@ def _transform_job_result_list(
             _transform_job_result_single(
                 memory, sim_type, result, output_register, input_bit_circuit, i
             )
-    # elif sim_type == "statevector":
-    #     for i, regs in enumerate(output_registers):
-    #         vector = list(np.asarray(result.data(i)["statevector"]).flatten())
-    #         for reg in regs.registers.complex_register_dict:
-    #             regs.registers.complex_register_dict[reg].append(vector)
-    # elif sim_type == "density_matrix":
-    #     for i, regs in enumerate(output_registers):
-    #         vector = list(np.asarray(result.data(i)["density_matrix"]).flatten())
-    #         for reg in regs.registers.complex_register_dict:
-    #             regs.registers.complex_register_dict[reg].append(vector)
 
 
 def _transform_job_result(
