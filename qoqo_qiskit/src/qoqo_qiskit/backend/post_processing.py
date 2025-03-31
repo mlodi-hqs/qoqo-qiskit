@@ -12,48 +12,12 @@
 """Results post-processing utilities."""
 
 from dataclasses import astuple
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
-import numpy as np
 from qiskit.result import Result
 from qoqo import Circuit
 
 from ..models import RegistersWithLengths
-
-
-def _counts_to_registers(
-    counts: Any, mem: bool, bit_regs_lengths: Dict[str, int]
-) -> List[List[List[bool]]]:
-    bit_map: List[List[List[bool]]] = []
-    reg_num = 0
-    for key, _value in bit_regs_lengths.items():
-        reg_num += bit_regs_lengths[key]
-    for _ in range(reg_num):
-        bit_map.append([])
-    for key in counts:
-        splitted = _split(key, bit_regs_lengths)
-        for i, measurement in enumerate(splitted):
-            transf_measurement = _bit_to_bool(measurement)
-            if mem:
-                bit_map[i].append(transf_measurement)
-            else:
-                for _ in range(counts[key]):
-                    bit_map[i].append(transf_measurement)
-    return bit_map
-
-
-def _are_measurement_operations_in(circuit: Circuit) -> bool:
-    for op in circuit:
-        if "Measurement" in op.tags():
-            return True
-    return False
-
-
-def _bit_to_bool(element: str) -> List[bool]:
-    ret = []
-    for char in element:
-        ret.append(char.lower() in ("1"))
-    return ret
 
 
 def _split(element: str, bit_regs_lengths: Dict[str, int]) -> List[str]:
@@ -71,7 +35,7 @@ def _split(element: str, bit_regs_lengths: Dict[str, int]) -> List[str]:
 
 
 def _transform_job_result_single(
-    memory: bool,
+    _memory: bool,
     sim_type: str,
     result: Result,
     output_register: RegistersWithLengths,
@@ -81,27 +45,19 @@ def _transform_job_result_single(
     # res_index is the index of the chosen result to extract in case
     #  the single Result contains multiple ExperimentalResult instances
     if sim_type == "automatic":
-        transformed_counts = _counts_to_registers(
-            result.get_memory(res_index) if memory else result.get_counts(res_index),
-            memory,
-            output_register.bit_regs_lengths,
-        )
-        for i, reg in enumerate(output_register.registers.bit_register_dict):
-            output_register.registers.bit_register_dict[reg] = [
-                shot[::-1] for shot in transformed_counts[i]
-            ]
+        for reg in output_register.registers.bit_register_dict:
+            qiskit_counts_dictionary = result[res_index].data[reg].get_counts()
+            for qiskit_qubits, count in qiskit_counts_dictionary.items():
+                to_bool_list = [char == "1" for char in qiskit_qubits]
+                to_bool_list.reverse()
+                for _ in range(count):
+                    output_register.registers.bit_register_dict[reg].append(to_bool_list)
         if input_bit_circuit:
             for input_bit_op in input_bit_circuit:
                 for bit_result in output_register.registers.bit_register_dict[input_bit_op.name()]:
                     bit_result[input_bit_op.index()] = input_bit_op.value()
-    elif sim_type == "statevector":
-        vector = list(np.asarray(result.data(res_index)["statevector"]).flatten())
-        for reg in output_register.registers.complex_register_dict:
-            output_register.registers.complex_register_dict[reg].append(vector)
-    elif sim_type == "density_matrix":
-        vector = list(np.asarray(result.data(res_index)["density_matrix"]).flatten())
-        for reg in output_register.registers.complex_register_dict:
-            output_register.registers.complex_register_dict[reg].append(vector)
+    elif sim_type == "statevector" or sim_type == "density_matrix":
+        raise ValueError("Statevector and density_matrix simulation types are not supported.")
 
 
 def _transform_job_result_list(
@@ -112,27 +68,14 @@ def _transform_job_result_list(
     input_bit_circuits: List[Optional[Circuit]],
 ) -> None:
     if sim_type == "automatic":
-        res_list = result.get_memory() if memory else result.get_counts()
-        for res, regs, input_bit_circuit in zip(res_list, output_registers, input_bit_circuits):
-            transformed_counts = _counts_to_registers(res, memory, regs.bit_regs_lengths)
-            for i, reg in enumerate(regs.registers.bit_register_dict):
-                regs.registers.bit_register_dict[reg] = [
-                    shot[::-1] for shot in transformed_counts[i]
-                ]
-            if input_bit_circuit:
-                for input_bit_op in input_bit_circuit:
-                    for bit_result in regs.registers.bit_register_dict[input_bit_op.name()]:
-                        bit_result[input_bit_op.index()] = input_bit_op.value()
-    elif sim_type == "statevector":
-        for i, regs in enumerate(output_registers):
-            vector = list(np.asarray(result.data(i)["statevector"]).flatten())
-            for reg in regs.registers.complex_register_dict:
-                regs.registers.complex_register_dict[reg].append(vector)
-    elif sim_type == "density_matrix":
-        for i, regs in enumerate(output_registers):
-            vector = list(np.asarray(result.data(i)["density_matrix"]).flatten())
-            for reg in regs.registers.complex_register_dict:
-                regs.registers.complex_register_dict[reg].append(vector)
+        for i, (output_register, input_bit_circuit) in enumerate(
+            zip(output_registers, input_bit_circuits)
+        ):
+            _transform_job_result_single(
+                memory, sim_type, result, output_register, input_bit_circuit, i
+            )
+    elif sim_type == "statevector" or sim_type == "density_matrix":
+        raise ValueError("Statevector and density_matrix simulation types are not supported.")
 
 
 def _transform_job_result(
