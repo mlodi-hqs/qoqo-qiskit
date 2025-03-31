@@ -223,10 +223,14 @@ def test_run_circuit_results(operations: List[Any]) -> None:
     assert not result[1]
     assert not result[2]
 
-    # circuit_2 = Circuit()
-    # circuit_2 += circuit
-    # circuit_2 += ops.DefinitionComplex("ri", len(involved_qubits), True)
-    # circuit_2 += ops.PragmaGetStateVector("ri", None)
+    circuit_2 = Circuit()
+    circuit_2 += circuit
+    circuit_2 += ops.DefinitionComplex("ri", len(involved_qubits), True)
+    circuit_2 += ops.PragmaGetStateVector("ri", None)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit(circuit_2)
+    assert "Statevector and density_matrix simulation types are not supported." in str(exc.value)
 
     # result = backend.run_circuit(circuit_2)
 
@@ -236,10 +240,14 @@ def test_run_circuit_results(operations: List[Any]) -> None:
     # assert result[2]["ri"]
     # assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
 
-    # circuit_3 = Circuit()
-    # circuit_3 += circuit
-    # circuit_3 += ops.DefinitionComplex("ri", len(involved_qubits), True)
-    # circuit_3 += ops.PragmaGetDensityMatrix("ri", None)
+    circuit_3 = Circuit()
+    circuit_3 += circuit
+    circuit_3 += ops.DefinitionComplex("ri", len(involved_qubits), True)
+    circuit_3 += ops.PragmaGetDensityMatrix("ri", None)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit(circuit_3)
+    assert "Statevector and density_matrix simulation types are not supported." in str(exc.value)
 
     # result = backend.run_circuit(circuit_3)
 
@@ -297,16 +305,20 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     assert not result[1]
     assert not result[2]
 
-    # circuit_2 = Circuit()
-    # circuit_2 += circuit
-    # circuit_2 += ops.DefinitionComplex("ri", 2 ** len(involved_qubits), True)
-    # circuit_2 += ops.PragmaGetStateVector("ri", None)
+    circuit_2 = Circuit()
+    circuit_2 += circuit
+    circuit_2 += ops.DefinitionComplex("ri", 2 ** len(involved_qubits), True)
+    circuit_2 += ops.PragmaGetStateVector("ri", None)
 
-    # circuit_3 = Circuit()
-    # circuit_3 += circuit
-    # circuit_3 += ops.Hadamard(0)
-    # circuit_3 += ops.DefinitionComplex("ro", 2 ** len(involved_qubits), True)
-    # circuit_3 += ops.PragmaGetStateVector("ro", None)
+    circuit_3 = Circuit()
+    circuit_3 += circuit
+    circuit_3 += ops.Hadamard(0)
+    circuit_3 += ops.DefinitionComplex("ro", 2 ** len(involved_qubits), True)
+    circuit_3 += ops.PragmaGetStateVector("ro", None)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit_list([circuit_2, circuit_3])
+    assert "Statevector and density_matrix simulation types are not supported." in str(exc.value)
 
     # result = backend.run_circuit_list([circuit_2, circuit_3])
 
@@ -318,16 +330,20 @@ def test_run_circuit_list_results(operations: List[Any]) -> None:
     # assert len(result[2]["ri"][0]) == 2 ** len(involved_qubits)
     # assert len(result[2]["ro"][0]) == 2 ** len(involved_qubits)
 
-    # circuit_4 = Circuit()
-    # circuit_4 += circuit
-    # circuit_4 += ops.DefinitionComplex("ri", 4 ** len(involved_qubits), True)
-    # circuit_4 += ops.PragmaGetDensityMatrix("ri", None)
+    circuit_4 = Circuit()
+    circuit_4 += circuit
+    circuit_4 += ops.DefinitionComplex("ri", 4 ** len(involved_qubits), True)
+    circuit_4 += ops.PragmaGetDensityMatrix("ri", None)
 
-    # circuit_5 = Circuit()
-    # circuit_5 += circuit
-    # circuit_5 += ops.Hadamard(0)
-    # circuit_5 += ops.DefinitionComplex("ro", 4 ** len(involved_qubits), True)
-    # circuit_5 += ops.PragmaGetDensityMatrix("ro", None)
+    circuit_5 = Circuit()
+    circuit_5 += circuit
+    circuit_5 += ops.Hadamard(0)
+    circuit_5 += ops.DefinitionComplex("ro", 4 ** len(involved_qubits), True)
+    circuit_5 += ops.PragmaGetDensityMatrix("ro", None)
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_circuit_list([circuit_4, circuit_5])
+    assert "Statevector and density_matrix simulation types are not supported." in str(exc.value)
 
     # result = backend.run_circuit_list([circuit_4, circuit_5])
 

@@ -56,6 +56,8 @@ def _transform_job_result_single(
             for input_bit_op in input_bit_circuit:
                 for bit_result in output_register.registers.bit_register_dict[input_bit_op.name()]:
                     bit_result[input_bit_op.index()] = input_bit_op.value()
+    elif sim_type == "statevector" or sim_type == "density_matrix":
+        raise ValueError("Statevector and density_matrix simulation types are not supported.")
 
 
 def _transform_job_result_list(
@@ -72,6 +74,8 @@ def _transform_job_result_list(
             _transform_job_result_single(
                 memory, sim_type, result, output_register, input_bit_circuit, i
             )
+    elif sim_type == "statevector" or sim_type == "density_matrix":
+        raise ValueError("Statevector and density_matrix simulation types are not supported.")
 
 
 def _transform_job_result(
