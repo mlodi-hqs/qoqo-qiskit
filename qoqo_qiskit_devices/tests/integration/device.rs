@@ -23,7 +23,7 @@ use test_case::test_case;
 fn new_device(device: IBMDevice) -> Py<PyAny> {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| -> Py<PyAny> {
-        let device_type: &PyType = match device {
+        let device_type: Bound<PyType> = match device {
             IBMDevice::IBMLagosDevice(_) => py.get_type::<IBMLagosDeviceWrapper>(),
             IBMDevice::IBMNairobiDevice(_) => py.get_type::<IBMNairobiDeviceWrapper>(),
             IBMDevice::IBMPerthDevice(_) => py.get_type::<IBMPerthDeviceWrapper>(),
@@ -176,9 +176,9 @@ fn test_to_generic_device(device: IBMDevice, pyo3_device: Py<PyAny>) {
 fn test_initialization_from_identifier(name: &str, device: Py<PyAny>) {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
-        let device_type = device.as_ref(py).get_type();
+        let device_type = device.bind(py).get_type();
         let result = qoqo_qiskit_device_from_ibmq_identifier(name).unwrap();
-        let resulting_type = result.as_ref(py).get_type();
+        let resulting_type = result.bind(py).get_type();
         assert!(device_type.compare(resulting_type).is_ok());
     })
 }

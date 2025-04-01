@@ -60,42 +60,42 @@ pub fn qoqo_qiskit_device_from_ibmq_identifier(identifier: &str) -> PyResult<Py<
     Python::with_gil(|py| -> PyResult<Py<PyAny>> {
         match identifier {
             "ibm_lagos" => Ok(py
-                .get_type_bound::<IBMLagosDeviceWrapper>()
+                .get_type::<IBMLagosDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibm_nairobi" => Ok(py
-                .get_type_bound::<IBMNairobiDeviceWrapper>()
+                .get_type::<IBMNairobiDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibm_perth" => Ok(py
-                .get_type_bound::<IBMPerthDeviceWrapper>()
+                .get_type::<IBMPerthDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_belem" => Ok(py
-                .get_type_bound::<IBMBelemDeviceWrapper>()
+                .get_type::<IBMBelemDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_jakarta" => Ok(py
-                .get_type_bound::<IBMJakartaDeviceWrapper>()
+                .get_type::<IBMJakartaDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_lima" => Ok(py
-                .get_type_bound::<IBMLimaDeviceWrapper>()
+                .get_type::<IBMLimaDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_manila" => Ok(py
-                .get_type_bound::<IBMManilaDeviceWrapper>()
+                .get_type::<IBMManilaDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),
             "ibmq_quito" => Ok(py
-                .get_type_bound::<IBMQuitoDeviceWrapper>()
+                .get_type::<IBMQuitoDeviceWrapper>()
                 .call0()
                 .unwrap()
                 .into()),

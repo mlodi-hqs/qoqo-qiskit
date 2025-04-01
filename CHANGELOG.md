@@ -4,6 +4,10 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 ## 0.10.0
 
+### Updated in 0.10.0
+
+* Updated to Pyo3 0.23, qoqo 1.19, ndarray 0.16, numpy 0.23
+
 ### Changed in 0.10.0
 
 * Migrated `backend.run()` method to using qiskit's `Sampler`
