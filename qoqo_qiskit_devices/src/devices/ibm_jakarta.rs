@@ -13,6 +13,7 @@
 use ndarray::Array2;
 use numpy::{PyArray2, ToPyArray};
 use pyo3::exceptions::PyValueError;
+use pyo3::ffi::c_str;
 use pyo3::prelude::*;
 
 use bincode::deserialize;
@@ -36,7 +37,7 @@ impl IBMJakartaDeviceWrapper {
     #[new]
     pub fn new() -> Self {
         Python::with_gil(|py| {
-            py.run("import warnings; warnings.warn(\"Device ibmq_jakarta has been retired. Setting noise information is not possible.\", category=DeprecationWarning, stacklevel=2)", None, None).unwrap();
+            py.run(c_str!("import warnings; warnings.warn(\"Device ibmq_jakarta has been retired. Setting noise information is not possible.\", category=DeprecationWarning, stacklevel=2)"), None, None).unwrap();
         });
         Self {
             internal: IBMJakartaDevice::new(),
@@ -211,10 +212,10 @@ impl IBMJakartaDeviceWrapper {
     fn qubit_decoherence_rates(&self, qubit: usize) -> Py<PyArray2<f64>> {
         Python::with_gil(|py| -> Py<PyArray2<f64>> {
             match self.internal.qubit_decoherence_rates(&qubit) {
-                Some(matrix) => matrix.to_pyarray(py).to_owned(),
+                Some(matrix) => matrix.to_pyarray(py).to_owned().into(),
                 None => {
                     let matrix = Array2::<f64>::zeros((3, 3));
-                    matrix.to_pyarray(py).to_owned()
+                    matrix.to_pyarray(py).to_owned().into()
                 }
             }
         })
@@ -326,22 +327,16 @@ impl IBMJakartaDeviceWrapper {
 
 impl IBMJakartaDeviceWrapper {
     /// Fallible conversion of generic python object...
-    pub fn from_pyany(input: Py<PyAny>) -> PyResult<IBMJakartaDevice> {
-        Python::with_gil(|py| -> PyResult<IBMJakartaDevice> {
-            let input = input.as_ref(py);
-            if let Ok(try_downcast) = input.extract::<IBMJakartaDeviceWrapper>() {
-                Ok(try_downcast.internal)
-            } else {
-                let get_bytes = input.call_method0("to_bincode")?;
-                let bytes = get_bytes.extract::<Vec<u8>>()?;
-                deserialize(&bytes[..]).map_err(|err| {
-                    PyValueError::new_err(format!(
-                        "Cannot treat input as IBMJakartaDevice: {}",
-                        err
-                    ))
-                })
-            }
-        })
+    pub fn from_pyany(input: &Bound<PyAny>) -> PyResult<IBMJakartaDevice> {
+        if let Ok(try_downcast) = input.extract::<IBMJakartaDeviceWrapper>() {
+            Ok(try_downcast.internal)
+        } else {
+            let get_bytes = input.call_method0("to_bincode")?;
+            let bytes = get_bytes.extract::<Vec<u8>>()?;
+            deserialize(&bytes[..]).map_err(|err| {
+                PyValueError::new_err(format!("Cannot treat input as IBMJakartaDevice: {}", err))
+            })
+        }
     }
 }
 
