@@ -14,15 +14,17 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
-from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
 from qoqo import measurements  # type:ignore
 
 from ..models import Registers, RegistersWithLengths
 from .post_processing import _transform_job_result
 from .utils import is_valid_uuid4
+
+if TYPE_CHECKING:
+    from qiskit.providers import Job
 
 
 class QueuedCircuitRun:
@@ -151,7 +153,7 @@ class QueuedCircuitRun:
             return self._qoqo_result
         if self._job.in_final_state():
             status = self._job.status()
-            if status == JobStatus.DONE:
+            if status == "DONE":
                 result = self._job.result()
                 modeled = RegistersWithLengths(
                     Registers(
@@ -167,7 +169,7 @@ class QueuedCircuitRun:
                     self._memory, self._sim_type, result, modeled, None, self._res_index
                 )
                 return self._qoqo_result
-            elif status == JobStatus.ERROR:
+            elif status == "ERROR":
                 raise RuntimeError("The job failed.")
             else:
                 raise RuntimeError("The job was cancelled.")
