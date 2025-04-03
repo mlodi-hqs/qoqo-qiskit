@@ -2,6 +2,12 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+## 0.10.1
+
+### Fixed in 0.10.1
+
+* Fixed an issue concerning the JobStatus check for QPUs jobs
+
 ## 0.10.0
 
 ### Updated in 0.10.0
