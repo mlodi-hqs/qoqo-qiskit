@@ -430,7 +430,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
- "struqture 2.0.0-alpha.13",
+ "struqture 2.0.0-alpha.14",
  "struqture-py",
  "syn",
  "thiserror",
@@ -444,7 +444,7 @@ checksum = "9d35ab1024980d4b84c7ed54346a8556478ffb4f987464225ae978ab3d7fc873"
 dependencies = [
  "proc-macro2",
  "quote",
- "struqture 2.0.0-alpha.13",
+ "struqture 2.0.0-alpha.14",
  "syn",
 ]
 
@@ -474,7 +474,7 @@ dependencies = [
 
 [[package]]
 name = "qoqo_qiskit_devices"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "bincode",
  "ndarray",
@@ -596,7 +596,7 @@ dependencies = [
  "roqoqo-derive",
  "serde",
  "struqture 1.12.2",
- "struqture 2.0.0-alpha.13",
+ "struqture 2.0.0-alpha.14",
  "syn",
  "thiserror",
 ]
@@ -614,7 +614,7 @@ dependencies = [
 
 [[package]]
 name = "roqoqo_qiskit_devices"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "ndarray",
  "roqoqo",
@@ -748,9 +748,9 @@ dependencies = [
 
 [[package]]
 name = "struqture"
-version = "2.0.0-alpha.13"
+version = "2.0.0-alpha.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6982c1fbd64a461c86962716b0dad7b0871506c2aabc1c638e6654d1ae5a7225"
+checksum = "f0ebba1a10e98cb1e725755ba9dbba2dd24b40796671f2a65b4c2b915cff900e"
 dependencies = [
  "indexmap",
  "itertools",
@@ -767,9 +767,9 @@ dependencies = [
 
 [[package]]
 name = "struqture-py"
-version = "2.0.0-alpha.13"
+version = "2.0.0-alpha.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfb744ca142a401b19dd0a6d14fb98733403377077a07b5d986163524c12a08f"
+checksum = "7b970939c2288b8c9fb76e8db26e6153a9890c4b9e1c4fe0ace379396b975bee"
 dependencies = [
  "bincode",
  "num-complex",
@@ -784,7 +784,7 @@ dependencies = [
  "schemars",
  "serde_json",
  "struqture 1.12.2",
- "struqture 2.0.0-alpha.13",
+ "struqture 2.0.0-alpha.14",
  "struqture-py-macros",
  "syn",
  "thiserror",
@@ -792,9 +792,9 @@ dependencies = [
 
 [[package]]
 name = "struqture-py-macros"
-version = "2.0.0-alpha.13"
+version = "2.0.0-alpha.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c9193fc0a98f1a92abe53442df6cf77fd0465ca19e3eb8713fb5fd48b0d9d31"
+checksum = "bdf6e2e2013940801118014a3e077b03f7c8cfe51786378f32183b17bbe5fc74"
 dependencies = [
  "proc-macro2",
  "quote",

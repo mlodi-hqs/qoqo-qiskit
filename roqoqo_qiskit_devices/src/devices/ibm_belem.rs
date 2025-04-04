@@ -445,7 +445,7 @@ impl QoqoDevice for IBMBelemDevice {
     /// # Returns
     ///
     /// * `Vec<(usize, usize)>` - A list of pairs of qubits linked with a native two-qubit-gate in
-    ///                           the device.
+    ///   the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
         vec![(0, 1), (1, 2), (1, 3), (3, 4)]

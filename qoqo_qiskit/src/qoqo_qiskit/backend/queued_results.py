@@ -151,7 +151,9 @@ class QueuedCircuitRun:
             return self._qoqo_result
         if self._job.in_final_state():
             status = self._job.status()
-            if status == JobStatus.DONE:
+            if (isinstance(status, JobStatus) and status == JobStatus.DONE) or (
+                isinstance(status, str) and status == "DONE"
+            ):
                 result = self._job.result()
                 modeled = RegistersWithLengths(
                     Registers(
@@ -167,7 +169,9 @@ class QueuedCircuitRun:
                     self._memory, self._sim_type, result, modeled, None, self._res_index
                 )
                 return self._qoqo_result
-            elif status == JobStatus.ERROR:
+            elif (isinstance(status, JobStatus) and status == JobStatus.ERROR) or (
+                isinstance(status, str) and status == "ERROR"
+            ):
                 raise RuntimeError("The job failed.")
             else:
                 raise RuntimeError("The job was cancelled.")
