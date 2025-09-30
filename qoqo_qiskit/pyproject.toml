@@ -9,7 +9,7 @@ maintainers = [
     { name = "Matteo Lodi", email = "matteo.lodi@quantumsimulations.de" },
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "qoqo>=1.19,<1.20",
     "qoqo_qasm>=0.12.1,<0.13",          # minimum version for Pyo3 0.21 support
