@@ -2,6 +2,10 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
+## Unreleased
+
+* Updated minimum supported Python version from 3.9 to 3.10.
+
 ## 0.10.1
 
 ### Fixed in 0.10.1
