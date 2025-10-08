@@ -25,7 +25,7 @@ jobs:
         pip install qoqo_qiskit/[docs] qoqo_qiskit_devices/[docs]
     - uses: peaceiris/actions-mdbook@v1
       with:
-        version: latest
+        mdbook-version: latest
     - name: build
       run: |
         # qoqo_qiskit
