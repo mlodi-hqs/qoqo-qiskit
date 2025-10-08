@@ -587,7 +587,7 @@ class QoqoQiskitBackend:
                         f"Wrong number of parameters {len(input_parameter_names)} parameters"
                         f" expected {len(params)} parameters given."
                     )
-                substituted_parameters = dict(zip(input_parameter_names, params))
+                substituted_parameters = dict(zip(input_parameter_names, params, strict=False))
                 measurement = program.measurement().substitute_parameters(substituted_parameters)
                 queued_runs.append(self.run_measurement_queued(measurement))
         else:
@@ -596,7 +596,7 @@ class QoqoQiskitBackend:
                     f"Wrong number of parameters {len(input_parameter_names)} parameters"
                     f" expected {len(params_values)} parameters given."
                 )
-            substituted_parameters = dict(zip(input_parameter_names, params_values))
+            substituted_parameters = dict(zip(input_parameter_names, params_values, strict=False))
             measurement = program.measurement().substitute_parameters(substituted_parameters)
             queued_runs.append(self.run_measurement_queued(measurement))
 

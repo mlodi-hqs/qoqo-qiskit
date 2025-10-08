@@ -9,10 +9,10 @@ maintainers = [
     { name = "Matteo Lodi", email = "matteo.lodi@quantumsimulations.de" },
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "qoqo>=1.19,<1.20",
-    "qoqo_qasm>=0.12.1,<0.13",          # minimum version for Pyo3 0.21 support
+    "qoqo_qasm>=0.14",                # minimum version for Pyo3 0.22 support
     "qiskit>=1.0,<1.3",                 # maximum version for transpilation support
     "qiskit_aer>=0.15",                 # minimum version for Python 3.12 support
     "qiskit_ibm_runtime>=0.35,<0.36",   # minimum version for `backend.run()` support drop
@@ -51,7 +51,7 @@ follow_imports = "silent"
 
 [tool.black]
 line-length = 99
-target-version = ["py39", "py310", "py311"]
+target-version = ["py310", "py311", "py312", "py313"]
 
 [tool.coverage.run]
 branch = true
@@ -63,7 +63,7 @@ source = ["src", "**/site-packages"]
 
 [tool.ruff]
 line-length = 99  # same as black
-target-version = "py39"
+target-version = "py310"
 show-fixes = true
 output-format = "full"
 # activate the following checks

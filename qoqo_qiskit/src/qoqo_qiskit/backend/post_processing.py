@@ -69,7 +69,7 @@ def _transform_job_result_list(
 ) -> None:
     if sim_type == "automatic":
         for i, (output_register, input_bit_circuit) in enumerate(
-            zip(output_registers, input_bit_circuits)
+            zip(output_registers, input_bit_circuits, strict=False)
         ):
             _transform_job_result_single(
                 memory, sim_type, result, output_register, input_bit_circuit, i
