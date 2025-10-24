@@ -9,10 +9,8 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Qoqo-qiskit backend module for compatibility and simulation purposes."""
+"""Qoqo-qiskit utils modules for compatibility purposes."""
 
-from qoqo_qiskit.backend.backend import QoqoQiskitBackend
-from qoqo_qiskit.backend.queued_results import QueuedProgramRun, QueuedCircuitRun
+from qoqo_qiskit.utils.utils import struqture_hamiltonian_to_qiskit_op
 
-
-__all__ = ["QoqoQiskitBackend", "QueuedCircuitRun", "QueuedProgramRun"]
+__all__ = ["struqture_hamiltonian_to_qiskit_op"]
