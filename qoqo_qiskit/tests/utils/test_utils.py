@@ -15,7 +15,7 @@ import pytest
 import sys
 
 from qoqo_qiskit.utils import struqture_hamiltonian_to_qiskit_op
-from struqture_py.spins import PauliHamiltonian, PauliProduct
+from struqture_py.spins import PauliHamiltonian, PauliProduct  # type:ignore
 
 
 def test_basic_hamiltonian() -> None:
