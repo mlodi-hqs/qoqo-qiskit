@@ -11,6 +11,7 @@
 # the License.
 """Qoqo-qiskit utils modules for compatibility purposes."""
 
+import re
 from typing import TYPE_CHECKING
 
 from qiskit.quantum_info.operators import SparsePauliOp
@@ -20,33 +21,39 @@ if TYPE_CHECKING:
 
 
 def struqture_hamiltonian_to_qiskit_op(
-    pauli_hamiltonian: "PauliHamiltonian", n_qubits: int
+    pauli_hamiltonian: "PauliHamiltonian",
+    n_qubits: int,
+    reverse_qubit_order: bool = True,
 ) -> SparsePauliOp:
     """Converts a struqture's PauliHamiltonian instance into a qiskit's SparsePauliOp one.
 
     Args:
         pauli_hamiltonian (PauliHamiltonian): The struqture_py.spins.PauliHamiltonian instance.
         n_qubits (int): Total number of qubits.
+        reverse_qubit_order (bool): Makes Qiskit's rightmost char qubit 0 (little-endian).
 
     Returns:
         SparsePauliOp: The equivalent SparsePauliOp instance.
     """
 
-    def convert_single(s: str) -> str:
-        pauli_vec = ["I"] * n_qubits
-        if s != "I":
-            for i in range(0, len(s), 2):
-                idx = int(s[i])
-                op = s[i + 1]
-                pauli_vec[n_qubits - idx - 1] = op
-        return "".join(pauli_vec)
-
-    pauli_strs = []
+    labels = []
     coeffs = []
+    token_re = re.compile(r"(\d+)([XYZ])")
+
     for key, val in zip(pauli_hamiltonian.keys(), pauli_hamiltonian.values(), strict=False):
-        s = str(key)
-        p = convert_single(s)
-        pauli_strs.append(p)
+        s = str(key)  # e.g., '0Z', '0X1X', '10X11X'
+        pauli = ["I"] * n_qubits
+        if s != "I":
+            for m in token_re.finditer(s):
+                idx = int(m.group(1))  # site index (can be multi-digit)
+                op = m.group(2)  # 'X', 'Y', or 'Z'
+                q = (n_qubits - 1 - idx) if reverse_qubit_order else idx
+                if not (0 <= q < n_qubits):
+                    raise IndexError(
+                        f"Site index {idx} (mapped to qubit {q}) out of range 0..{n_qubits - 1}"
+                    )
+                pauli[q] = op
+        labels.append("".join(pauli))
         coeffs.append(complex(val))
 
-    return SparsePauliOp(pauli_strs, coeffs)
+    return SparsePauliOp(labels, coeffs)
