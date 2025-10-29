@@ -31,6 +31,19 @@ def test_basic_hamiltonian() -> None:
     assert res.to_list() == [("YZX", (0.5 + 0j))]
 
 
+def test_big_hamiltonian() -> None:
+    """Test the big Hamiltonian conversion."""
+    pp = PauliProduct().x(0).z(1).y(2).x(3).z(4).y(5).x(6).z(7).y(8).x(9).z(10).y(11)
+
+    hamiltonian = PauliHamiltonian()
+    hamiltonian.add_operator_product(pp, 0.5)
+
+    res = struqture_hamiltonian_to_qiskit_op(hamiltonian, 12)
+
+    assert res.num_qubits == 12
+    assert res.to_list() == [("YZXYZXYZXYZX", (0.5 + 0j))]
+
+
 # For pytest
 if __name__ == "__main__":
     pytest.main(sys.argv)
