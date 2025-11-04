@@ -27,6 +27,7 @@ Translates qoqo operations and circuits to qiskit equivalents.
 
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
+from qoqo_qiskit.utils import struqture_hamiltonian_to_qiskit_op
 from .models import Registers, RegistersWithLengths
 
 __all__ = (
@@ -35,5 +36,6 @@ __all__ = (
     "QueuedProgramRun",
     "Registers",
     "RegistersWithLengths",
+    "struqture_hamiltonian_to_qiskit_op",
     "to_qiskit_circuit",
 )
