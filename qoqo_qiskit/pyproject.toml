@@ -24,7 +24,7 @@ tests = [
     "coverage",
     "pytest",
     "pytest-cov",
-    "struqture_py",
+    "struqture_py>=2.0.0",
 ]
 dev = [
     "bandit",
