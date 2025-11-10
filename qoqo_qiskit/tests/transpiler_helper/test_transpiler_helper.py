@@ -11,6 +11,9 @@
 # the License.
 """Test file for interface.py."""
 
+import pytest
+import sys
+
 from qoqo import Circuit, CircuitDag, QuantumProgram
 from qoqo import operations as ops  # type:ignore
 from qoqo.measurements import (  # type:ignore
@@ -51,13 +54,14 @@ def test_medium_circuit_basic_gates() -> None:
     circuit_res = Circuit()
     circuit_res += ops.RotateZ(1, 1.5707963267948966)
     circuit_res += ops.SqrtPauliX(1)
-    circuit_res += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res += ops.RotateZ(1, 3.141592653589793)
     circuit_res += ops.ControlledPauliZ(0, 1)
-    circuit_res += ops.RotateZ(1, 1.5707963267948966)
     circuit_res += ops.SqrtPauliX(1)
     circuit_res += ops.RotateZ(1, 1.5707963267948966)
 
-    transpiled_circuit = transpile_with_qiskit(circuit, [{"basis_gates": ["sx", "rz", "cz"]}])
+    transpiled_circuit = transpile_with_qiskit(
+        circuit, [{"basis_gates": ["sx", "rz", "cz"], "initial_layout": [0, 1]}]
+    )
 
     assert transpiled_circuit == circuit_res
 
@@ -72,7 +76,9 @@ def test_basic_circuit_backend() -> None:
     circuit_res += ops.PauliX(0)
 
     backend = FakeManilaV2()
-    transpiled_circuit = transpile_with_qiskit(circuit, [{"backend": backend}])
+    transpiled_circuit = transpile_with_qiskit(
+        circuit, [{"backend": backend, "initial_layout": [0]}]
+    )
 
     assert transpiled_circuit == circuit_res
 
@@ -100,7 +106,7 @@ def test_toffoli_circuit_basic_gates() -> None:
     circuit_res += ops.CNOT(0, 1)
 
     transpiled_circuit = transpile_with_qiskit(
-        circuit, [{"basis_gates": ["rz", "sx", "x", "cx", "h", "t"]}]
+        circuit, [{"basis_gates": ["rz", "sx", "x", "cx", "h", "t"], "initial_layout": [0, 1, 2]}]
     )
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
@@ -128,7 +134,9 @@ def test_medium_circuit_backend() -> None:
     circuit_res += ops.RotateZ(1, 1.5707963267948966)
 
     backend = FakeManilaV2()
-    transpiled_circuit = transpile_with_qiskit(circuit, [{"backend": backend}])
+    transpiled_circuit = transpile_with_qiskit(
+        circuit, [{"backend": backend, "initial_layout": [0, 1]}]
+    )
 
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
@@ -142,10 +150,12 @@ def test_multiple_circuits_backend() -> None:
     """Test multiple circuits conversion with a BaseGates transpiler."""
     circuit_1 = Circuit()
     circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.PauliX(1)
     circuit_1 += ops.Identity(0)
 
     circuit_res_1 = Circuit()
     circuit_res_1 += ops.PauliX(0)
+    circuit_res_1 += ops.PauliX(1)
 
     circuit_2 = Circuit()
     circuit_2 += ops.PauliX(0)
@@ -163,7 +173,9 @@ def test_multiple_circuits_backend() -> None:
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
 
     backend = FakeManilaV2()
-    transpiled_circuits = transpile_with_qiskit([circuit_1, circuit_2], [{"backend": backend}])
+    transpiled_circuits = transpile_with_qiskit(
+        [circuit_1, circuit_2], [{"backend": backend, "initial_layout": [0, 1]}]
+    )
 
     transpiled_circuit_dag = CircuitDag()
     circuit_res_dag = CircuitDag()
@@ -207,11 +219,14 @@ def test_basic_program_basic_gates() -> None:
     """Test basic program conversion with a BaseGates transpiler."""
     circuit_1 = Circuit()
     circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.PauliX(1)
     circuit_1 += ops.Identity(0)
 
     circuit_res_1 = Circuit()
     circuit_res_1 += ops.SqrtPauliX(0)
     circuit_res_1 += ops.SqrtPauliX(0)
+    circuit_res_1 += ops.SqrtPauliX(1)
+    circuit_res_1 += ops.SqrtPauliX(1)
 
     circuit_2 = Circuit()
     circuit_2 += ops.CNOT(0, 1)
@@ -219,9 +234,8 @@ def test_basic_program_basic_gates() -> None:
     circuit_res_2 = Circuit()
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
     circuit_res_2 += ops.SqrtPauliX(1)
-    circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
+    circuit_res_2 += ops.RotateZ(1, 3.141592653589793)
     circuit_res_2 += ops.ControlledPauliZ(0, 1)
-    circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
     circuit_res_2 += ops.SqrtPauliX(1)
     circuit_res_2 += ops.RotateZ(1, 1.5707963267948966)
 
@@ -233,7 +247,7 @@ def test_basic_program_basic_gates() -> None:
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
 
     transpiled_program = transpile_program_with_qiskit(
-        quantum_program, [{"basis_gates": ["sx", "rz", "cz"]}]
+        quantum_program, [{"basis_gates": ["sx", "rz", "cz"], "initial_layout": [0, 1]}]
     )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)
@@ -284,7 +298,7 @@ def test_program_with_constant_circuit_basic_gates() -> None:
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
 
     transpiled_program = transpile_program_with_qiskit(
-        quantum_program, [{"basis_gates": ["sx", "rz", "cz"]}]
+        quantum_program, [{"basis_gates": ["sx", "rz", "cz"], "initial_layout": [0, 1]}]
     )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)
@@ -294,10 +308,12 @@ def test_quantum_program_backend() -> None:
     """Test basic program conversion with a BaseGates transpiler."""
     circuit_1 = Circuit()
     circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.PauliX(1)
     circuit_1 += ops.Identity(0)
 
     circuit_res_1 = Circuit()
     circuit_res_1 += ops.PauliX(0)
+    circuit_res_1 += ops.PauliX(1)
 
     circuit_2 = Circuit()
     circuit_2 += ops.PauliX(0)
@@ -339,7 +355,9 @@ def test_quantum_program_backend() -> None:
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
 
     backend = FakeManilaV2()
-    transpiled_program = transpile_program_with_qiskit(quantum_program, [{"backend": backend}])
+    transpiled_program = transpile_program_with_qiskit(
+        quantum_program, [{"backend": backend, "initial_layout": [0, 1]}]
+    )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)
 
@@ -406,6 +424,13 @@ def test_quantum_program_with_constant_circuit_backend() -> None:
     quantum_program_res = QuantumProgram(measurement=measurement_res, input_parameter_names=["x"])
 
     backend = FakeManilaV2()
-    transpiled_program = transpile_program_with_qiskit(quantum_program, [{"backend": backend}])
+    transpiled_program = transpile_program_with_qiskit(
+        quantum_program, [{"backend": backend, "initial_layout": [0, 1]}]
+    )
 
     assert_quantum_program_equal(transpiled_program, quantum_program_res)
+
+
+# For pytest
+if __name__ == "__main__":
+    pytest.main(sys.argv)
