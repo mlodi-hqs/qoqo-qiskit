@@ -13,9 +13,9 @@ This changelog tracks changes of the qoqo_qiskit project starting at version 0.1
 
 * Added `utils` module with `struqture_hamiltonian_to_qiskit_op`, making it possible to cast a struqture's PauliHamiltonian into a qiskit's SparsePauliOp.
 
-### Deprecated in 0.11.0
+### Changed in 0.11.0
 
-* Deprecated `qoqo_qiskit_devices` and `roqoqo_qiskit_devices` packa
+* Archived `qoqo_qiskit_devices` and `roqoqo_qiskit_devices` packages.
 
 ## 0.10.1
 
