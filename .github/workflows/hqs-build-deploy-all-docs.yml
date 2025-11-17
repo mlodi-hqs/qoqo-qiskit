@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip maturin
-        pip install qoqo_qiskit/[docs] qoqo_qiskit_devices/[docs]
+        pip install qoqo_qiskit/[docs]
     - uses: peaceiris/actions-mdbook@v1
       with:
         mdbook-version: latest
@@ -33,14 +33,6 @@ jobs:
         python -m sphinx -T -E -b html . _build/html
         cd ../../
         cp -r ./qoqo_qiskit/docs/_build/html ./documentation/src/qoqo_qiskit_api
-        # qoqo_qiskit_devices
-        cd qoqo_qiskit_devices/docs
-        python -m sphinx -T -E -b html . _build/html
-        cd ../../
-        cp -r ./qoqo_qiskit_devices/docs/_build/html ./documentation/src/qoqo_qiskit_devices_api
-        # roqoqo_qiskit_devices
-        cargo doc --no-deps --package=roqoqo_qiskit_devices
-        cp -r ./target/doc/* ./documentation/src/roqoqo_qiskit_devices_api
         # Generating doc
         cd documentation/
         mdbook build
