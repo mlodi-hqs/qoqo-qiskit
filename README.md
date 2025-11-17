@@ -22,17 +22,6 @@ This software is still in the beta stage. Functions and documentation are not ye
 
 If you find unexpected behaviour please open a github issue. You can also run the pytests in qoqo_qiskit/tests/ locally.
 
-
-### Installation
-
-To use roqoqo_qiskit_devices in a Rust project simply add
-
-```TOML
-roqoqo_qiskit_devices = {version="0.1"}
-```
-
-to the `[dependencies]` section of the project Cargo.toml.
-
 ## General Notes
 
 Qiskit is under the Apache-2.0 license ( see https://github.com/Qiskit/qiskit/blob/master/LICENSE.txt ).

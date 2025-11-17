@@ -20,3 +20,13 @@ Where `MY_API_TOKEN` is the API key that can be found in the account settings of
 ![Crates.io](https://img.shields.io/crates/l/roqoqo-qiskit-devices)
 
 Qiskit devices Rust interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
+
+### Installation
+
+To use roqoqo_qiskit_devices in a Rust project simply add
+
+```TOML
+roqoqo_qiskit_devices = {version="0.1"}
+```
+
+to the `[dependencies]` section of the project Cargo.toml.
