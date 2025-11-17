@@ -1,9 +1,11 @@
 target/*
-qoqo_qiskit_devices/target/*
-roqoqo_qiskit_devices/target/*
+deprecated/qoqo_qiskit_devices/target/*
+deprecated/roqoqo_qiskit_devices/target/*
 *__pycache__*
 */docs/_build*
 */docs/generated*
+deprecated/*/docs/_build*
+deprecated/*/docs/generated*
 */dist/*
 .mypy_cache*
 *.egg-info*
