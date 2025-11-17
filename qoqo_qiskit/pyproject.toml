@@ -33,9 +33,12 @@ dev = [
     "ruff",
 ]
 docs = [
-    "sphinx",
-    "sphinx_rtd_theme",
+    "sphinx >= 2.1",
     "nbsphinx",
+    "pygments",
+    "recommonmark",
+    "myst_parser",
+    "sphinx_rtd_theme",
     "tomli",
 ]
 
