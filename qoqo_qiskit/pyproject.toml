@@ -11,7 +11,7 @@ maintainers = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "qoqo>=1.21,<1.22",
+    "qoqo>=1.21",
     "qoqo_qasm>=0.14",
     "qiskit>=2.2,<2.3",
     "qiskit_aer>=0.17,<0.18",
