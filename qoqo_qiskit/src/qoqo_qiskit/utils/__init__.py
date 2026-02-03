@@ -11,6 +11,14 @@
 # the License.
 """Qoqo-qiskit utils modules for compatibility purposes."""
 
-from qoqo_qiskit.utils.utils import struqture_hamiltonian_to_qiskit_op
+from qoqo_qiskit.utils.utils import (
+    _sort_by_length,
+    measure_spin_operator_to_qiskit,
+    struqture_hamiltonian_to_qiskit_op,
+)
 
-__all__ = ["struqture_hamiltonian_to_qiskit_op"]
+__all__ = [
+    "_sort_by_length",
+    "measure_spin_operator_to_qiskit",
+    "struqture_hamiltonian_to_qiskit_op",
+]
