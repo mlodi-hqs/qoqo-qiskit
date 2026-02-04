@@ -12,20 +12,18 @@
 """Qoqo-qiskit utils modules for compatibility purposes."""
 
 import re
-from typing import TYPE_CHECKING, Optional, Tuple, List, Dict
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from qiskit import QuantumCircuit, transpile
 from qiskit.quantum_info.operators import SparsePauliOp
 from qiskit_aer import Aer
-
-if TYPE_CHECKING:
-    from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type:ignore
+from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type:ignore
 
 _TOKEN_RE = re.compile(r"(\d+)([XYZ])")
 
 
 def struqture_hamiltonian_to_qiskit_op(
-    pauli_hamiltonian: "PauliHamiltonian",
+    pauli_hamiltonian: PauliHamiltonian,
     n_qubits: int,
     reverse_qubit_order: bool = True,
 ) -> SparsePauliOp:
@@ -64,7 +62,7 @@ def struqture_hamiltonian_to_qiskit_op(
 
 
 def measure_spin_operator_to_qiskit(
-    input_operator: "PauliHamiltonian",
+    input_operator: PauliHamiltonian,
     name: str,
     undo_basis_rotation: bool,
     constant_circuit: Optional[QuantumCircuit] = None,
@@ -101,19 +99,12 @@ def measure_spin_operator_to_qiskit(
     return circuits
 
 
-def _sort_spin_operator(input_operator: "PauliOperator") -> List:
-    """
-    Split a PauliOperator-like object into a list of PauliOperators,
-    each containing only mutually measurement-compatible PauliProducts.
-
-    Note: This is a greedy heuristic (same as the Rust code). It does NOT
-    guarantee the minimum number of groups.
-    """
+def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
+    """Split a PauliOperator-like object into measurement-compatible PauliProducts."""
     output_ops: List[PauliOperator] = []
     sorted_keys = _sort_by_length(input_operator)
 
-    # Rust asserts sorted.len() == input_operator.len()
-    # Here we’ll just proceed.
+    # TODO length check
 
     while sorted_keys:
         new_op = PauliOperator()
@@ -122,7 +113,6 @@ def _sort_spin_operator(input_operator: "PauliOperator") -> List:
         first = sorted_keys.pop(0)
         new_op.set(first, input_operator.get(first))
 
-        # Iterate over a snapshot (Rust clones sorted -> tmp_sorted)
         for pp in list(sorted_keys):
             # Check pp against all keys already in new_op
             incompatible_with_group = any(
@@ -140,7 +130,7 @@ def _sort_spin_operator(input_operator: "PauliOperator") -> List:
     return output_ops
 
 
-def _sort_by_length(op: "PauliHamiltonian") -> List:
+def _sort_by_length(op: PauliOperator) -> List:
     """Return op.keys() ordered then reversed.
 
     Rust's Ord for PauliProduct is "by length then content" (effectively).

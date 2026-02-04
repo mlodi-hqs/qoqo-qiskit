@@ -13,12 +13,14 @@
 
 from qoqo_qiskit.utils.utils import (
     _sort_by_length,
+    _sort_spin_operator,
     measure_spin_operator_to_qiskit,
     struqture_hamiltonian_to_qiskit_op,
 )
 
 __all__ = [
     "_sort_by_length",
+    "_sort_spin_operator",
     "measure_spin_operator_to_qiskit",
     "struqture_hamiltonian_to_qiskit_op",
 ]
