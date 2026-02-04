@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_qiskit"
-version = "0.11.0"
+version = "0.11.1"
 license = { file = "LICENSE" }
 authors = [
     { name = "HQS Quantum Simulation GmbH", email = "info@quantumsimulations.de" },
@@ -17,6 +17,7 @@ dependencies = [
     "qiskit_aer>=0.17,<0.18",
     "qiskit_ibm_runtime>=0.41,<0.42",
     "numpy",
+    "struqture_py>=2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -24,7 +25,6 @@ tests = [
     "coverage",
     "pytest",
     "pytest-cov",
-    "struqture_py>=2.0.0",
 ]
 dev = [
     "bandit",
