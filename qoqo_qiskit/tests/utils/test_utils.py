@@ -18,8 +18,9 @@ from qoqo_qiskit.utils import (
     struqture_hamiltonian_to_qiskit_op,
     measure_spin_operator_to_qiskit,
     _sort_by_length,
+    _sort_spin_operator,
 )
-from struqture_py.spins import PauliHamiltonian, PauliProduct  # type:ignore
+from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # type:ignore
 
 
 def test_basic_hamiltonian() -> None:
@@ -73,25 +74,69 @@ def test_sort_by_length() -> None:
     pp_2 = PauliProduct().x(0).z(2).y(4)
     pp_3 = PauliProduct().x(0).y(1)
 
-    hamiltonian_1 = PauliHamiltonian()
+    hamiltonian = PauliOperator()
+
+    hamiltonian_1 = PauliOperator()
     hamiltonian_1.add_operator_product(pp_1, 0.5)
 
-    hamiltonian_2 = PauliHamiltonian()
+    hamiltonian_2 = PauliOperator()
     hamiltonian_2.add_operator_product(pp_1, 0.5)
     hamiltonian_2.add_operator_product(pp_2, 0.5)
 
-    hamiltonian_3 = PauliHamiltonian()
+    hamiltonian_3 = PauliOperator()
     hamiltonian_3.add_operator_product(pp_1, 0.5)
     hamiltonian_3.add_operator_product(pp_3, 0.5)
 
-    hamiltonian_4 = PauliHamiltonian()
+    hamiltonian_4 = PauliOperator()
     hamiltonian_4.add_operator_product(pp_3, 0.5)
     hamiltonian_4.add_operator_product(pp_1, 0.5)
 
+    assert _sort_by_length(hamiltonian) == []
     assert _sort_by_length(hamiltonian_1) == [pp_1]
     assert _sort_by_length(hamiltonian_2) == [pp_2, pp_1]
     assert _sort_by_length(hamiltonian_3) == [pp_1, pp_3]
     assert _sort_by_length(hamiltonian_4) == [pp_1, pp_3]
+
+
+def test_sort_spin_operator() -> None:
+    pp_o = PauliProduct()
+    pp_1 = PauliProduct().x(0).z(1).y(4)
+    pp_2 = PauliProduct().x(0).z(2).y(4)
+    pp_3 = PauliProduct().x(0).y(1)
+    pp_4 = PauliProduct().y(4).z(6)
+
+    po_emp = PauliOperator()
+    po_1 = PauliOperator()
+    po_1.add_operator_product(pp_o, 1)
+    po_2 = PauliOperator()
+    po_2.add_operator_product(pp_1, 1)
+    po_3 = PauliOperator()
+    po_3.add_operator_product(pp_1, 1)
+    po_3.add_operator_product(pp_2, 1)
+    po_4 = PauliOperator()
+    po_4.add_operator_product(pp_1, 1)
+    po_4.add_operator_product(pp_3, 1)
+    po_5 = PauliOperator()
+    po_5.add_operator_product(pp_3, 1)
+    po_5.add_operator_product(pp_1, 1)
+    po_6 = PauliOperator()
+    po_6.add_operator_product(pp_3, 1)
+    po_7 = PauliOperator()
+    po_7.add_operator_product(pp_1, 1)
+    po_7.add_operator_product(pp_3, 1)
+    po_7.add_operator_product(pp_4, 1)
+    po_8 = PauliOperator()
+    po_8.add_operator_product(pp_1, 1)
+    po_8.add_operator_product(pp_4, 1)
+
+    assert _sort_spin_operator(po_emp) == []
+    assert _sort_spin_operator(po_1) == [po_1]
+    assert _sort_spin_operator(po_2) == [po_2]
+    assert _sort_spin_operator(po_3) == [po_3]
+    assert _sort_spin_operator(po_4) == [po_2, po_6]
+    assert _sort_spin_operator(po_5) == [po_2, po_6]
+    assert _sort_spin_operator(po_7) == [po_8, po_6]
+
 
 # For pytest
 if __name__ == "__main__":
