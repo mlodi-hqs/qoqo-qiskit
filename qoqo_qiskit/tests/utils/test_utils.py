@@ -11,6 +11,7 @@
 # the License.
 """Test file for utils.py."""
 
+import numpy as np
 import pytest
 import sys
 
@@ -19,7 +20,11 @@ from qoqo_qiskit.utils import (
     measure_spin_operator_to_qiskit,
     _sort_by_length,
     _sort_spin_operator,
+    _single_measurement_circuit,
+    _collect_pauli_products,
+    _basis_rotation_from_z_basis,
 )
+from qiskit import QuantumCircuit
 from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # type:ignore
 
 
@@ -136,6 +141,36 @@ def test_sort_spin_operator() -> None:
     assert _sort_spin_operator(po_4) == [po_2, po_6]
     assert _sort_spin_operator(po_5) == [po_2, po_6]
     assert _sort_spin_operator(po_7) == [po_8, po_6]
+
+
+# def test_single_measurement_circuit() -> None:
+#     pp = PauliProduct().x(0).z(1)
+#     _single_measurement_circuit(pp, "test", False, None, 2, None)
+
+
+def test_collect_pauli_products() -> None:
+    pp = PauliProduct().x(0).z(1)
+    pp2 = PauliProduct().x(0).z(2).y(4)
+    p_err = PauliProduct().y(0)
+    pp_comb = PauliProduct().x(0).z(1).z(2).y(4)
+
+    assert (pp_comb, 5) == _collect_pauli_products([pp, pp2])
+
+    with pytest.raises(ValueError):
+        _ = _collect_pauli_products([pp, p_err])
+
+
+def test_basis_rotation_from_z_basis() -> None:
+    pp = PauliProduct().x(0).z(1)
+    pp2 = PauliProduct().x(0).z(2).y(4)
+    circuit = QuantumCircuit(5)
+
+    _basis_rotation_from_z_basis(circuit, [pp, pp2], None)
+
+    assert_circ = QuantumCircuit(5)
+    assert_circ.ry(-np.pi / 2, 0)
+    assert_circ.rx(np.pi / 2, 4)
+    assert circuit == assert_circ
 
 
 # For pytest

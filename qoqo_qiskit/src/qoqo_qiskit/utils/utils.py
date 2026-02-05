@@ -14,7 +14,9 @@
 import re
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
-from qiskit import QuantumCircuit, transpile
+import numpy as np
+from qiskit import ClassicalRegister, QuantumCircuit, transpile
+from qiskit.circuit import Gate
 from qiskit.quantum_info.operators import SparsePauliOp
 from qiskit_aer import Aer
 from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type:ignore
@@ -69,7 +71,7 @@ def measure_spin_operator_to_qiskit(
     number_measurements: Optional[int] = None,
     qubit_mapping: Optional[dict[int, int]] = None,
     definitionbit_length: Optional[int] = None,
-) -> Tuple[list[QuantumCircuit], int]:
+) -> Tuple[list[QuantumCircuit], QuantumCircuit, int]:
     if (
         definitionbit_length is not None
         and definitionbit_length < input_operator.current_number_spins()
@@ -81,8 +83,12 @@ def measure_spin_operator_to_qiskit(
             The measurement can therefore not be constructed."
         )
 
-    # TODO: take operators names
+    operators: List[PauliOperator] = _sort_spin_operator(input_operator)
     circuits: list[QuantumCircuit] = []
+    temp = 0
+
+    for i, op in enumerate(operators):
+        keys: List[PauliProduct] = op.keys()
 
     # sim = Aer.get_backend("aer_simulator")
     # circuits_transpiled = transpile(circuits_with_meas, sim)
@@ -96,7 +102,11 @@ def measure_spin_operator_to_qiskit(
     #         bitsring_qoqo = bitstrings_qiskit_to_bool(bitstring_qiskit)
     #         br_tmp[f"ro_{meas_idx}"] = bitsring_qoqo
     #     expectation_values.append(meas.evaluate(br_tmp, {}, {}))
-    return circuits
+    return (
+        circuits,
+        constant_circuit,
+        temp,
+    )
 
 
 def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
@@ -128,6 +138,78 @@ def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
         output_ops.append(new_op)
 
     return output_ops
+
+
+def _single_measurement_circuit(
+    pauli_products: List[PauliProduct],
+    readout_register: str,
+    undo_basis_rotation: bool,
+    qubit_mapping: Optional[Dict[int, int]],
+    number_qubits: int,
+    creg_length: Optional[int],
+) -> QuantumCircuit:
+    mapping = dict(qubit_mapping) if qubit_mapping is not None else {}
+    circuit = QuantumCircuit(number_qubits)
+    creg = ClassicalRegister(creg_length, readout_register)
+    circuit.add_register(creg)
+
+    _basis_rotation_from_z_basis(circuit, pauli_products, mapping)
+
+    circuit.measure_all()
+    if undo_basis_rotation:
+        pass  # TODO implement basis_rotation_to_z_basis
+    return circuit
+
+
+def _basis_rotation_from_z_basis(
+    circuit: QuantumCircuit,
+    pauli_products: List[PauliProduct],
+    qubit_mapping: Optional[Dict[int, int]],
+) -> QuantumCircuit:
+    collected_pauli_products, _ = _collect_pauli_products(pauli_products)
+
+    mapping = dict(qubit_mapping) if qubit_mapping is not None else {}
+
+    for qbt in collected_pauli_products.keys():
+        pauli_str = collected_pauli_products.get(qbt)
+        qubit = mapping[qbt] if qbt in mapping else qbt
+        if pauli_str == "X":
+            circuit.ry(-np.pi / 2, qubit)
+        elif pauli_str == "Y":
+            circuit.rx(np.pi / 2, qubit)
+    return circuit
+
+
+def _basis_rotation_to_z_basis(
+    circuit: QuantumCircuit,
+    pauli_products: List[PauliProduct],
+    qubit_mapping: Optional[Dict[int, int]],
+) -> QuantumCircuit:
+    collected_pauli_products, _ = _collect_pauli_products(pauli_products)
+
+    mapping = dict(qubit_mapping) if qubit_mapping is not None else {}
+
+    for qbt in collected_pauli_products.keys():
+        pauli_str = collected_pauli_products.get(qbt)
+        qubit = mapping[qbt] if qbt in mapping else qbt
+        if pauli_str == "X":
+            circuit.ry(np.pi / 2, qubit)
+        elif pauli_str == "Y":
+            circuit.rx(-np.pi / 2, qubit)
+    return circuit
+
+
+def _collect_pauli_products(pauli_products: List[PauliProduct]) -> Tuple[PauliProduct, int]:
+    for i, pp_left in enumerate(pauli_products):
+        for ppright in pauli_products[i + 1 :]:
+            if _pauli_products_are_not_measurement_compatible(pp_left, ppright):
+                raise ValueError("Pauli products are not measurement compatible.")
+    collected_pauli_products = PauliProduct()
+    for pp in pauli_products:
+        for key in pp.keys():
+            collected_pauli_products = collected_pauli_products.set_pauli(key, pp.get(key))
+    max_length = max(collected_pauli_products.keys()) + 1
+    return (collected_pauli_products, max_length)
 
 
 def _sort_by_length(op: PauliOperator) -> List:

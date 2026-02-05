@@ -12,6 +12,9 @@
 """Qoqo-qiskit utils modules for compatibility purposes."""
 
 from qoqo_qiskit.utils.utils import (
+    _basis_rotation_from_z_basis,
+    _collect_pauli_products,
+    _single_measurement_circuit,
     _sort_by_length,
     _sort_spin_operator,
     measure_spin_operator_to_qiskit,
@@ -19,6 +22,9 @@ from qoqo_qiskit.utils.utils import (
 )
 
 __all__ = [
+    "_basis_rotation_from_z_basis",
+    "_collect_pauli_products",
+    "_single_measurement_circuit",
     "_sort_by_length",
     "_sort_spin_operator",
     "measure_spin_operator_to_qiskit",
