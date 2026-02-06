@@ -124,7 +124,6 @@ def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
         new_op.set(first, input_operator.get(first))
 
         for pp in list(sorted_keys):
-            # Check pp against all keys already in new_op
             incompatible_with_group = any(
                 _pauli_products_are_not_measurement_compatible(existing_pp, pp)
                 for existing_pp in new_op.keys()
@@ -148,16 +147,19 @@ def _single_measurement_circuit(
     number_qubits: int,
     creg_length: Optional[int],
 ) -> QuantumCircuit:
-    mapping = dict(qubit_mapping) if qubit_mapping is not None else {}
+    mapping = qubit_mapping if qubit_mapping is not None else {}
     circuit = QuantumCircuit(number_qubits)
+    creg_length = creg_length if creg_length is not None else number_qubits
     creg = ClassicalRegister(creg_length, readout_register)
     circuit.add_register(creg)
 
     _basis_rotation_from_z_basis(circuit, pauli_products, mapping)
 
     circuit.measure_all()
+
     if undo_basis_rotation:
-        pass  # TODO implement basis_rotation_to_z_basis
+        _basis_rotation_to_z_basis(circuit, pauli_products, mapping)
+
     return circuit
 
 
@@ -168,7 +170,7 @@ def _basis_rotation_from_z_basis(
 ) -> QuantumCircuit:
     collected_pauli_products, _ = _collect_pauli_products(pauli_products)
 
-    mapping = dict(qubit_mapping) if qubit_mapping is not None else {}
+    mapping = qubit_mapping if qubit_mapping is not None else {}
 
     for qbt in collected_pauli_products.keys():
         pauli_str = collected_pauli_products.get(qbt)
@@ -187,7 +189,7 @@ def _basis_rotation_to_z_basis(
 ) -> QuantumCircuit:
     collected_pauli_products, _ = _collect_pauli_products(pauli_products)
 
-    mapping = dict(qubit_mapping) if qubit_mapping is not None else {}
+    mapping = qubit_mapping if qubit_mapping is not None else {}
 
     for qbt in collected_pauli_products.keys():
         pauli_str = collected_pauli_products.get(qbt)
@@ -208,7 +210,10 @@ def _collect_pauli_products(pauli_products: List[PauliProduct]) -> Tuple[PauliPr
     for pp in pauli_products:
         for key in pp.keys():
             collected_pauli_products = collected_pauli_products.set_pauli(key, pp.get(key))
-    max_length = max(collected_pauli_products.keys()) + 1
+    if len(collected_pauli_products.keys()) == 0:
+        max_length = 1
+    else:
+        max_length = max(collected_pauli_products.keys()) + 1
     return (collected_pauli_products, max_length)
 
 
