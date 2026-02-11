@@ -17,7 +17,7 @@ import sys
 
 from qoqo_qiskit.utils import (
     struqture_hamiltonian_to_qiskit_op,
-    measure_spin_operator_to_qiskit,
+    measure_spin_operator,
     _sort_by_length,
     _sort_spin_operator,
     _single_measurement_circuit,
@@ -59,11 +59,11 @@ def test_big_hamiltonian() -> None:
 def test_measure_spin_operator_empty() -> None:
     """Test measure_spin_operator with an empty operator."""
     pp = PauliProduct().x(0).z(1)
-    hamiltonian = PauliHamiltonian()
-    hamiltonian.add_operator_product(pp, 0.5)
+    po = PauliOperator()
+    po.add_operator_product(pp, 0.5)
 
     with pytest.raises(ValueError) as exc:
-        _ = measure_spin_operator_to_qiskit(hamiltonian, "empty", False, definitionbit_length=1)
+        _ = measure_spin_operator(po, "empty", False, None, 1)
     assert (
         "The number of spins in the operators passed is \
             2. The length of the \
@@ -71,6 +71,36 @@ def test_measure_spin_operator_empty() -> None:
             The measurement can therefore not be constructed."
         in str(exc.value)
     )
+
+
+def test_measure_spin_operator_simple() -> None:
+    pp = PauliProduct().x(0).z(1).y(4)
+    po = PauliOperator()
+    po.add_operator_product(pp, 1.7)
+
+    res = measure_spin_operator(po, "test", False, None, 10)
+
+    sc = _single_measurement_circuit([pp], "test_0", False, None, 5, 10)
+
+    assert res[0] == sc
+
+
+def test_measure_spin_operator_complex() -> None:
+    pp0 = PauliProduct().x(0).z(1).y(4)
+    pp1 = PauliProduct().x(0).y(1)
+    pp2 = PauliProduct().y(4).z(6)
+    po = PauliOperator()
+    po.add_operator_product(pp0, 1.7)
+    po.add_operator_product(pp1, 2.7)
+    po.add_operator_product(pp2, 3.7)
+
+    res = measure_spin_operator(po, "empty", False, None, 8)
+
+    circ1 = _single_measurement_circuit([pp0, pp2], "empty_0", False, None, 7, 8)
+    circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 2, 8)
+
+    assert res[0] == circ1
+    assert res[1] == circ2
 
 
 def test_sort_by_length() -> None:

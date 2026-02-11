@@ -12,14 +12,20 @@
 """Qoqo-qiskit utils modules for compatibility purposes."""
 
 import re
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from qiskit import ClassicalRegister, QuantumCircuit, transpile
 from qiskit.circuit import Gate
+from qiskit.primitives import SamplerPubResult
 from qiskit.quantum_info.operators import SparsePauliOp
 from qiskit_aer import Aer
+from qiskit_aer.primitives import SamplerV2
+from qoqo import Circuit
+from qoqo.measurements import PauliZProduct, PauliZProductInput
 from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type:ignore
+
+from qoqo_qiskit.interface import to_qiskit_circuit
 
 _TOKEN_RE = re.compile(r"(\d+)([XYZ])")
 
@@ -63,33 +69,45 @@ def struqture_hamiltonian_to_qiskit_op(
     return SparsePauliOp(labels, coeffs)
 
 
-def measure_spin_operator_to_qiskit(
-    input_operator: PauliHamiltonian,
+def run_spin_operator(
+    input_circuit: Circuit,
+    input_operator: PauliOperator,
     name: str,
     undo_basis_rotation: bool,
-    constant_circuit: Optional[QuantumCircuit] = None,
+    constant_circuit: Optional[Circuit] = None,
     number_measurements: Optional[int] = None,
     qubit_mapping: Optional[dict[int, int]] = None,
-    definitionbit_length: Optional[int] = None,
-) -> Tuple[list[QuantumCircuit], QuantumCircuit, int]:
-    if (
-        definitionbit_length is not None
-        and definitionbit_length < input_operator.current_number_spins()
-    ):
-        raise ValueError(
-            f"The number of spins in the operators passed is \
-            {input_operator.current_number_spins()}. The length of the \
-            DefinitionBit input is {definitionbit_length}, which is smaller. \
-            The measurement can therefore not be constructed."
-        )
+    creg_length: Optional[int] = None,
+) -> Tuple[List[QuantumCircuit], List[float], List[Any]]:
+    circuits = measure_spin_operator(
+        input_operator,
+        name,
+        undo_basis_rotation,
+        qubit_mapping,
+        creg_length,
+    )
 
-    operators: List[PauliOperator] = _sort_spin_operator(input_operator)
-    circuits: list[QuantumCircuit] = []
-    temp = 0
+    qiskit_circuit, _ = to_qiskit_circuit(input_circuit, None)
+    for circuit in circuits:
+        circuit.compose(qiskit_circuit, front=True, inplace=True)
+        if constant_circuit:
+            circuit.compose(constant_circuit, front=True)
 
-    for i, op in enumerate(operators):
-        keys: List[PauliProduct] = op.keys()
+    sampler = SamplerV2()
+    shots = number_measurements if number_measurements else sampler.default_shots
+    res = sampler.run(circuits, shots=shots).result()
 
+    # Get the BitArray holding the shot samples.
+    # If you have exactly one classical register, join_data() is convenient:
+    # ba = res[0].join_data()  # BitArray
+    # otherwise
+    # ba = res[0].data["meas"]  # (use your creg name)
+    ba = res[0]
+
+    n = ba.data.test_0.num_bits
+
+    single_z_ops = ["I" * i + "Z" + "I" * (n - i - 1) for i in range(n)]
+    z_expectations = ba.expectation_values(single_z_ops)
     # sim = Aer.get_backend("aer_simulator")
     # circuits_transpiled = transpile(circuits_with_meas, sim)
     # result = sim.run(circuits_transpiled, shots=shots, memory=True).result()
@@ -102,11 +120,53 @@ def measure_spin_operator_to_qiskit(
     #         bitsring_qoqo = bitstrings_qiskit_to_bool(bitstring_qiskit)
     #         br_tmp[f"ro_{meas_idx}"] = bitsring_qoqo
     #     expectation_values.append(meas.evaluate(br_tmp, {}, {}))
-    return (
-        circuits,
-        constant_circuit,
-        temp,
-    )
+    return (circuits, z_expectations, ba)
+    # return PauliZProduct(constant_circuit, circuits, pzp_input)
+
+
+def measure_spin_operator(
+    input_operator: PauliOperator,
+    name: str,
+    undo_basis_rotation: bool,
+    qubit_mapping: Optional[dict[int, int]] = None,
+    creg_length: Optional[int] = None,
+) -> List[QuantumCircuit]:
+    """Create a optimized PauliZ-basis measurement circuit of all of the terms in a PauliOperator.
+
+    Args:
+        input_operator (PauliOperator): The struqture_py.spins.PauliOperator instance.
+        name (str): Name for the measurement circuit.
+        undo_basis_rotation (bool): Whether to append operations undoing basis rotations or not.
+        qubit_mapping (Optional[dict[int, int]]): Optional qubit mapping to apply to
+            the measurement circuit.
+        creg_length (Optional[int]): Optional length of the ClassicalRegister instance.
+
+    Returns:
+        List[QuantumCircuit]: The list of optimized PauliZ-basis measurement circuits.
+    """
+    if creg_length is not None and creg_length < input_operator.current_number_spins():
+        raise ValueError(
+            f"The number of spins in the operators passed is \
+            {input_operator.current_number_spins()}. The length of the \
+            DefinitionBit input is {creg_length}, which is smaller. \
+            The measurement can therefore not be constructed."
+        )
+
+    operators: List[PauliOperator] = _sort_spin_operator(input_operator)
+    circuits: list[QuantumCircuit] = []
+
+    for i, pp in enumerate(operators):
+        circuit = _single_measurement_circuit(
+            pp.keys(),
+            f"{name}_{i}",
+            undo_basis_rotation,
+            qubit_mapping,
+            pp.current_number_spins(),
+            creg_length,
+        )
+        circuits.append(circuit)
+
+    return circuits
 
 
 def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
