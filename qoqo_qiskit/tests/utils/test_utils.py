@@ -97,7 +97,7 @@ def test_measure_spin_operator_complex() -> None:
     res = measure_spin_operator(po, "empty", False, None, 8)
 
     circ1 = _single_measurement_circuit([pp0, pp2], "empty_0", False, None, 7, 8)
-    circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 2, 8)
+    circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 7, 8)
 
     assert res[0] == circ1
     assert res[1] == circ2
