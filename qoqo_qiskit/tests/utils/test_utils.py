@@ -108,17 +108,112 @@ def test_measure_spin_operator_complex() -> None:
 
 
 def test_run_spin_operator_simple() -> None:
+    """Test deterministic execution and a weighted expectation value."""
     pp = PauliProduct().z(0).z(1)
+    po = PauliOperator()
+    po.add_operator_product(pp, 2.5)
+
+    circuit = Circuit()
+    circuit += ops.PauliX(0)
+    circuit += ops.Identity(1)
+
+    circuits, shots, term_expectations, overall_exp = run_spin_operator(
+        circuit,
+        po,
+        "test",
+        False,
+        number_measurements=20,
+    )
+
+    assert len(circuits) == 1
+    assert len(shots) == 1
+    assert len(shots[0]) == 20
+    assert set(shots[0]) == {"01"}
+    assert term_expectations[pp] == pytest.approx(-1.0)
+    assert overall_exp == pytest.approx(-2.5 + 0.0j)
+
+
+def test_run_spin_operator_constant_circuit() -> None:
+    """Test that the optional constant circuit is executed first."""
+    pp = PauliProduct().z(0)
+    po = PauliOperator()
+    po.add_operator_product(pp, 1.5)
+
+    constant_circuit = Circuit()
+    constant_circuit += ops.PauliX(0)
+
+    input_circuit = Circuit()
+    input_circuit += ops.PauliX(0)
+
+    _, shots, term_expectations, overall_exp = run_spin_operator(
+        input_circuit,
+        po,
+        "test",
+        False,
+        constant_circuit=constant_circuit,
+        number_measurements=10,
+    )
+
+    assert len(shots[0]) == 10
+    assert set(shots[0]) == {"0"}
+    assert term_expectations[pp] == pytest.approx(1.0)
+    assert overall_exp == pytest.approx(1.5 + 0.0j)
+
+
+def test_run_spin_operator_empty_operator() -> None:
+    """Test execution with an empty operator."""
+    po = PauliOperator()
+    circuit = Circuit()
+    circuit += ops.Identity(0)
+
+    assert run_spin_operator(
+        circuit,
+        po,
+        "test",
+        False,
+        number_measurements=10,
+    ) == ([], [], {}, 0.0 + 0.0j)
+
+
+def test_run_spin_operator_negative_measurements() -> None:
+    """Test rejection of a negative shot count."""
+    pp = PauliProduct().z(0)
     po = PauliOperator()
     po.add_operator_product(pp, 1.0)
 
     circuit = Circuit()
-    circuit += ops.DefinitionBit("ro", 2, True)
-    circuit += ops.PauliX(0)
-    circuit += ops.MeasureQubit(0, "ro", 0)
-    circuit += ops.MeasureQubit(1, "ro", 1)
+    circuit += ops.Identity(0)
 
-    res = run_spin_operator(circuit, po, "test", False, None, None, None, None)
+    with pytest.raises(ValueError, match="cannot be negative"):
+        run_spin_operator(
+            circuit,
+            po,
+            "test",
+            False,
+            number_measurements=-1,
+        )
+
+
+def test_run_spin_operator_preparation_too_wide() -> None:
+    """Test rejection of a preparation circuit that is too wide."""
+    pp = PauliProduct().z(0)
+    po = PauliOperator()
+    po.add_operator_product(pp, 1.0)
+
+    circuit = Circuit()
+    circuit += ops.Identity(1)
+
+    with pytest.raises(
+        ValueError,
+        match="preparation circuit requires more qubits",
+    ):
+        run_spin_operator(
+            circuit,
+            po,
+            "test",
+            False,
+            number_measurements=10,
+        )
 
 
 def test_sort_by_length() -> None:

@@ -78,7 +78,36 @@ def run_spin_operator(
     number_measurements: Optional[int] = None,
     qubit_mapping: Optional[dict[int, int]] = None,
     creg_length: Optional[int] = None,
-) -> Tuple[List[QuantumCircuit], List[float], List[Any]]:
+) -> Tuple[
+    List[QuantumCircuit],
+    List[List[str]],
+    Dict[PauliProduct, float],
+    complex,
+]:
+    """Build and execute measurement circuits for a PauliOperator.
+
+    Args:
+        input_circuit (Circuit): State-preparation circuit.
+        input_operator (PauliOperator): Operator to measure.
+        name (str): Base name for generated classical registers.
+        undo_basis_rotation (bool): Whether to undo basis rotations after measurement.
+        constant_circuit (Optional[Circuit]): Optional circuit executed before input_circuit.
+        number_measurements (Optional[int]): Number of shots to execute.
+        qubit_mapping (Optional[dict[int, int]]): Optional qubit mapping.
+        creg_length (Optional[int]): Optional generated classical-register length.
+
+    Returns:
+        Tuple[List[QuantumCircuit], List[List[str]], Dict[PauliProduct, float], complex]:
+            Executed circuits, shot bitstrings for each circuit, individual term
+            expectation values, and the coefficient-weighted operator expectation value.
+
+    Raises:
+        ValueError: The number of measurements is negative or the preparation circuit
+            requires more qubits than the generated measurement circuits.
+    """
+    if number_measurements is not None and number_measurements < 0:
+        raise ValueError("The number of measurements cannot be negative.")
+
     circuits, op_terms, op_coeffs = measure_spin_operator(
         input_operator,
         name,
@@ -87,18 +116,36 @@ def run_spin_operator(
         creg_length,
     )
 
-    qiskit_circuit, _ = to_qiskit_circuit(input_circuit, None)
+    if not circuits:
+        return [], [], {}, 0.0 + 0.0j
+
+    preparation_circuit = (
+        input_circuit if constant_circuit is None else constant_circuit + input_circuit
+    )
+    qiskit_circuit, _ = to_qiskit_circuit(preparation_circuit, None)
+
     for circuit in circuits:
-        circuit.compose(qiskit_circuit, front=True, inplace=True)
-        if constant_circuit:
-            circuit.compose(constant_circuit, front=True)
+        if qiskit_circuit.num_qubits > circuit.num_qubits:
+            raise ValueError(
+                "The preparation circuit requires more qubits than the measurement circuit."
+            )
+        circuit.compose(
+            qiskit_circuit,
+            qubits=range(qiskit_circuit.num_qubits),
+            front=True,
+            inplace=True,
+        )
 
     sampler = SamplerV2()
-    shots = number_measurements if number_measurements else sampler.default_shots
+    shots = (
+        number_measurements
+        if number_measurements is not None
+        else sampler.default_shots
+    )
     res = sampler.run(circuits, shots=shots).result()
 
     all_shots: list[list[str]] = []
-    term_expectations: dict[Any, float] = {}
+    term_expectations: dict[PauliProduct, float] = {}
     overall_exp: complex = 0.0 + 0.0j
 
     for i, pub_res in enumerate(res):
