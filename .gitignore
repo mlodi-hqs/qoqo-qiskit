@@ -17,3 +17,4 @@ coveragehtml/*
 *.pytest_cache*
 *.vscode*
 */build/*
+.aider*
