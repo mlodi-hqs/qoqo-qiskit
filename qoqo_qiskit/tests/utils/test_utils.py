@@ -18,12 +18,16 @@ import sys
 from qoqo_qiskit.utils import (
     struqture_hamiltonian_to_qiskit_op,
     measure_spin_operator,
+    run_spin_operator,
     _sort_by_length,
     _sort_spin_operator,
     _single_measurement_circuit,
     _collect_pauli_products,
     _basis_rotation_from_z_basis,
+    _z_label_from_pauli_product,
 )
+from qoqo import Circuit
+from qoqo import operations as ops
 from qiskit import QuantumCircuit, ClassicalRegister
 from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # type:ignore
 
@@ -78,7 +82,7 @@ def test_measure_spin_operator_simple() -> None:
     po = PauliOperator()
     po.add_operator_product(pp, 1.7)
 
-    res = measure_spin_operator(po, "test", False, None, 10)
+    res, _, _ = measure_spin_operator(po, "test", False, None, 10)
 
     sc = _single_measurement_circuit([pp], "test_0", False, None, 5, 10)
 
@@ -94,13 +98,27 @@ def test_measure_spin_operator_complex() -> None:
     po.add_operator_product(pp1, 2.7)
     po.add_operator_product(pp2, 3.7)
 
-    res = measure_spin_operator(po, "empty", False, None, 8)
+    res, _, _ = measure_spin_operator(po, "empty", False, None, 8)
 
     circ1 = _single_measurement_circuit([pp0, pp2], "empty_0", False, None, 7, 8)
     circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 7, 8)
 
     assert res[0] == circ1
     assert res[1] == circ2
+
+
+def test_run_spin_operator_simple() -> None:
+    pp = PauliProduct().z(0).z(1)
+    po = PauliOperator()
+    po.add_operator_product(pp, 1.0)
+
+    circuit = Circuit()
+    circuit += ops.DefinitionBit("ro", 2, True)
+    circuit += ops.PauliX(0)
+    circuit += ops.MeasureQubit(0, "ro", 0)
+    circuit += ops.MeasureQubit(1, "ro", 1)
+
+    res = run_spin_operator(circuit, po, "test", False, None, None, None, None)
 
 
 def test_sort_by_length() -> None:
@@ -296,6 +314,29 @@ def test_basis_rotation_from_z_basis() -> None:
     assert_circ.ry(-np.pi / 2, 0)
     assert_circ.rx(np.pi / 2, 4)
     assert circuit == assert_circ
+
+
+def test_z_label_from_pauli_product() -> None:
+    pp0 = PauliProduct().x(0).z(1)
+    pp1 = PauliProduct().x(0).z(2).y(4)
+    pp2 = PauliProduct().y(0)
+    pp3 = PauliProduct().z(5)
+    pp4 = PauliProduct().z(5).x(3)
+    pp5 = PauliProduct().z(5).y(3).z(0)
+
+    mapping = {5: 4}
+    mapping_er = {0: 7}
+
+    assert "ZZ" == _z_label_from_pauli_product(pp0, 2, None)
+    assert "ZIZIZ" == _z_label_from_pauli_product(pp1, 5, None)
+    assert "Z" == _z_label_from_pauli_product(pp2, 1, None)
+    assert "ZIIIII" == _z_label_from_pauli_product(pp3, 6, None)
+    assert "ZIZIII" == _z_label_from_pauli_product(pp4, 6, None)
+    assert "ZIZIIZ" == _z_label_from_pauli_product(pp5, 6, None)
+    assert "IZZIIZ" == _z_label_from_pauli_product(pp5, 6, mapping)
+
+    with pytest.raises(ValueError):
+        _ = _z_label_from_pauli_product(pp0, 2, mapping_er)
 
 
 # For pytest

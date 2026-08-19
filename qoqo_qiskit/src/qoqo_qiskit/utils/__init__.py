@@ -17,7 +17,9 @@ from qoqo_qiskit.utils.utils import (
     _single_measurement_circuit,
     _sort_by_length,
     _sort_spin_operator,
+    _z_label_from_pauli_product,
     measure_spin_operator,
+    run_spin_operator,
     struqture_hamiltonian_to_qiskit_op,
 )
 
@@ -27,6 +29,8 @@ __all__ = [
     "_single_measurement_circuit",
     "_sort_by_length",
     "_sort_spin_operator",
+    "_z_label_from_pauli_product",
     "measure_spin_operator",
+    "run_spin_operator",
     "struqture_hamiltonian_to_qiskit_op",
 ]
