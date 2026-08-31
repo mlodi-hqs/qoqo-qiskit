@@ -27,7 +27,7 @@ from qoqo_qiskit.utils import (
     _z_label_from_pauli_product,
 )
 from qoqo import Circuit
-from qoqo import operations as ops
+from qoqo import operations as ops  # type:ignore
 from qiskit import QuantumCircuit, ClassicalRegister
 from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # type:ignore
 
@@ -82,9 +82,9 @@ def test_measure_spin_operator_simple() -> None:
     po = PauliOperator()
     po.add_operator_product(pp, 1.7)
 
-    res, _, _ = measure_spin_operator(po, "test", False, None, 10)
+    res, _, _ = measure_spin_operator(po, "test", False, None, 5)
 
-    sc = _single_measurement_circuit([pp], "test_0", False, None, 5, 10)
+    sc = _single_measurement_circuit([pp], "test_0", False, None, 5, 5)
 
     assert res[0] == sc
 
@@ -98,10 +98,10 @@ def test_measure_spin_operator_complex() -> None:
     po.add_operator_product(pp1, 2.7)
     po.add_operator_product(pp2, 3.7)
 
-    res, _, _ = measure_spin_operator(po, "empty", False, None, 8)
+    res, _, _ = measure_spin_operator(po, "empty", False, None, 7)
 
-    circ1 = _single_measurement_circuit([pp0, pp2], "empty_0", False, None, 7, 8)
-    circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 7, 8)
+    circ1 = _single_measurement_circuit([pp0, pp2], "empty_0", False, None, 7, 7)
+    circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 7, 7)
 
     assert res[0] == circ1
     assert res[1] == circ2
@@ -291,7 +291,7 @@ def test_single_measurement_circuit_empty() -> None:
     circuit = QuantumCircuit(2)
     creg = ClassicalRegister(2, "test")
     circuit.add_register(creg)
-    circuit.measure_all()
+    circuit.measure(range(2), creg)
 
     assert circuit == _single_measurement_circuit([], "test", False, None, 2, None)
     assert circuit == _single_measurement_circuit([pp], "test", False, None, 2, None)
@@ -303,22 +303,21 @@ def test_single_measurement_circuit_single_measurement() -> None:
     ppx = PauliProduct().x(0)
     ppy = PauliProduct().y(0)
 
-    circuit0 = QuantumCircuit(1)
     creg = ClassicalRegister(1, "test")
-    circuit0.add_register(creg)
-    circuit0.measure_all()
 
+    circuit0 = QuantumCircuit(1)
+    circuit0.add_register(creg)
+    circuit0.measure(range(1), creg)
+    
     circuit1 = QuantumCircuit(1)
-    creg = ClassicalRegister(1, "test")
     circuit1.ry(-np.pi / 2, 0)
     circuit1.add_register(creg)
-    circuit1.measure_all()
+    circuit1.measure(range(1), creg)
 
     circuit2 = QuantumCircuit(1)
-    creg = ClassicalRegister(1, "test")
     circuit2.rx(np.pi / 2, 0)
     circuit2.add_register(creg)
-    circuit2.measure_all()
+    circuit2.measure(range(1), creg)
 
     assert circuit0 == _single_measurement_circuit([ppz], "test", False, None, 1, None)
     assert circuit0 == _single_measurement_circuit([ppz, ppemp], "test", False, None, 1, None)
@@ -348,7 +347,7 @@ def test_single_measurement_circuit_multi_operators() -> None:
     circuit0.add_register(creg)
     circuit0.ry(-np.pi / 2, 1)
     circuit0.rx(np.pi / 2, 3)
-    circuit0.measure_all()
+    circuit0.measure(range(6), creg)
 
     assert circuit0 == _single_measurement_circuit([pp0, ppemp], "test", False, None, 6, None)
     assert circuit0 == _single_measurement_circuit([pp0, pp0], "test", False, None, 6, None)
@@ -361,15 +360,15 @@ def test_single_measurement_circuit_multi_operators_def_length() -> None:
     pp1 = PauliProduct().y(3)
 
     circuit0 = QuantumCircuit(6)
-    creg = ClassicalRegister(18, "test")
+    creg = ClassicalRegister(6, "test")
     circuit0.add_register(creg)
     circuit0.ry(-np.pi / 2, 1)
     circuit0.rx(np.pi / 2, 3)
-    circuit0.measure_all()
+    circuit0.measure(range(6), creg)
 
-    assert circuit0 == _single_measurement_circuit([pp0, ppemp], "test", False, None, 6, 18)
-    assert circuit0 == _single_measurement_circuit([pp0, pp0], "test", False, None, 6, 18)
-    assert circuit0 == _single_measurement_circuit([pp0, pp1], "test", False, None, 6, 18)
+    assert circuit0 == _single_measurement_circuit([pp0, ppemp], "test", False, None, 6, 6)
+    assert circuit0 == _single_measurement_circuit([pp0, pp0], "test", False, None, 6, 6)
+    assert circuit0 == _single_measurement_circuit([pp0, pp1], "test", False, None, 6, 6)
 
 
 def test_single_measurement_circuit_use_mapping() -> None:
@@ -378,12 +377,12 @@ def test_single_measurement_circuit_use_mapping() -> None:
     mapping = {1: 10}
 
     circuit0 = QuantumCircuit(12)
-    creg = ClassicalRegister(18, "rx")
+    creg = ClassicalRegister(12, "rx")
     circuit0.add_register(creg)
     circuit0.ry(-np.pi / 2, 10)
-    circuit0.measure_all()
+    circuit0.measure(range(12), creg)
 
-    assert circuit0 == _single_measurement_circuit(pps, "rx", False, mapping, 12, 18)
+    assert circuit0 == _single_measurement_circuit(pps, "rx", False, mapping, 12, 12)
 
 
 def test_collect_pauli_products() -> None:

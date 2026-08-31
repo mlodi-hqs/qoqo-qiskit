@@ -12,17 +12,13 @@
 """Qoqo-qiskit utils modules for compatibility purposes."""
 
 import re
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
-from qiskit import ClassicalRegister, QuantumCircuit, transpile
-from qiskit.circuit import Gate
-from qiskit.primitives import SamplerPubResult
+from qiskit import ClassicalRegister, QuantumCircuit
 from qiskit.quantum_info.operators import SparsePauliOp
-from qiskit_aer import Aer
 from qiskit_aer.primitives import SamplerV2
 from qoqo import Circuit
-from qoqo.measurements import PauliZProduct, PauliZProductInput
 from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type:ignore
 
 from qoqo_qiskit.interface import to_qiskit_circuit
@@ -137,11 +133,7 @@ def run_spin_operator(
         )
 
     sampler = SamplerV2()
-    shots = (
-        number_measurements
-        if number_measurements is not None
-        else sampler.default_shots
-    )
+    shots = number_measurements if number_measurements is not None else sampler.default_shots
     res = sampler.run(circuits, shots=shots).result()
 
     all_shots: list[list[str]] = []
