@@ -20,8 +20,8 @@ from typing import Dict, List, Tuple
 import pytest
 from qiskit.providers import Job
 from qoqo import Circuit
-from qoqo import operations as ops  # type:ignore
-from qoqo.measurements import ClassicalRegister  # type:ignore
+from qoqo import operations as ops  # type: ignore
+from qoqo.measurements import ClassicalRegister  # type: ignore
 from qoqo_qiskit.backend import QoqoQiskitBackend, QueuedCircuitRun, QueuedProgramRun
 
 
@@ -56,7 +56,7 @@ def _mocked_run(
 
     backend = QoqoQiskitBackend(memory=memory)
 
-    (job, sim_type, output_registers, _input_bit_circuit) = backend._run_circuit(circuit)
+    job, sim_type, output_registers, _input_bit_circuit = backend._run_circuit(circuit)
 
     return (job, sim_type, output_registers.to_flat_tuple(), circuit)
 

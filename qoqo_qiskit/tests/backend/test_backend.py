@@ -18,13 +18,13 @@ from typing import Any, List
 import pytest
 from qiskit_aer import AerSimulator
 from qoqo import Circuit, QuantumProgram
-from qoqo import operations as ops  # type:ignore
-from qoqo.measurements import (  # type:ignore
+from qoqo import operations as ops  # type: ignore
+from qoqo.measurements import (  # type: ignore
     ClassicalRegister,
     PauliZProduct,
     PauliZProductInput,
 )
-from qoqo_qiskit.backend import QoqoQiskitBackend  # type:ignore
+from qoqo_qiskit.backend import QoqoQiskitBackend  # type: ignore
 from qoqo_qiskit.backend.post_processing import _split
 from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 

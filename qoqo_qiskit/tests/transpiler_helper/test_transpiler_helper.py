@@ -15,8 +15,8 @@ import pytest
 import sys
 
 from qoqo import Circuit, CircuitDag, QuantumProgram
-from qoqo import operations as ops  # type:ignore
-from qoqo.measurements import (  # type:ignore
+from qoqo import operations as ops  # type: ignore
+from qoqo.measurements import (  # type: ignore
     PauliZProduct,
     PauliZProductInput,
     ClassicalRegister,
@@ -29,7 +29,7 @@ from qiskit_ibm_runtime.fake_provider import FakeManilaV2
 from qoqo_qiskit.transpiler_helper.transpiler_helper import (
     transpile_with_qiskit,
     transpile_program_with_qiskit,
-)  # type:ignore
+)  # type: ignore
 
 
 def test_basic_circuit_basic_gates() -> None:

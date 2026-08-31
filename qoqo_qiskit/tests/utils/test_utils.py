@@ -27,9 +27,9 @@ from qoqo_qiskit.utils import (
     _z_label_from_pauli_product,
 )
 from qoqo import Circuit
-from qoqo import operations as ops  # type:ignore
+from qoqo import operations as ops  # type: ignore
 from qiskit import QuantumCircuit, ClassicalRegister
-from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # type:ignore
+from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # type: ignore
 
 
 def test_basic_hamiltonian() -> None:
@@ -68,13 +68,10 @@ def test_measure_spin_operator_empty() -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = measure_spin_operator(po, "empty", False, None, 1)
-    assert (
-        "The number of spins in the operators passed is \
+    assert "The number of spins in the operators passed is \
             2. The length of the \
             DefinitionBit input is 1, which is smaller. \
-            The measurement can therefore not be constructed."
-        in str(exc.value)
-    )
+            The measurement can therefore not be constructed." in str(exc.value)
 
 
 def test_measure_spin_operator_simple() -> None:
@@ -308,7 +305,7 @@ def test_single_measurement_circuit_single_measurement() -> None:
     circuit0 = QuantumCircuit(1)
     circuit0.add_register(creg)
     circuit0.measure(range(1), creg)
-    
+
     circuit1 = QuantumCircuit(1)
     circuit1.ry(-np.pi / 2, 0)
     circuit1.add_register(creg)

@@ -13,8 +13,8 @@
 
 from qoqo_qiskit import QoqoQiskitBackend
 from qoqo import Circuit, QuantumProgram
-from qoqo.measurements import ClassicalRegister, PauliZProductInput, PauliZProduct  # type:ignore
-from qoqo import operations as ops  # type:ignore
+from qoqo.measurements import ClassicalRegister, PauliZProductInput, PauliZProduct  # type: ignore
+from qoqo import operations as ops  # type: ignore
 import pytest
 import sys
 
@@ -43,7 +43,7 @@ def test_running_with_input_bit() -> None:
     circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
     backend = QoqoQiskitBackend()
-    (bit_res, _, _) = backend.run_circuit(circuit)
+    bit_res, _, _ = backend.run_circuit(circuit)
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 
@@ -59,7 +59,7 @@ def test_running_with_input_bit() -> None:
     circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
     backend = QoqoQiskitBackend()
-    (bit_res, _, _) = backend.run_circuit(circuit)
+    bit_res, _, _ = backend.run_circuit(circuit)
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 
@@ -88,7 +88,7 @@ def test_running_with_input_bit_lists() -> None:
     circuit_1 += ops.PragmaSetNumberOfMeasurements(5, "ri")
 
     backend = QoqoQiskitBackend()
-    (bit_res, _, _) = backend.run_circuit_list([circuit_0, circuit_1])
+    bit_res, _, _ = backend.run_circuit_list([circuit_0, circuit_1])
     assert "ro" in bit_res.keys()
     assert "ri" in bit_res.keys()
     registers_ro = bit_res["ro"]

@@ -17,8 +17,8 @@ from typing import Union
 import pytest
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qoqo import Circuit
-from qoqo import operations as ops  # type:ignore
-from qoqo_qiskit.interface import to_qiskit_circuit  # type:ignore
+from qoqo import operations as ops  # type: ignore
+from qoqo_qiskit.interface import to_qiskit_circuit  # type: ignore
 
 
 def test_basic_circuit() -> None:

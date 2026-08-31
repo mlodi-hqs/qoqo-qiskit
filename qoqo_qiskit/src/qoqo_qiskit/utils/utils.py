@@ -19,7 +19,7 @@ from qiskit import ClassicalRegister, QuantumCircuit
 from qiskit.quantum_info.operators import SparsePauliOp
 from qiskit_aer.primitives import SamplerV2
 from qoqo import Circuit
-from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type:ignore
+from struqture_py.spins import PauliHamiltonian, PauliOperator, PauliProduct  # type: ignore
 
 from qoqo_qiskit.interface import to_qiskit_circuit
 
@@ -142,7 +142,9 @@ def run_spin_operator(
 
     for i, pub_res in enumerate(res):
         # If you have multiple classical registers, pass names=[...] here.
-        ba = pub_res.join_data()  # BitArray ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.SamplerPubResult?utm_source=openai))
+        ba = (
+            pub_res.join_data()
+        )  # BitArray ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.SamplerPubResult?utm_source=openai))
         n_bits = ba.num_bits
 
         # per-shot samples (strings like "0101..."); length == shots
@@ -201,12 +203,10 @@ def measure_spin_operator(
             `input_operator`.
     """
     if creg_length is not None and creg_length < input_operator.current_number_spins():
-        raise ValueError(
-            f"The number of spins in the operators passed is \
+        raise ValueError(f"The number of spins in the operators passed is \
             {input_operator.current_number_spins()}. The length of the \
             DefinitionBit input is {creg_length}, which is smaller. \
-            The measurement can therefore not be constructed."
-        )
+            The measurement can therefore not be constructed.")
 
     operators: List[PauliOperator] = _sort_spin_operator(input_operator)
     circuits: List[QuantumCircuit] = []

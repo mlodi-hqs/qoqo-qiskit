@@ -20,7 +20,7 @@ from qiskit.providers.job import Job
 from qiskit_ibm_runtime import Sampler
 from qiskit_aer import AerSimulator
 from qoqo import Circuit, QuantumProgram
-from qoqo.measurements import ClassicalRegister  # type:ignore
+from qoqo.measurements import ClassicalRegister  # type: ignore
 
 from qoqo_qiskit.backend.queued_results import QueuedCircuitRun, QueuedProgramRun
 from qoqo_qiskit.interface import to_qiskit_circuit
@@ -68,11 +68,11 @@ class QoqoQiskitBackend:
 
         output_registers = self._set_up_registers(circuit)
 
-        (compiled_circuit, run_options, input_bit_circuit) = self._compile_circuit(circuit)
+        compiled_circuit, run_options, input_bit_circuit = self._compile_circuit(circuit)
 
         self._handle_errors(run_options)
 
-        (shots, sim_type) = self._handle_simulation_options(run_options, compiled_circuit)
+        shots, sim_type = self._handle_simulation_options(run_options, compiled_circuit)
 
         job = self._job_execution([compiled_circuit], shots, sim_type)
 
@@ -94,11 +94,11 @@ class QoqoQiskitBackend:
         for circuit in circuit_list:
             output_registers = self._set_up_registers(circuit)
 
-            (compiled_circuit, run_options, input_bit_circuit) = self._compile_circuit(circuit)
+            compiled_circuit, run_options, input_bit_circuit = self._compile_circuit(circuit)
 
             self._handle_errors(run_options)
 
-            (shots, sim_type) = self._handle_simulation_options(run_options, compiled_circuit)
+            shots, sim_type = self._handle_simulation_options(run_options, compiled_circuit)
 
             # Raise errors if some circuits have different sim types or shots
             if sim_type_list is None:
@@ -276,7 +276,7 @@ class QoqoQiskitBackend:
         Raises:
             ValueError: Incorrect Measurement or Pragma operations.
         """
-        (job, sim_type, output_registers, input_bit_circuit) = self._run_circuit(circuit)
+        job, sim_type, output_registers, input_bit_circuit = self._run_circuit(circuit)
 
         result = job.result()
 
@@ -317,7 +317,7 @@ class QoqoQiskitBackend:
             ValueError: Incorrect Measurement or Pragma operations or incompatible run options\
                 between different circuits.
         """
-        (job, sim_type, output_registers_list, input_bit_circuits_list) = self._run_circuit_list(
+        job, sim_type, output_registers_list, input_bit_circuits_list = self._run_circuit_list(
             circuits
         )
 
@@ -350,7 +350,7 @@ class QoqoQiskitBackend:
         Returns:
             QueuedCircuitRun
         """
-        (job, sim_type, output_registers, _input_bit_circuit) = self._run_circuit(circuit)
+        job, sim_type, output_registers, _input_bit_circuit = self._run_circuit(circuit)
 
         return QueuedCircuitRun(job, self.memory, sim_type, output_registers.to_flat_tuple())
 

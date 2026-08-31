@@ -18,7 +18,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from qiskit.providers import Job, JobStatus
 from qiskit_ibm_runtime import QiskitRuntimeService
-from qoqo import measurements  # type:ignore
+from qoqo import measurements  # type: ignore
 
 from ..models import Registers, RegistersWithLengths
 from .post_processing import _transform_job_result
