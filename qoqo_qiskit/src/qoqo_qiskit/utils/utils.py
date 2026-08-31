@@ -173,7 +173,11 @@ def measure_spin_operator(
     undo_basis_rotation: bool,
     qubit_mapping: Optional[dict[int, int]] = None,
     creg_length: Optional[int] = None,
-) -> Tuple[List[QuantumCircuit], List[str], List[complex]]:
+) -> Tuple[
+    List[QuantumCircuit],
+    List[List[PauliProduct]],
+    List[List[complex]],
+]:
     """Create a optimized PauliZ-basis measurement circuit of all of the terms in a PauliOperator.
 
     Args:
@@ -197,12 +201,12 @@ def measure_spin_operator(
 
     operators: List[PauliOperator] = _sort_spin_operator(input_operator)
     circuits: List[QuantumCircuit] = []
-    operators_terms: List[str] = []
-    operators_coeffs: List[complex] = []
+    operators_terms: List[List[PauliProduct]] = []
+    operators_coeffs: List[List[complex]] = []
 
     for i, pp in enumerate(operators):
         terms = pp.keys()
-        coeffs = np.array([complex(pp.get(t)) for t in terms], dtype=complex)
+        coeffs = [complex(pp.get(t)) for t in terms]
         circuit = _single_measurement_circuit(
             pp.keys(),
             f"{name}_{i}",
