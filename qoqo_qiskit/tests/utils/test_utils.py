@@ -129,6 +129,17 @@ def test_run_spin_operator_simple() -> None:
     assert term_expectations[pp] == pytest.approx(-1.0)
     assert overall_exp == pytest.approx(-2.5 + 0.0j)
 
+def test_run_spin_operator_complex() -> None:
+    pp0 = PauliProduct().x(0).z(1).y(4)
+    pp1 = PauliProduct().x(0).y(1)
+    pp2 = PauliProduct().y(4).z(6)
+    po = PauliOperator()
+    po.add_operator_product(pp0, 1.7)
+    po.add_operator_product(pp1, 2.7)
+    po.add_operator_product(pp2, 3.7)
+
+    
+
 
 def test_run_spin_operator_constant_circuit() -> None:
     """Test that the optional constant circuit is executed first."""
