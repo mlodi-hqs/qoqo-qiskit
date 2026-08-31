@@ -178,7 +178,10 @@ def measure_spin_operator(
     List[List[PauliProduct]],
     List[List[complex]],
 ]:
-    """Create a optimized PauliZ-basis measurement circuit of all of the terms in a PauliOperator.
+    """Create optimized Pauli-Z-basis measurement circuits for a PauliOperator.
+
+    Groups measurement-compatible Pauli products and creates one circuit for
+    each group.
 
     Args:
         input_operator (PauliOperator): The struqture_py.spins.PauliOperator instance.
@@ -189,7 +192,13 @@ def measure_spin_operator(
         creg_length (Optional[int]): Optional length of the ClassicalRegister instance.
 
     Returns:
-        List[QuantumCircuit]: The list of optimized PauliZ-basis measurement circuits.
+        Tuple[List[QuantumCircuit], List[List[PauliProduct]], List[List[complex]]]:
+            The measurement circuits, the Pauli products grouped by circuit,
+            and the corresponding complex coefficients grouped by circuit.
+
+    Raises:
+        ValueError: If `creg_length` is smaller than the number of spins in
+            `input_operator`.
     """
     if creg_length is not None and creg_length < input_operator.current_number_spins():
         raise ValueError(
