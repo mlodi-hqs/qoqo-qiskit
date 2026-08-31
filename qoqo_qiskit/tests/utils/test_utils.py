@@ -129,7 +129,9 @@ def test_run_spin_operator_simple() -> None:
     assert term_expectations[pp] == pytest.approx(-1.0)
     assert overall_exp == pytest.approx(-2.5 + 0.0j)
 
+
 def test_run_spin_operator_complex() -> None:
+    """Test grouped execution and weighted expectations for multiple terms."""
     pp0 = PauliProduct().x(0).z(1).y(4)
     pp1 = PauliProduct().x(0).y(1)
     pp2 = PauliProduct().y(4).z(6)
@@ -138,7 +140,31 @@ def test_run_spin_operator_complex() -> None:
     po.add_operator_product(pp1, 2.7)
     po.add_operator_product(pp2, 3.7)
 
-    
+    circuit = Circuit()
+    circuit += ops.Hadamard(0)
+    circuit += ops.RotateX(4, -np.pi / 2)
+    circuit += ops.Identity(6)
+
+    circuits, shots, term_expectations, overall_exp = run_spin_operator(
+        circuit,
+        po,
+        "test",
+        False,
+        number_measurements=4096,
+    )
+
+    assert len(circuits) == 2
+    assert len(shots) == 2
+    assert all(len(grouped_shots) == 4096 for grouped_shots in shots)
+    assert set(term_expectations) == {pp0, pp1, pp2}
+    assert term_expectations[pp0] == pytest.approx(1.0)
+    assert term_expectations[pp1] == pytest.approx(0.0, abs=0.1)
+    assert term_expectations[pp2] == pytest.approx(1.0)
+    assert overall_exp == pytest.approx(
+        1.7 * term_expectations[pp0]
+        + 2.7 * term_expectations[pp1]
+        + 3.7 * term_expectations[pp2]
+    )
 
 
 def test_run_spin_operator_constant_circuit() -> None:
