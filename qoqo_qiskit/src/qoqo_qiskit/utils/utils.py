@@ -78,7 +78,6 @@ def run_spin_operator(
     List[QuantumCircuit],
     List[List[str]],
     Dict[PauliProduct, float],
-    complex,
 ]:
     """Build and execute measurement circuits for a PauliOperator.
 
@@ -93,9 +92,9 @@ def run_spin_operator(
         creg_length (Optional[int]): Optional generated classical-register length.
 
     Returns:
-        Tuple[List[QuantumCircuit], List[List[str]], Dict[PauliProduct, float], complex]:
-            Executed circuits, shot bitstrings for each circuit, individual term
-            expectation values, and the coefficient-weighted operator expectation value.
+        Tuple[List[QuantumCircuit], List[List[str]], Dict[PauliProduct, float]]:
+            Executed circuits, shot bitstrings for each circuit, and individual
+            term expectation values.
 
     Raises:
         ValueError: The number of measurements is negative or the preparation circuit
@@ -104,7 +103,7 @@ def run_spin_operator(
     if number_measurements is not None and number_measurements < 0:
         raise ValueError("The number of measurements cannot be negative.")
 
-    circuits, op_terms, op_coeffs = measure_spin_operator(
+    circuits, op_terms, _ = measure_spin_operator(
         input_operator,
         name,
         undo_basis_rotation,
@@ -113,7 +112,7 @@ def run_spin_operator(
     )
 
     if not circuits:
-        return [], [], {}, 0.0 + 0.0j
+        return [], [], {}
 
     preparation_circuit = (
         input_circuit if constant_circuit is None else constant_circuit + input_circuit
@@ -138,7 +137,6 @@ def run_spin_operator(
 
     all_shots: list[list[str]] = []
     term_expectations: dict[PauliProduct, float] = {}
-    overall_exp: complex = 0.0 + 0.0j
 
     for i, pub_res in enumerate(res):
         # If you have multiple classical registers, pass names=[...] here.
@@ -163,10 +161,7 @@ def run_spin_operator(
         # Store per-term expectations
         for k, ev in zip(op_terms[i], expvals, strict=False):
             term_expectations[k] = float(ev)
-
-        # Linear combination (this is the “linear expectation value” part)
-        overall_exp += np.dot(op_coeffs[i], expvals)
-    return circuits, all_shots, term_expectations, overall_exp
+    return circuits, all_shots, term_expectations
 
 
 def measure_spin_operator(

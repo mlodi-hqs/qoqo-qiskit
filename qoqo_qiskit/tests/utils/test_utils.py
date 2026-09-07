@@ -114,7 +114,7 @@ def test_run_spin_operator_simple() -> None:
     circuit += ops.PauliX(0)
     circuit += ops.Identity(1)
 
-    circuits, shots, term_expectations, overall_exp = run_spin_operator(
+    circuits, shots, term_expectations = run_spin_operator(
         circuit,
         po,
         "test",
@@ -127,7 +127,6 @@ def test_run_spin_operator_simple() -> None:
     assert len(shots[0]) == 20
     assert set(shots[0]) == {"01"}
     assert term_expectations[pp] == pytest.approx(-1.0)
-    assert overall_exp == pytest.approx(-2.5 + 0.0j)
 
 
 def test_run_spin_operator_complex() -> None:
@@ -145,7 +144,7 @@ def test_run_spin_operator_complex() -> None:
     circuit += ops.RotateX(4, -np.pi / 2)
     circuit += ops.Identity(6)
 
-    circuits, shots, term_expectations, overall_exp = run_spin_operator(
+    circuits, shots, term_expectations = run_spin_operator(
         circuit,
         po,
         "test",
@@ -160,11 +159,6 @@ def test_run_spin_operator_complex() -> None:
     assert term_expectations[pp0] == pytest.approx(1.0)
     assert term_expectations[pp1] == pytest.approx(0.0, abs=0.1)
     assert term_expectations[pp2] == pytest.approx(1.0)
-    assert overall_exp == pytest.approx(
-        1.7 * term_expectations[pp0]
-        + 2.7 * term_expectations[pp1]
-        + 3.7 * term_expectations[pp2]
-    )
 
 
 def test_run_spin_operator_constant_circuit() -> None:
@@ -179,7 +173,7 @@ def test_run_spin_operator_constant_circuit() -> None:
     input_circuit = Circuit()
     input_circuit += ops.PauliX(0)
 
-    _, shots, term_expectations, overall_exp = run_spin_operator(
+    _, shots, term_expectations = run_spin_operator(
         input_circuit,
         po,
         "test",
@@ -191,7 +185,6 @@ def test_run_spin_operator_constant_circuit() -> None:
     assert len(shots[0]) == 10
     assert set(shots[0]) == {"0"}
     assert term_expectations[pp] == pytest.approx(1.0)
-    assert overall_exp == pytest.approx(1.5 + 0.0j)
 
 
 def test_run_spin_operator_empty_operator() -> None:
@@ -206,7 +199,7 @@ def test_run_spin_operator_empty_operator() -> None:
         "test",
         False,
         number_measurements=10,
-    ) == ([], [], {}, 0.0 + 0.0j)
+    ) == ([], [], {})
 
 
 def test_run_spin_operator_negative_measurements() -> None:
