@@ -160,6 +160,86 @@ def test_run_spin_operator_complex() -> None:
     assert term_expectations[pp1] == pytest.approx(0.0, abs=0.1)
     assert term_expectations[pp2] == pytest.approx(1.0)
 
+    # Grouping: pp0 and pp2 are measurement-compatible (no conflicting Pauli on
+    # any shared qubit) and share one circuit; pp1 conflicts with pp0 on qubit 1
+    # (Z vs Y) and is measured in its own circuit.
+    ref_circuits, ref_terms, _ = measure_spin_operator(po, "test", False)
+    assert len(ref_circuits) == 2
+    assert set(ref_terms[0]) == {pp0, pp2}
+    assert ref_terms[1] == [pp1]
+    # run_spin_operator must produce as many circuits as measure_spin_operator
+    # (the grouping is identical; run_spin_operator then composes the
+    # preparation circuit onto each measurement circuit, so the circuits
+    # themselves are not expected to equal the bare measurement circuits).
+    assert len(circuits) == len(ref_circuits)
+
+
+def test_run_spin_operator_undo_basis_rotation() -> None:
+    """Test that undo_basis_rotation=True appends inverse rotations after measure.
+
+    The recorded measurement outcomes are unaffected (the undo runs after the
+    measure), so expectation values match the False case, but the measurement
+    circuit itself carries the trailing inverse-rotation gates.
+    """
+    pp = PauliProduct().x(0)
+    po = PauliOperator()
+    po.add_operator_product(pp, 1.0)
+
+    circuit = Circuit()
+    circuit += ops.Hadamard(0)
+
+    circuits_undo, shots_undo, term_expectations_undo = run_spin_operator(
+        circuit,
+        po,
+        "test_undo",
+        True,
+        number_measurements=1024,
+    )
+    circuits_no_undo, _, term_expectations_no_undo = run_spin_operator(
+        circuit,
+        po,
+        "test_no_undo",
+        False,
+        number_measurements=1024,
+    )
+
+    assert len(circuits_undo) == 1
+    # Same deterministic expectation regardless of the undo flag.
+    assert term_expectations_undo[pp] == pytest.approx(1.0)
+    assert term_expectations_undo[pp] == pytest.approx(term_expectations_no_undo[pp])
+    # The undo circuit has extra gates (the inverse rotations) after measure,
+    # so it must differ from the no-undo circuit and be strictly larger.
+    assert circuits_undo[0] != circuits_no_undo[0]
+    assert circuits_undo[0].size() > circuits_no_undo[0].size()
+
+
+def test_run_spin_operator_single_x_term() -> None:
+    """Test deterministic expectation of an X term on the |+> state.
+
+    |+> is the +1 eigenstate of X, so <X> = +1.0 exactly. This exercises the
+    full measurement pipeline (basis rotation -> Z measurement -> expectation
+    extraction) for a non-Z Pauli with a tight, deterministic assertion.
+    """
+    pp = PauliProduct().x(0)
+    po = PauliOperator()
+    po.add_operator_product(pp, 1.0)
+
+    circuit = Circuit()
+    circuit += ops.Hadamard(0)
+
+    circuits, shots, term_expectations = run_spin_operator(
+        circuit,
+        po,
+        "test",
+        False,
+        number_measurements=256,
+    )
+
+    assert len(circuits) == 1
+    assert len(shots) == 1
+    # |+> is the +1 eigenstate of X: every shot measures the +1 outcome.
+    assert term_expectations[pp] == pytest.approx(1.0)
+
 
 def test_run_spin_operator_constant_circuit() -> None:
     """Test that the optional constant circuit is executed first."""
