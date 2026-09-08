@@ -2,9 +2,9 @@
 
 This changelog tracks changes of the qoqo_qiskit project starting at version 0.1.0 (initial release).
 
-## 0.11.1
+## 0.12.0
 
-### Added in 0.11.1
+### Added in 0.12.0
 
 * Added `run_spin_operator` and `measure_spin_operator`.
 
