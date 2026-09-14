@@ -18,3 +18,4 @@ coveragehtml/*
 *.vscode*
 */build/*
 .aider*
+.scanossignore
