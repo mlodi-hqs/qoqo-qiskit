@@ -226,11 +226,9 @@ def measure_pauli_operator(
 
 
 def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
-    """Split a PauliOperator-like object into measurement-compatible PauliProducts."""
+    """Split a PauliOperator object into measurement-compatible PauliProducts."""
     output_ops: List[PauliOperator] = []
     sorted_keys = _sort_by_length(input_operator)
-
-    # TODO length check
 
     while sorted_keys:
         new_op = PauliOperator()
