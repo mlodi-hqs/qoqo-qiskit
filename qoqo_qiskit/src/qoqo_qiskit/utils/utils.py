@@ -354,6 +354,10 @@ def _pauli_products_are_not_measurement_compatible(pp_a: str, pp_b: str) -> bool
     It works under the "single-qubit basis rotation then Z-measurement" model.
     Incompatible if there exists a qubit where both have non-identity Paulis
     and they differ (e.g., X vs Z).
+
+    Example: X0Z1 and X0Z1Z3 are compatible, in that they never assign different
+    non-identiy Paulis to the same qubit. X0Z1 and Y0Z1 are for that reason not compatible.
+    They require different basis rotations so they must be measured in separate circuits.
     """
     a = _pp_to_local_map(pp_a)
     b = _pp_to_local_map(pp_b)
