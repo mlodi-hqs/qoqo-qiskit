@@ -302,6 +302,10 @@ def _basis_rotation_to_z_basis(
     pauli_products: List[PauliProduct],
     qubit_mapping: Optional[Dict[int, int]],
 ) -> QuantumCircuit:
+    """Append inverse basis-rotation gates after measurement.
+
+    It reverses the rotations applied by ``_basis_rotation_from_z_basis``.
+    """
     collected_pauli_products, _ = _collect_pauli_products(pauli_products)
 
     mapping = qubit_mapping if qubit_mapping is not None else {}
