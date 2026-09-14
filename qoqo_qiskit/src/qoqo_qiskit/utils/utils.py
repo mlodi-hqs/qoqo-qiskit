@@ -139,12 +139,11 @@ def run_pauli_operator(
     term_expectations: dict[PauliProduct, float] = {}
 
     for i, pub_res in enumerate(res):
-        # If you have multiple classical registers, pass names=[...] here.
-        ba = pub_res.join_data()  # BitArray ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.SamplerPubResult?utm_source=openai))
-        n_bits = ba.num_bits
+        bit_array = pub_res.join_data()  # BitArray ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.SamplerPubResult))
+        n_bits = bit_array.num_bits
 
         # per-shot samples (strings like "0101..."); length == shots
-        shots_i = ba.get_bitstrings()
+        shots_i = bit_array.get_bitstrings()
         all_shots.append(shots_i)
 
         # Build diagonal observables (I/Z only) for each term in this group.
@@ -153,8 +152,8 @@ def run_pauli_operator(
             for k in op_terms[i]
         ]
 
-        # Vector of <P_k> for this group; returns real floats for diagonal observables. ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.BitArray))
-        expvals = np.asarray(ba.expectation_values(obs), dtype=float)
+        # Vector of <P_k> for this group; returns real floats for diagonal observables.
+        expvals = np.asarray(bit_array.expectation_values(obs), dtype=float)
 
         # Store per-term expectations
         for k, ev in zip(op_terms[i], expvals, strict=False):
