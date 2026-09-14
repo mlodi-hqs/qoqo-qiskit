@@ -282,6 +282,7 @@ def _basis_rotation_from_z_basis(
     pauli_products: List[PauliProduct],
     qubit_mapping: Optional[Dict[int, int]],
 ) -> QuantumCircuit:
+    """Append basis-rotation gates that map X/Y eigenstates onto the Z basis before measurement."""
     collected_pauli_products, _ = _collect_pauli_products(pauli_products)
 
     mapping = qubit_mapping if qubit_mapping is not None else {}
