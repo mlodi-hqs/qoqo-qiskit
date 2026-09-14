@@ -17,8 +17,8 @@ import sys
 
 from qoqo_qiskit.utils import (
     struqture_hamiltonian_to_qiskit_op,
-    measure_spin_operator,
-    run_spin_operator,
+    measure_pauli_operator,
+    run_pauli_operator,
     _sort_by_length,
     _sort_spin_operator,
     _single_measurement_circuit,
@@ -60,33 +60,36 @@ def test_big_hamiltonian() -> None:
     assert res.to_list() == [("IYZXYZXYZXYZX", (0.5 + 0j)), ("XIIIIIIIIIIII", (0.25 + 0j))]
 
 
-def test_measure_spin_operator_empty() -> None:
-    """Test measure_spin_operator with an empty operator."""
+def test_measure_pauli_operator_empty() -> None:
+    """Test measure_pauli_operator with an empty operator."""
     pp = PauliProduct().x(0).z(1)
     po = PauliOperator()
     po.add_operator_product(pp, 0.5)
 
     with pytest.raises(ValueError) as exc:
-        _ = measure_spin_operator(po, "empty", False, None, 1)
-    assert "The number of spins in the operators passed is \
+        _ = measure_pauli_operator(po, "empty", False, None, 1)
+    assert (
+        "The number of spins in the operators passed is \
             2. The length of the \
             DefinitionBit input is 1, which is smaller. \
-            The measurement can therefore not be constructed." in str(exc.value)
+            The measurement can therefore not be constructed."
+        in str(exc.value)
+    )
 
 
-def test_measure_spin_operator_simple() -> None:
+def test_measure_pauli_operator_simple() -> None:
     pp = PauliProduct().x(0).z(1).y(4)
     po = PauliOperator()
     po.add_operator_product(pp, 1.7)
 
-    res, _, _ = measure_spin_operator(po, "test", False, None, 5)
+    res, _, _ = measure_pauli_operator(po, "test", False, None, 5)
 
     sc = _single_measurement_circuit([pp], "test_0", False, None, 5, 5)
 
     assert res[0] == sc
 
 
-def test_measure_spin_operator_complex() -> None:
+def test_measure_pauli_operator_complex() -> None:
     pp0 = PauliProduct().x(0).z(1).y(4)
     pp1 = PauliProduct().x(0).y(1)
     pp2 = PauliProduct().y(4).z(6)
@@ -95,7 +98,7 @@ def test_measure_spin_operator_complex() -> None:
     po.add_operator_product(pp1, 2.7)
     po.add_operator_product(pp2, 3.7)
 
-    res, _, _ = measure_spin_operator(po, "empty", False, None, 7)
+    res, _, _ = measure_pauli_operator(po, "empty", False, None, 7)
 
     circ1 = _single_measurement_circuit([pp0, pp2], "empty_0", False, None, 7, 7)
     circ2 = _single_measurement_circuit([pp1], "empty_1", False, None, 7, 7)
@@ -104,7 +107,7 @@ def test_measure_spin_operator_complex() -> None:
     assert res[1] == circ2
 
 
-def test_run_spin_operator_simple() -> None:
+def test_run_pauli_operator_simple() -> None:
     """Test deterministic execution and a weighted expectation value."""
     pp = PauliProduct().z(0).z(1)
     po = PauliOperator()
@@ -114,7 +117,7 @@ def test_run_spin_operator_simple() -> None:
     circuit += ops.PauliX(0)
     circuit += ops.Identity(1)
 
-    circuits, shots, term_expectations = run_spin_operator(
+    circuits, shots, term_expectations = run_pauli_operator(
         circuit,
         po,
         "test",
@@ -129,7 +132,7 @@ def test_run_spin_operator_simple() -> None:
     assert term_expectations[pp] == pytest.approx(-1.0)
 
 
-def test_run_spin_operator_complex() -> None:
+def test_run_pauli_operator_complex() -> None:
     """Test grouped execution and weighted expectations for multiple terms."""
     pp0 = PauliProduct().x(0).z(1).y(4)
     pp1 = PauliProduct().x(0).y(1)
@@ -144,7 +147,7 @@ def test_run_spin_operator_complex() -> None:
     circuit += ops.RotateX(4, -np.pi / 2)
     circuit += ops.Identity(6)
 
-    circuits, shots, term_expectations = run_spin_operator(
+    circuits, shots, term_expectations = run_pauli_operator(
         circuit,
         po,
         "test",
@@ -163,18 +166,18 @@ def test_run_spin_operator_complex() -> None:
     # Grouping: pp0 and pp2 are measurement-compatible (no conflicting Pauli on
     # any shared qubit) and share one circuit; pp1 conflicts with pp0 on qubit 1
     # (Z vs Y) and is measured in its own circuit.
-    ref_circuits, ref_terms, _ = measure_spin_operator(po, "test", False)
+    ref_circuits, ref_terms, _ = measure_pauli_operator(po, "test", False)
     assert len(ref_circuits) == 2
     assert set(ref_terms[0]) == {pp0, pp2}
     assert ref_terms[1] == [pp1]
-    # run_spin_operator must produce as many circuits as measure_spin_operator
-    # (the grouping is identical; run_spin_operator then composes the
+    # run_pauli_operator must produce as many circuits as measure_pauli_operator
+    # (the grouping is identical; run_pauli_operator then composes the
     # preparation circuit onto each measurement circuit, so the circuits
     # themselves are not expected to equal the bare measurement circuits).
     assert len(circuits) == len(ref_circuits)
 
 
-def test_run_spin_operator_undo_basis_rotation() -> None:
+def test_run_pauli_operator_undo_basis_rotation() -> None:
     """Test that undo_basis_rotation=True appends inverse rotations after measure.
 
     The recorded measurement outcomes are unaffected (the undo runs after the
@@ -188,14 +191,14 @@ def test_run_spin_operator_undo_basis_rotation() -> None:
     circuit = Circuit()
     circuit += ops.Hadamard(0)
 
-    circuits_undo, shots_undo, term_expectations_undo = run_spin_operator(
+    circuits_undo, shots_undo, term_expectations_undo = run_pauli_operator(
         circuit,
         po,
         "test_undo",
         True,
         number_measurements=1024,
     )
-    circuits_no_undo, _, term_expectations_no_undo = run_spin_operator(
+    circuits_no_undo, _, term_expectations_no_undo = run_pauli_operator(
         circuit,
         po,
         "test_no_undo",
@@ -213,7 +216,7 @@ def test_run_spin_operator_undo_basis_rotation() -> None:
     assert circuits_undo[0].size() > circuits_no_undo[0].size()
 
 
-def test_run_spin_operator_single_x_term() -> None:
+def test_run_pauli_operator_single_x_term() -> None:
     """Test deterministic expectation of an X term on the |+> state.
 
     |+> is the +1 eigenstate of X, so <X> = +1.0 exactly. This exercises the
@@ -227,7 +230,7 @@ def test_run_spin_operator_single_x_term() -> None:
     circuit = Circuit()
     circuit += ops.Hadamard(0)
 
-    circuits, shots, term_expectations = run_spin_operator(
+    circuits, shots, term_expectations = run_pauli_operator(
         circuit,
         po,
         "test",
@@ -241,7 +244,7 @@ def test_run_spin_operator_single_x_term() -> None:
     assert term_expectations[pp] == pytest.approx(1.0)
 
 
-def test_run_spin_operator_constant_circuit() -> None:
+def test_run_pauli_operator_constant_circuit() -> None:
     """Test that the optional constant circuit is executed first."""
     pp = PauliProduct().z(0)
     po = PauliOperator()
@@ -253,7 +256,7 @@ def test_run_spin_operator_constant_circuit() -> None:
     input_circuit = Circuit()
     input_circuit += ops.PauliX(0)
 
-    _, shots, term_expectations = run_spin_operator(
+    _, shots, term_expectations = run_pauli_operator(
         input_circuit,
         po,
         "test",
@@ -267,13 +270,13 @@ def test_run_spin_operator_constant_circuit() -> None:
     assert term_expectations[pp] == pytest.approx(1.0)
 
 
-def test_run_spin_operator_empty_operator() -> None:
+def test_run_pauli_operator_empty_operator() -> None:
     """Test execution with an empty operator."""
     po = PauliOperator()
     circuit = Circuit()
     circuit += ops.Identity(0)
 
-    assert run_spin_operator(
+    assert run_pauli_operator(
         circuit,
         po,
         "test",
@@ -282,7 +285,7 @@ def test_run_spin_operator_empty_operator() -> None:
     ) == ([], [], {})
 
 
-def test_run_spin_operator_negative_measurements() -> None:
+def test_run_pauli_operator_negative_measurements() -> None:
     """Test rejection of a negative shot count."""
     pp = PauliProduct().z(0)
     po = PauliOperator()
@@ -292,7 +295,7 @@ def test_run_spin_operator_negative_measurements() -> None:
     circuit += ops.Identity(0)
 
     with pytest.raises(ValueError, match="cannot be negative"):
-        run_spin_operator(
+        run_pauli_operator(
             circuit,
             po,
             "test",
@@ -301,7 +304,7 @@ def test_run_spin_operator_negative_measurements() -> None:
         )
 
 
-def test_run_spin_operator_preparation_too_wide() -> None:
+def test_run_pauli_operator_preparation_too_wide() -> None:
     """Test rejection of a preparation circuit that is too wide."""
     pp = PauliProduct().z(0)
     po = PauliOperator()
@@ -314,7 +317,7 @@ def test_run_spin_operator_preparation_too_wide() -> None:
         ValueError,
         match="preparation circuit requires more qubits",
     ):
-        run_spin_operator(
+        run_pauli_operator(
             circuit,
             po,
             "test",
