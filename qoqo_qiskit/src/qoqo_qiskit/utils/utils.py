@@ -207,11 +207,11 @@ def measure_pauli_operator(
     operators_terms: List[List[PauliProduct]] = []
     operators_coeffs: List[List[complex]] = []
 
-    for i, pp in enumerate(operators):
-        terms = pp.keys()
-        coeffs = [complex(pp.get(t)) for t in terms]
+    for i, po in enumerate(operators):
+        terms = po.keys()
+        coeffs = [complex(po.get(t)) for t in terms]
         circuit = _single_measurement_circuit(
-            pp.keys(),
+            po.keys(),
             f"{name}_{i}",
             undo_basis_rotation,
             qubit_mapping,
