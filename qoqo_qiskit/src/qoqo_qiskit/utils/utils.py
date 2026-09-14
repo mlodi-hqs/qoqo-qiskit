@@ -209,7 +209,7 @@ def measure_pauli_operator(
 
     for i, po in enumerate(operators):
         terms = po.keys()
-        coeffs = [complex(po.get(t)) for t in terms]
+        coeffs = po.values()
         circuit = _single_measurement_circuit(
             po.keys(),
             f"{name}_{i}",
