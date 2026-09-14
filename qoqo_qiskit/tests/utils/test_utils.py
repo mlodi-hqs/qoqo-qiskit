@@ -34,7 +34,7 @@ from struqture_py.spins import PauliHamiltonian, PauliProduct, PauliOperator  # 
 
 def test_basic_hamiltonian() -> None:
     """Test struqture_hamiltonian_to_qiskit_op with a basic Hamiltonian."""
-    pp = PauliProduct().x(0).z(1).y(2)
+    pp = PauliProduct().from_string("0X1Z2Y")
 
     hamiltonian = PauliHamiltonian()
     hamiltonian.add_operator_product(pp, 0.5)
@@ -47,8 +47,8 @@ def test_basic_hamiltonian() -> None:
 
 def test_big_hamiltonian() -> None:
     """Test struqture_hamiltonian_to_qiskit_op with a big Hamiltonian."""
-    pp = PauliProduct().x(0).z(1).y(2).x(3).z(4).y(5).x(6).z(7).y(8).x(9).z(10).y(11)
-    pp2 = PauliProduct().x(12)
+    pp = PauliProduct().from_string("0X1Z2Y3X4Z5Y6X7Z8Y9X10Z11Y")
+    pp2 = PauliProduct().from_string("12X")
 
     hamiltonian = PauliHamiltonian()
     hamiltonian.add_operator_product(pp, 0.5)
@@ -62,7 +62,7 @@ def test_big_hamiltonian() -> None:
 
 def test_measure_pauli_operator_empty() -> None:
     """Test measure_pauli_operator with an empty operator."""
-    pp = PauliProduct().x(0).z(1)
+    pp = PauliProduct().from_string("0X1Z")
     po = PauliOperator()
     po.add_operator_product(pp, 0.5)
 
@@ -78,7 +78,7 @@ def test_measure_pauli_operator_empty() -> None:
 
 
 def test_measure_pauli_operator_simple() -> None:
-    pp = PauliProduct().x(0).z(1).y(4)
+    pp = PauliProduct().from_string("0X1Z4Y")
     po = PauliOperator()
     po.add_operator_product(pp, 1.7)
 
@@ -90,9 +90,9 @@ def test_measure_pauli_operator_simple() -> None:
 
 
 def test_measure_pauli_operator_complex() -> None:
-    pp0 = PauliProduct().x(0).z(1).y(4)
-    pp1 = PauliProduct().x(0).y(1)
-    pp2 = PauliProduct().y(4).z(6)
+    pp0 = PauliProduct().from_string("0X1Z4Y")
+    pp1 = PauliProduct().from_string("0X1Y")
+    pp2 = PauliProduct().from_string("4Y6Z")
     po = PauliOperator()
     po.add_operator_product(pp0, 1.7)
     po.add_operator_product(pp1, 2.7)
@@ -109,7 +109,7 @@ def test_measure_pauli_operator_complex() -> None:
 
 def test_run_pauli_operator_simple() -> None:
     """Test deterministic execution and a weighted expectation value."""
-    pp = PauliProduct().z(0).z(1)
+    pp = PauliProduct().from_string("0Z1Z")
     po = PauliOperator()
     po.add_operator_product(pp, 2.5)
 
@@ -134,9 +134,9 @@ def test_run_pauli_operator_simple() -> None:
 
 def test_run_pauli_operator_complex() -> None:
     """Test grouped execution and weighted expectations for multiple terms."""
-    pp0 = PauliProduct().x(0).z(1).y(4)
-    pp1 = PauliProduct().x(0).y(1)
-    pp2 = PauliProduct().y(4).z(6)
+    pp0 = PauliProduct().from_string("0X1Z4Y")
+    pp1 = PauliProduct().from_string("0X1Y")
+    pp2 = PauliProduct().from_string("4Y6Z")
     po = PauliOperator()
     po.add_operator_product(pp0, 1.7)
     po.add_operator_product(pp1, 2.7)
@@ -184,7 +184,7 @@ def test_run_pauli_operator_undo_basis_rotation() -> None:
     measure), so expectation values match the False case, but the measurement
     circuit itself carries the trailing inverse-rotation gates.
     """
-    pp = PauliProduct().x(0)
+    pp = PauliProduct().from_string("0X")
     po = PauliOperator()
     po.add_operator_product(pp, 1.0)
 
@@ -223,7 +223,7 @@ def test_run_pauli_operator_single_x_term() -> None:
     full measurement pipeline (basis rotation -> Z measurement -> expectation
     extraction) for a non-Z Pauli with a tight, deterministic assertion.
     """
-    pp = PauliProduct().x(0)
+    pp = PauliProduct().from_string("0X")
     po = PauliOperator()
     po.add_operator_product(pp, 1.0)
 
@@ -246,7 +246,7 @@ def test_run_pauli_operator_single_x_term() -> None:
 
 def test_run_pauli_operator_constant_circuit() -> None:
     """Test that the optional constant circuit is executed first."""
-    pp = PauliProduct().z(0)
+    pp = PauliProduct().from_string("0Z")
     po = PauliOperator()
     po.add_operator_product(pp, 1.5)
 
@@ -287,7 +287,7 @@ def test_run_pauli_operator_empty_operator() -> None:
 
 def test_run_pauli_operator_negative_measurements() -> None:
     """Test rejection of a negative shot count."""
-    pp = PauliProduct().z(0)
+    pp = PauliProduct().from_string("0Z")
     po = PauliOperator()
     po.add_operator_product(pp, 1.0)
 
@@ -306,7 +306,7 @@ def test_run_pauli_operator_negative_measurements() -> None:
 
 def test_run_pauli_operator_preparation_too_wide() -> None:
     """Test rejection of a preparation circuit that is too wide."""
-    pp = PauliProduct().z(0)
+    pp = PauliProduct().from_string("0Z")
     po = PauliOperator()
     po.add_operator_product(pp, 1.0)
 
@@ -328,9 +328,9 @@ def test_run_pauli_operator_preparation_too_wide() -> None:
 
 def test_sort_by_length() -> None:
     """Test _sort_by_length function."""
-    pp_1 = PauliProduct().x(0).z(1).y(4)
-    pp_2 = PauliProduct().x(0).z(2).y(4)
-    pp_3 = PauliProduct().x(0).y(1)
+    pp_1 = PauliProduct().from_string("0X1Z4Y")
+    pp_2 = PauliProduct().from_string("0X2Z4Y")
+    pp_3 = PauliProduct().from_string("0X1Y")
 
     hamiltonian = PauliOperator()
 
@@ -357,11 +357,11 @@ def test_sort_by_length() -> None:
 
 
 def test_sort_spin_operator() -> None:
-    pp_o = PauliProduct()
-    pp_1 = PauliProduct().x(0).z(1).y(4)
-    pp_2 = PauliProduct().x(0).z(2).y(4)
-    pp_3 = PauliProduct().x(0).y(1)
-    pp_4 = PauliProduct().y(4).z(6)
+    pp_o = PauliProduct().from_string("")
+    pp_1 = PauliProduct().from_string("0X1Z4Y")
+    pp_2 = PauliProduct().from_string("0X2Z4Y")
+    pp_3 = PauliProduct().from_string("0X1Y")
+    pp_4 = PauliProduct().from_string("4Y6Z")
 
     po_emp = PauliOperator()
     po_1 = PauliOperator()
@@ -397,7 +397,7 @@ def test_sort_spin_operator() -> None:
 
 
 def test_single_measurement_circuit_empty() -> None:
-    pp = PauliProduct()
+    pp = PauliProduct().from_string("")
     circuit = QuantumCircuit(2)
     creg = ClassicalRegister(2, "test")
     circuit.add_register(creg)
@@ -408,10 +408,10 @@ def test_single_measurement_circuit_empty() -> None:
 
 
 def test_single_measurement_circuit_single_measurement() -> None:
-    ppemp = PauliProduct()
-    ppz = PauliProduct().z(0)
-    ppx = PauliProduct().x(0)
-    ppy = PauliProduct().y(0)
+    ppemp = PauliProduct().from_string("")
+    ppz = PauliProduct().from_string("0Z")
+    ppx = PauliProduct().from_string("0X")
+    ppy = PauliProduct().from_string("0Y")
 
     creg = ClassicalRegister(1, "test")
 
@@ -436,9 +436,9 @@ def test_single_measurement_circuit_single_measurement() -> None:
 
 
 def test_single_measurement_circuit_error() -> None:
-    pp0 = PauliProduct().z(4)
-    pp1 = PauliProduct().x(4)
-    pp2 = PauliProduct().y(4)
+    pp0 = PauliProduct().from_string("4Z")
+    pp1 = PauliProduct().from_string("4X")
+    pp2 = PauliProduct().from_string("4Y")
 
     with pytest.raises(ValueError):
         _ = _single_measurement_circuit([pp2, pp1], "test", True, None, 5, None)
@@ -448,9 +448,9 @@ def test_single_measurement_circuit_error() -> None:
 
 
 def test_single_measurement_circuit_multi_operators() -> None:
-    ppemp = PauliProduct()
-    pp0 = PauliProduct().x(1).y(3).z(5)
-    pp1 = PauliProduct().y(3)
+    ppemp = PauliProduct().from_string("")
+    pp0 = PauliProduct().from_string("1X3Y5Z")
+    pp1 = PauliProduct().from_string("3Y")
 
     circuit0 = QuantumCircuit(6)
     creg = ClassicalRegister(6, "test")
@@ -465,9 +465,9 @@ def test_single_measurement_circuit_multi_operators() -> None:
 
 
 def test_single_measurement_circuit_multi_operators_def_length() -> None:
-    ppemp = PauliProduct()
-    pp0 = PauliProduct().x(1).y(3).z(5)
-    pp1 = PauliProduct().y(3)
+    ppemp = PauliProduct().from_string("")
+    pp0 = PauliProduct().from_string("1X3Y5Z")
+    pp1 = PauliProduct().from_string("3Y")
 
     circuit0 = QuantumCircuit(6)
     creg = ClassicalRegister(6, "test")
@@ -482,7 +482,7 @@ def test_single_measurement_circuit_multi_operators_def_length() -> None:
 
 
 def test_single_measurement_circuit_use_mapping() -> None:
-    pps = [PauliProduct().x(1), PauliProduct()]
+    pps = [PauliProduct().from_string("1X"), PauliProduct().from_string("")]
 
     mapping = {1: 10}
 
@@ -496,10 +496,10 @@ def test_single_measurement_circuit_use_mapping() -> None:
 
 
 def test_collect_pauli_products() -> None:
-    pp = PauliProduct().x(0).z(1)
-    pp2 = PauliProduct().x(0).z(2).y(4)
-    p_err = PauliProduct().y(0)
-    pp_comb = PauliProduct().x(0).z(1).z(2).y(4)
+    pp = PauliProduct().from_string("0X1Z")
+    pp2 = PauliProduct().from_string("0X2Z4Y")
+    p_err = PauliProduct().from_string("0Y")
+    pp_comb = PauliProduct().from_string("0X1Z2Z4Y")
 
     assert (pp_comb, 5) == _collect_pauli_products([pp, pp2])
 
@@ -508,8 +508,8 @@ def test_collect_pauli_products() -> None:
 
 
 def test_basis_rotation_from_z_basis() -> None:
-    pp = PauliProduct().x(0).z(1)
-    pp2 = PauliProduct().x(0).z(2).y(4)
+    pp = PauliProduct().from_string("0X1Z")
+    pp2 = PauliProduct().from_string("0X2Z4Y")
     circuit = QuantumCircuit(5)
 
     _basis_rotation_from_z_basis(circuit, [pp, pp2], None)
@@ -521,12 +521,12 @@ def test_basis_rotation_from_z_basis() -> None:
 
 
 def test_z_label_from_pauli_product() -> None:
-    pp0 = PauliProduct().x(0).z(1)
-    pp1 = PauliProduct().x(0).z(2).y(4)
-    pp2 = PauliProduct().y(0)
-    pp3 = PauliProduct().z(5)
-    pp4 = PauliProduct().z(5).x(3)
-    pp5 = PauliProduct().z(5).y(3).z(0)
+    pp0 = PauliProduct().from_string("0X1Z")
+    pp1 = PauliProduct().from_string("0X2Z4Y")
+    pp2 = PauliProduct().from_string("0Y")
+    pp3 = PauliProduct().from_string("5Z")
+    pp4 = PauliProduct().from_string("5Z3X")
+    pp5 = PauliProduct().from_string("5Z3Y0Z")
 
     mapping = {5: 4}
     mapping_er = {0: 7}
