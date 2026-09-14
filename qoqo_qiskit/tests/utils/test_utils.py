@@ -68,13 +68,10 @@ def test_measure_pauli_operator_empty() -> None:
 
     with pytest.raises(ValueError) as exc:
         _ = measure_pauli_operator(po, "empty", False, None, 1)
-    assert (
-        "The number of spins in the operators passed is \
+    assert "The number of spins in the operators passed is \
             2. The length of the \
             DefinitionBit input is 1, which is smaller. \
-            The measurement can therefore not be constructed."
-        in str(exc.value)
-    )
+            The measurement can therefore not be constructed." in str(exc.value)
 
 
 def test_measure_pauli_operator_simple() -> None:

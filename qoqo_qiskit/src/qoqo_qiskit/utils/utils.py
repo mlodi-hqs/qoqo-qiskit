@@ -139,7 +139,9 @@ def run_pauli_operator(
     term_expectations: dict[PauliProduct, float] = {}
 
     for i, pub_res in enumerate(res):
-        bit_array = pub_res.join_data()  # BitArray ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.SamplerPubResult))
+        bit_array = (
+            pub_res.join_data()
+        )  # BitArray ([docs.quantum.ibm.com](https://docs.quantum.ibm.com/api/qiskit/qiskit.primitives.SamplerPubResult))
         n_bits = bit_array.num_bits
 
         # per-shot samples (strings like "0101..."); length == shots
@@ -195,12 +197,10 @@ def measure_pauli_operator(
             `input_operator`.
     """
     if creg_length is not None and creg_length < input_operator.current_number_spins():
-        raise ValueError(
-            f"The number of spins in the operators passed is \
+        raise ValueError(f"The number of spins in the operators passed is \
             {input_operator.current_number_spins()}. The length of the \
             DefinitionBit input is {creg_length}, which is smaller. \
-            The measurement can therefore not be constructed."
-        )
+            The measurement can therefore not be constructed.")
 
     operators: List[PauliOperator] = _sort_spin_operator(input_operator)
     circuits: List[QuantumCircuit] = []
