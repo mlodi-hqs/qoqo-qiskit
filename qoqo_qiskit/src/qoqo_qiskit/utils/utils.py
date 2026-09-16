@@ -56,10 +56,7 @@ def struqture_hamiltonian_to_qiskit_op(
                 q = (n_qubits - 1 - idx) if reverse_qubit_order else idx
                 if not (0 <= q < n_qubits):
                     raise IndexError(
-q = (n_qubits - 1 - idx) if reverse_qubit_order else idx  # due to endianness
-if not (0 <= q < n_qubits):
-raise IndexError(
-f"Site index {idx} (mapped to qubit {q}) out of range 0..{n_qubits - 1}"
+                        f"Site index {idx} (mapped to qubit {q}) out of range 0..{n_qubits - 1}"
                     )
                 pauli[q] = op
         labels.append("".join(pauli))
