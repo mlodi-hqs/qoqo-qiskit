@@ -20,7 +20,7 @@ from qoqo_qiskit.utils import (
     measure_pauli_operator,
     run_pauli_operator,
     _sort_by_length,
-    _sort_spin_operator,
+    _sort_pauli_operator,
     _single_measurement_circuit,
     _collect_pauli_products,
     _basis_rotation_from_z_basis,
