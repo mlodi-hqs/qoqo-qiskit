@@ -384,13 +384,13 @@ def test_sort_spin_operator() -> None:
     po_8.add_operator_product(pp_1, 1)
     po_8.add_operator_product(pp_4, 1)
 
-    assert _sort_spin_operator(po_emp) == []
-    assert _sort_spin_operator(po_1) == [po_1]
-    assert _sort_spin_operator(po_2) == [po_2]
-    assert _sort_spin_operator(po_3) == [po_3]
-    assert _sort_spin_operator(po_4) == [po_2, po_6]
-    assert _sort_spin_operator(po_5) == [po_2, po_6]
-    assert _sort_spin_operator(po_7) == [po_8, po_6]
+    assert _sort_pauli_operator(po_emp) == []
+    assert _sort_pauli_operator(po_1) == [po_1]
+    assert _sort_pauli_operator(po_2) == [po_2]
+    assert _sort_pauli_operator(po_3) == [po_3]
+    assert _sort_pauli_operator(po_4) == [po_2, po_6]
+    assert _sort_pauli_operator(po_5) == [po_2, po_6]
+    assert _sort_pauli_operator(po_7) == [po_8, po_6]
 
 
 def test_single_measurement_circuit_empty() -> None:
