@@ -53,7 +53,8 @@ def struqture_hamiltonian_to_qiskit_op(
             for m in token_re.finditer(s):
                 idx = int(m.group(1))  # site index (can be multi-digit)
                 op = m.group(2)  # 'X', 'Y', or 'Z'
-                q = (n_qubits - 1 - idx) if reverse_qubit_order else idx  # indexing due to endianness
+                # indexing due to endianness:
+                q = (n_qubits - 1 - idx) if reverse_qubit_order else idx
                 if not (0 <= q < n_qubits):
                     raise IndexError(
                         f"Site index {idx} (mapped to qubit {q}) out of range 0..{n_qubits - 1}"
