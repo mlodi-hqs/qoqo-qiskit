@@ -56,7 +56,10 @@ def struqture_hamiltonian_to_qiskit_op(
                 q = (n_qubits - 1 - idx) if reverse_qubit_order else idx
                 if not (0 <= q < n_qubits):
                     raise IndexError(
-                        f"Site index {idx} (mapped to qubit {q}) out of range 0..{n_qubits - 1}"
+q = (n_qubits - 1 - idx) if reverse_qubit_order else idx  # due to endianness
+if not (0 <= q < n_qubits):
+raise IndexError(
+f"Site index {idx} (mapped to qubit {q}) out of range 0..{n_qubits - 1}"
                     )
                 pauli[q] = op
         labels.append("".join(pauli))
@@ -202,7 +205,7 @@ def measure_pauli_operator(
             DefinitionBit input is {creg_length}, which is smaller. \
             The measurement can therefore not be constructed.")
 
-    operators: List[PauliOperator] = _sort_spin_operator(input_operator)
+    operators: List[PauliOperator] = _sort_pauli_operator(input_operator)
     circuits: List[QuantumCircuit] = []
     operators_terms: List[List[PauliProduct]] = []
     operators_coeffs: List[List[complex]] = []
@@ -225,7 +228,7 @@ def measure_pauli_operator(
     return (circuits, operators_terms, operators_coeffs)
 
 
-def _sort_spin_operator(input_operator: PauliOperator) -> List[PauliOperator]:
+def _sort_pauli_operator(input_operator: PauliOperator) -> List[PauliOperator]:
     """Split a PauliOperator object into measurement-compatible PauliProducts."""
     output_ops: List[PauliOperator] = []
     sorted_keys = _sort_by_length(input_operator)
@@ -412,7 +415,7 @@ def _z_label_from_pauli_product(
         if not (0 <= qubit < n):
             raise ValueError(f"Mapped qubit index {qubit} out of range for n={n}")
 
-        # Put 'Z' on measured qubit position.
+        # Put 'Z' on measured qubit position (indexing is due to endianness).
         label[n - 1 - qubit] = "Z"
 
     return "".join(label)
