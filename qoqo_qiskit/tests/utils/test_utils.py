@@ -353,7 +353,7 @@ def test_sort_by_length() -> None:
     assert _sort_by_length(hamiltonian_4) == [pp_1, pp_3]
 
 
-def test_sort_spin_operator() -> None:
+def test_sort_pauli_operator() -> None:
     pp_o = PauliProduct().from_string("")
     pp_1 = PauliProduct().from_string("0X1Z4Y")
     pp_2 = PauliProduct().from_string("0X2Z4Y")
